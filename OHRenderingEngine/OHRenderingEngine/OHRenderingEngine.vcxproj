@@ -19,7 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="OHRenderingEngine.cpp" />
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="src\game\Game.cpp" />
+    <ClCompile Include="src\dependencies\utils\glad.c" />
+    <ClCompile Include="src\dependencies\utils\stb_image.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\game\Game.h" />
+    <ClInclude Include="src\dependencies\utils\glm_util.h" />
+    <ClInclude Include="src\dependencies\utils\stb_image.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -76,22 +84,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine\src\dependencies\include;K:\study\openGL\RenderingEngine\OHRenderingEngine\OHRenderingEngine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
