@@ -1,9 +1,14 @@
 #include <iostream>
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "Game.h"
+#include "renderer/Shader.h"
+#include "renderer/VertexBuffer.h"
+#include "renderer/IndexBuffer.h"
+#include "renderer/VertexArray.h"
+#include "renderer/VertexBufferLayout.h"
+#include "renderer/Debugger.h"
 
 Game::Game()
 {
@@ -26,10 +31,37 @@ bool Game::GameEnded()
 
 int Game::RunLevel()
 {
+
+	float vertices[] = {
+		-0.5f,	 0.5f,	0.0f,	1.0f, 0.0f, 0.0f,	//0
+		-0.5f,	-0.5f,	0.0f,	0.0f, 1.0f, 0.0f,	//1
+		 0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	//2
+		 0.5f,	 0.5f,	0.0f,	1.0f, 0.0f, 1.0f	//3
+
+	};
+	unsigned int indices[] = {
+		0, 1, 3,
+		1, 2, 3
+	};
+	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
+	VertexArray vao;
+
+	VertexBufferLayout vbl;
+	VertexBuffer vb(vertices, 6 * 4 * sizeof(float), GL_STATIC_DRAW);
+	
+	IndexBuffer ib(indices, 6 * sizeof(unsigned int), GL_STATIC_DRAW);
+	vbl.Push<float>(3, false);
+	vbl.Push<float>(3, false);
+	
+	vao.AddBuffer(vb, vbl);
+
 	while (!glfwWindowShouldClose(m_current_window_))
 	{
-		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		vao.Bind();
+		simple_shader.Use();
+		GlCall(glClearColor(0.0f, 0.0f, 1.0f, 1.0f));
+		GlCall(glClear(GL_COLOR_BUFFER_BIT));
+		GlCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 		glfwSwapBuffers(m_current_window_);
 		glfwPollEvents();
 		ProcessInput();

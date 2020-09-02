@@ -8,7 +8,7 @@
 const unsigned int MAJOR = 3; 
 const unsigned int MINOR = 3;
 //Window size
-const unsigned int WIDTH = 1080;
+const unsigned int WIDTH = 720;
 const unsigned int HEIGHT = 720;
 
 class Game
