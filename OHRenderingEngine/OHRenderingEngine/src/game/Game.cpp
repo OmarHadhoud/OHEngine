@@ -37,33 +37,49 @@ int Game::RunLevel()
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 tex_coord;
+		float tex_num;
 	};
 	Vertex vertices[] = {
-		glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	//0
-		glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	//1
-		glm::vec3(0.5f,-0.5f,0.0f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	//2
-		glm::vec3(0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f)	//3
+		glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	1,	//0
+		glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//1
+		glm::vec3(0.5f,-0.5f,0.0f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//2
+		glm::vec3(0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1,	//3
+		glm::vec3(2-0.5f,2+0.5f,0.0f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	2,	//4
+		glm::vec3(2-0.5f,2-0.5f,0.0f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	2,	//5
+		glm::vec3(2+0.5f,2-0.5f,0.0f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	2,	//6
+		glm::vec3(2+0.5f,2+0.5f,0.0f),	glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	2	//7
 	};
 	unsigned int indices[] = {
 		0, 1, 3,
-		1, 2, 3
+		1, 2, 3,
+		4, 5, 7,
+		5, 6, 7
 	};
-	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
-	stbi_set_flip_vertically_on_load_thread(1);
-	Texture tex("res/textures/2.jpg");
-
-	tex.Activate(0);
-	tex.Bind();
-
 	VertexArray vao;
 
+	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
+	stbi_set_flip_vertically_on_load_thread(1);
+	Texture tex1("res/textures/1.jpg");
+	Texture tex2("res/textures/2.jpg");
+
+	tex1.Activate(0);
+	tex1.Bind();
+	simple_shader.SetInt("texture0", 0);
+
+	tex2.Activate(1);
+	tex2.Bind();
+	simple_shader.SetInt("texture1", 1);
+
+
+
 	VertexBufferLayout vbl;
-	VertexBuffer vb(vertices, 8 * 4 * sizeof(float), GL_STATIC_DRAW);
+	VertexBuffer vb(vertices, 9 * 8 * sizeof(float), GL_STATIC_DRAW);
 	
-	IndexBuffer ib(indices, 6 * sizeof(unsigned int), GL_STATIC_DRAW);
+	IndexBuffer ib(indices, 12 * sizeof(unsigned int), GL_STATIC_DRAW);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(2, false);
+	vbl.Push<float>(1, false);
 	
 	vao.AddBuffer(vb, vbl);
 
@@ -99,7 +115,7 @@ int Game::RunLevel()
 		simple_shader.SetMat4("projection", projection);
 
 		//Render using openGL
-		Renderer::Draw(vao, simple_shader, 6, 0);
+		Renderer::Draw(vao, simple_shader, 12, 0);
 
 		//Render GUI onto screen
 		ImGui::Render();
