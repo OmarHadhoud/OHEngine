@@ -13,11 +13,9 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui.h"
 
-Game::Game()
+Game::Game(): m_window_width_(WIDTH), m_window_height_(HEIGHT)
 {
 	InitializeGLFW(MAJOR, MINOR);
-	m_window_width_ = WIDTH;
-	m_window_height_ = HEIGHT;
 }
 
 

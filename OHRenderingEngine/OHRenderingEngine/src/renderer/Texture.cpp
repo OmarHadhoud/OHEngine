@@ -27,7 +27,7 @@ Texture::Texture(const char *path)
 			format = GL_RGB;
 		else if (nrChannels == 4)
 			format = GL_RGBA;
-		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, data));
+		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data));
 		GlCall(glGenerateMipmap(GL_TEXTURE_2D));
 	}
 	else
