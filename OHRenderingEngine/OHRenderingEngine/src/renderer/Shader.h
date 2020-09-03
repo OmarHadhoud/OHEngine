@@ -20,9 +20,6 @@ public:
 	Shader(const char* vertexPath, const char* fragmentPath);
 	//To use the shader program
 	void Use() const;
-	//TODO: Should be moved to Texture class
-	//Generates the texture and returns it's id
-	unsigned int GenerateTexture(const char* path, const char* type);
 	//Utility uniform functions
 	void SetBool(const std::string &name, bool value) const;
 	void SetInt(const std::string &name, int value) const;

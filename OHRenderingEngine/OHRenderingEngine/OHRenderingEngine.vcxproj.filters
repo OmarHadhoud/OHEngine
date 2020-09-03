@@ -9,6 +9,7 @@
     <ClCompile Include="src\renderer\VertexBuffer.cpp" />
     <ClCompile Include="src\renderer\IndexBuffer.cpp" />
     <ClCompile Include="src\renderer\VertexArray.cpp" />
+    <ClCompile Include="src\renderer\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dependencies\utils\glm_util.h" />
@@ -20,5 +21,6 @@
     <ClInclude Include="src\renderer\Debugger.h" />
     <ClInclude Include="src\renderer\VertexBufferLayout.h" />
     <ClInclude Include="src\renderer\VertexArray.h" />
+    <ClInclude Include="src\renderer\Texture.h" />
   </ItemGroup>
 </Project>

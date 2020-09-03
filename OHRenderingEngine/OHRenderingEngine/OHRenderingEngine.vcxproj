@@ -27,6 +27,7 @@
     <ClCompile Include="src\renderer\Shader.cpp" />
     <ClCompile Include="src\renderer\VertexBuffer.cpp" />
     <ClCompile Include="src\renderer\VertexArray.cpp" />
+    <ClCompile Include="src\renderer\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\Game.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="src\renderer\VertexBuffer.h" />
     <ClInclude Include="src\renderer\VertexArray.h" />
     <ClInclude Include="src\renderer\VertexBufferLayout.h" />
+    <ClInclude Include="src\renderer\Texture.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

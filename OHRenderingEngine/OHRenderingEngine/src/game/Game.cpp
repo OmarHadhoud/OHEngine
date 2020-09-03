@@ -8,6 +8,7 @@
 #include "renderer/IndexBuffer.h"
 #include "renderer/VertexArray.h"
 #include "renderer/VertexBufferLayout.h"
+#include "renderer/Texture.h"
 #include "renderer/Debugger.h"
 
 Game::Game()
@@ -33,25 +34,32 @@ int Game::RunLevel()
 {
 
 	float vertices[] = {
-		-0.5f,	 0.5f,	0.0f,	1.0f, 0.0f, 0.0f,	//0
-		-0.5f,	-0.5f,	0.0f,	0.0f, 1.0f, 0.0f,	//1
-		 0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	//2
-		 0.5f,	 0.5f,	0.0f,	1.0f, 0.0f, 1.0f	//3
-
+		//Coordinates			//Colors			//Texture coordinates
+		-0.5f,	 0.5f,	0.0f,	1.0f, 0.0f, 0.0f,	 0.0f,	 1.0f,	//0
+		-0.5f,	-0.5f,	0.0f,	0.0f, 1.0f, 0.0f,	 0.0f,	 0.0f,	//1
+		 0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	 1.0f,	 0.0f,	//2
+		 0.5f,	 0.5f,	0.0f,	1.0f, 0.0f, 1.0f,	 1.0f,	 1.0f	//3
 	};
 	unsigned int indices[] = {
 		0, 1, 3,
 		1, 2, 3
 	};
 	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
+	stbi_set_flip_vertically_on_load_thread(1);
+	Texture tex("res/textures/2.jpg");
+
+	tex.Activate(0);
+	tex.Bind();
+
 	VertexArray vao;
 
 	VertexBufferLayout vbl;
-	VertexBuffer vb(vertices, 6 * 4 * sizeof(float), GL_STATIC_DRAW);
+	VertexBuffer vb(vertices, 8 * 4 * sizeof(float), GL_STATIC_DRAW);
 	
 	IndexBuffer ib(indices, 6 * sizeof(unsigned int), GL_STATIC_DRAW);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(3, false);
+	vbl.Push<float>(2, false);
 	
 	vao.AddBuffer(vb, vbl);
 
@@ -78,6 +86,7 @@ int Game::Run()
 		std::cout << "ERROR: COULDN'T CREATE WINDOW" << std::endl;
 		return -1;
 	}
+	AssignGLFWCallbacks();
 	//Load GLAD function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -109,4 +118,17 @@ void Game::ProcessInput()
 {
 	if (glfwGetKey(m_current_window_, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(m_current_window_, true);
+}
+
+
+
+void Game::AssignGLFWCallbacks() const
+{
+	glfwSetWindowSizeCallback(m_current_window_, window_size_callback);
+}
+
+//GLFW Callback functions
+void window_size_callback(GLFWwindow *window, int width, int height)
+{
+	GlCall(glViewport(0, 0, width, height));
 }

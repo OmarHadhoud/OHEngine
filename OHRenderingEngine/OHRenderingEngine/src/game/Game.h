@@ -27,6 +27,10 @@ private:
 	void CreateWindow();
 	int RunLevel();
 	void ProcessInput();
+	void AssignGLFWCallbacks() const;
 };
+
+//GLFW callback functions
+void window_size_callback(GLFWwindow *window, int width, int height);
 
 #endif // !GAME_H
