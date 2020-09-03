@@ -28,6 +28,7 @@ private:
 	int RunLevel();
 	void ProcessInput();
 	void AssignGLFWCallbacks() const;
+	void SetupIMGUI() const;
 };
 
 //GLFW callback functions
