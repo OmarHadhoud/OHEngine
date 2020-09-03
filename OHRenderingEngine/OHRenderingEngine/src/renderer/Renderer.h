@@ -16,7 +16,7 @@ public:
 	Renderer();
 	~Renderer();
 	static void ClearScreen(float r, float g, float b, float a);
-	static void Draw(VertexArray &vao, Shader &shader, unsigned int count, unsigned int offset);
+	static void Draw(const VertexArray &vao, const Shader &shader, unsigned int count, unsigned int offset);
 	static void ResizeWindow(int width, int height);
 };
 

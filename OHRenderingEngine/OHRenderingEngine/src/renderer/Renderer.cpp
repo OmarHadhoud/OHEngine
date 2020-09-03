@@ -17,7 +17,7 @@ void Renderer::ClearScreen(float r, float g, float b, float a)
 	GlCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
-void Renderer::Draw(VertexArray & vao, Shader & shader, unsigned int count, unsigned int offset)
+void Renderer::Draw(const VertexArray & vao, const Shader & shader, unsigned int count, unsigned int offset)
 {
 	vao.Bind();
 	shader.Use();
