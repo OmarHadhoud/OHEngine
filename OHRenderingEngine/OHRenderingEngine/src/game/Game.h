@@ -1,6 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
+
+#include "renderer/Renderer.h"
+
 #include <GLFW/glfw3.h>
 
 //Game global variables, game settings

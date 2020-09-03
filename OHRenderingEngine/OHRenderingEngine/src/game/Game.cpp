@@ -2,16 +2,12 @@
 #include <vector>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Game.h"
 #include "dependencies/utils/glm_util.h"
-#include "renderer/Shader.h"
-#include "renderer/VertexBuffer.h"
-#include "renderer/IndexBuffer.h"
-#include "renderer/VertexArray.h"
-#include "renderer/VertexBufferLayout.h"
-#include "renderer/Texture.h"
-#include "renderer/Debugger.h"
+#include "renderer/Renderer.h"
 
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -28,7 +24,6 @@ Game::Game()
 Game::~Game()
 {
 	glfwTerminate();
-	
 }
 
 bool Game::GameEnded()
@@ -74,25 +69,41 @@ int Game::RunLevel()
 	
 	vao.AddBuffer(vb, vbl);
 
+	glm::vec3 offset = glm::vec3(0.0f);
+
+
 	while (!glfwWindowShouldClose(m_current_window_))
 	{
 		//Start new frame for IMGUI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		//Render IMGUI GUI
+		ImGui::Begin("Editor");
+		{
+			ImGui::SliderFloat("X offset", &offset.x, -3.0f, 3.0f);            
+			ImGui::SliderFloat("Y offset", &offset.y, -3.0f, 3.0f);           
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		}
+		ImGui::End();
 
 		//Clear screen using openGL
-		GlCall(glClearColor(0.0f, 0.0f, 1.0f, 1.0f));
-		GlCall(glClear(GL_COLOR_BUFFER_BIT));
+		Renderer::ClearScreen(0.4f, 0.2f, 0.4f, 1.0f);
 
-		ImGui::Text("This is some useful text.");
+		//Transformations
+		glm::mat4 model = glm::mat4(1.0);
+		glm::mat4 view = glm::mat4(1.0); //TODO: to be implemented
+		glm::mat4 projection = glm::mat4(1.0); //TODO: to be implemented
+		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::translate(model, offset);
+		simple_shader.SetMat4("model", model);
+		simple_shader.SetMat4("view", view);
+		simple_shader.SetMat4("projection", projection);
 
-		vao.Bind();
-		simple_shader.Use();
+		//Render using openGL
+		Renderer::Draw(vao, simple_shader, 6, 0);
 
-		//Draw using openGL
-		GlCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
-		//Render IMGUI frame		
+		//Render GUI onto screen
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -170,5 +181,5 @@ void Game::SetupIMGUI() const
 //GLFW Callback functions
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
-	GlCall(glViewport(0, 0, width, height));
+	Renderer::ResizeWindow(width, height);
 }
