@@ -7,6 +7,7 @@
 #include "renderer/VertexArray.h"
 #include "renderer/VertexBufferLayout.h"
 #include "renderer/Texture.h"
+#include "renderer/Camera.h"
 #include "renderer/Debugger.h"
 
 
@@ -18,6 +19,7 @@ public:
 	static void ClearScreen(float r, float g, float b, float a);
 	static void Draw(const VertexArray &vao, const Shader &shader, unsigned int count, unsigned int offset);
 	static void ResizeWindow(int width, int height);
+	static void EnableDepthTesting();
 };
 
 #endif // !RENDERER_H

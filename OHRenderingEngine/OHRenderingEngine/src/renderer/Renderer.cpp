@@ -14,7 +14,7 @@ Renderer::~Renderer()
 void Renderer::ClearScreen(float r, float g, float b, float a)
 {
 	GlCall(glClearColor(r,g,b,a));
-	GlCall(glClear(GL_COLOR_BUFFER_BIT));
+	GlCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void Renderer::Draw(const VertexArray & vao, const Shader & shader, unsigned int count, unsigned int offset)
@@ -27,4 +27,9 @@ void Renderer::Draw(const VertexArray & vao, const Shader & shader, unsigned int
 void Renderer::ResizeWindow(int width, int height)
 {
 	GlCall(glViewport(0, 0, width, height));
+}
+
+void Renderer::EnableDepthTesting()
+{
+	GlCall(glEnable(GL_DEPTH_TEST));
 }

@@ -13,9 +13,12 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui.h"
 
+Camera *current_camera;
+
 Game::Game(): m_window_width_(WIDTH), m_window_height_(HEIGHT)
 {
 	InitializeGLFW(MAJOR, MINOR);
+	current_camera = &m_camera_;
 }
 
 
@@ -37,45 +40,92 @@ int Game::RunLevel()
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 tex_coord;
-		float tex_num;
+		int tex_num;
 	};
 	Vertex vertices[] = {
-		glm::vec3(-0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	1,	//0
-		glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//1
-		glm::vec3(0.5f,-0.5f,0.0f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//2
-		glm::vec3(0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1,	//3
+		//Front face
+		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	1,	//0
+		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//1
+		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//2
+		glm::vec3(0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1,	//3
+		//Back face
+		glm::vec3(-0.5f,0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	1,	//4
+		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//5
+		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//6
+		glm::vec3(0.5f,0.5f,-0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1,	//7
+		//Right face
+		glm::vec3(0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(0.0f,1.0f),	1,	//8
+		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//9
+		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//10
+		glm::vec3(0.5f,0.5f,-0.5f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(1.0f,1.0f),	1,	//11
+		//Left face
+		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(0.0f,1.0f),	1,	//12
+		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//13
+		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//14
+		glm::vec3(-0.5f,0.5f,-0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(1.0f,1.0f),	1,	//15
+		//Upper face
+		glm::vec3(-0.5f,0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	1,	//16
+		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//17
+		glm::vec3(0.5f,0.5f,0.5f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//18
+		glm::vec3(0.5f,0.5f,-0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1,	//19
+		//Upper face
+		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	1,	//20
+		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//21
+		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//22
+		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1	//23
 	};
 	unsigned int indices[] = {
 		0, 1, 3,
-		1, 2, 3
+		1, 2, 3,
+		
+		4, 5, 7,
+		5, 6, 7,
+		
+		8, 9, 11,
+		9, 10, 11,
+
+		12, 13, 15,
+		13, 14, 15,
+
+		16, 17, 19,
+		17, 18, 19,
+
+		20, 21, 23,
+		21, 22, 23
 	};
 	VertexArray vao;
 
-	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
-	stbi_set_flip_vertically_on_load_thread(1);
-	Texture tex1("res/textures/2.jpg");
-
-	tex1.Activate(0);
-	tex1.Bind();
-	simple_shader.SetInt("texture0", 0);
-
 
 	VertexBufferLayout vbl;
-	VertexBuffer vb(vertices, 9 * 4 * sizeof(float), GL_STATIC_DRAW);
+	VertexBuffer vb(vertices, 24 * sizeof(Vertex), GL_STATIC_DRAW);
 	
-	IndexBuffer ib(indices, 6 * sizeof(unsigned int), GL_STATIC_DRAW);
+	IndexBuffer ib(indices, 6 * 6 * sizeof(unsigned int), GL_STATIC_DRAW);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(2, false);
 	vbl.Push<float>(1, false);
 	
 	vao.AddBuffer(vb, vbl);
+	
+	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
+	stbi_set_flip_vertically_on_load_thread(1);
+	Texture tex1("res/textures/3.png");
+
+	tex1.Activate(0);
+	tex1.Bind();
+	simple_shader.SetInt("texture0", 0);
 
 	glm::vec3 offset[] = { glm::vec3(0.0f), glm::vec3(0.0f) };
-
+	
+	m_last_time_ = glfwGetTime();
 
 	while (!glfwWindowShouldClose(m_current_window_))
 	{
+		//Update time
+		m_current_frame_ = glfwGetTime();
+		m_delta_time_ = m_current_frame_ - m_last_time_;
+		m_last_time_ = m_current_frame_;
+
 		//Start new frame for IMGUI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -89,24 +139,22 @@ int Game::RunLevel()
 		}
 		ImGui::End();
 
-
-		vb.BufferSubData(vertices, 9 * 4 * sizeof(float), 0);
-
 		//Clear screen using openGL
 		Renderer::ClearScreen(0.4f, 0.2f, 0.4f, 1.0f);
 
 		//Transformations
 		glm::mat4 model = glm::mat4(1.0);
-		glm::mat4 view = glm::mat4(1.0); //TODO: to be implemented
-		glm::mat4 projection = glm::mat4(1.0); //TODO: to be implemented
-		model = glm::scale(model, glm::vec3(0.2f));
+		glm::mat4 view = glm::mat4(1.0);
+		glm::mat4 projection = glm::mat4(1.0);
 		model = glm::translate(model, offset[0]);
+		view = m_camera_.GetViewMatrix();
+		projection = glm::perspective(glm::radians(m_camera_.m_zoom_val_), (float)m_window_width_/(float)m_window_height_, 0.1f, 100.0f);
 		simple_shader.SetMat4("model", model);
 		simple_shader.SetMat4("view", view);
 		simple_shader.SetMat4("projection", projection);
 
 		//Render using openGL
-		Renderer::Draw(vao, simple_shader, 6, 0);
+		Renderer::Draw(vao, simple_shader, 6 * 6, 0);
 
 		//Render GUI onto screen
 		ImGui::Render();
@@ -136,6 +184,7 @@ int Game::Run()
 		return -1;
 	}
 	SetupIMGUI();
+	Renderer::EnableDepthTesting();
 	return RunLevel();
 }
 
@@ -155,12 +204,22 @@ void Game::CreateWindow()
 	if (m_current_window_ == nullptr) 
 		return;
 	glfwMakeContextCurrent(m_current_window_);
+	glfwSetInputMode(m_current_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Game::ProcessInput()
 {
 	if (glfwGetKey(m_current_window_, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(m_current_window_, true);
+	if (glfwGetKey(m_current_window_, GLFW_KEY_W))
+		m_camera_.UpdatePosition(kForward, m_delta_time_);
+	if (glfwGetKey(m_current_window_, GLFW_KEY_S))
+		m_camera_.UpdatePosition(kBackward, m_delta_time_);
+	if (glfwGetKey(m_current_window_, GLFW_KEY_D))
+		m_camera_.UpdatePosition(kRight, m_delta_time_);
+	if (glfwGetKey(m_current_window_, GLFW_KEY_A))
+		m_camera_.UpdatePosition(kLeft, m_delta_time_);
+
 }
 
 
@@ -168,6 +227,7 @@ void Game::ProcessInput()
 void Game::AssignGLFWCallbacks() const
 {
 	glfwSetWindowSizeCallback(m_current_window_, window_size_callback);
+	glfwSetCursorPosCallback(m_current_window_, cursor_position_callback);
 }
 
 void Game::SetupIMGUI() const
@@ -187,4 +247,9 @@ void Game::SetupIMGUI() const
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
 	Renderer::ResizeWindow(width, height);
+}
+
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	current_camera->Update(xpos, ypos);
 }

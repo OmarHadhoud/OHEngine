@@ -17,6 +17,7 @@
     <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
+    <ClCompile Include="src\renderer\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dependencies\utils\glm_util.h" />
@@ -38,5 +39,6 @@
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\renderer\Renderer.h" />
+    <ClInclude Include="src\renderer\Camera.h" />
   </ItemGroup>
 </Project>
