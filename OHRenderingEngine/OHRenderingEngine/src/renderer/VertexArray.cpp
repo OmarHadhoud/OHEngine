@@ -4,8 +4,8 @@
 
 VertexArray::VertexArray()
 {
-	GlCall(glGenVertexArrays(1, &m_id_));
-	GlCall(glBindVertexArray(m_id_));
+	GlCall(glGenVertexArrays(1, &m_ID));
+	GlCall(glBindVertexArray(m_ID));
 }
 
 static unsigned int GLSizeOf(unsigned int type)
@@ -30,12 +30,12 @@ static unsigned int GLSizeOf(unsigned int type)
 
 VertexArray::~VertexArray()
 {
-	GlCall(glDeleteVertexArrays(1, &m_id_));
+	GlCall(glDeleteVertexArrays(1, &m_ID));
 }
 
 void VertexArray::Bind() const
 {
-	GlCall(glBindVertexArray(m_id_));
+	GlCall(glBindVertexArray(m_ID));
 }
 
 void VertexArray::Unbind() const

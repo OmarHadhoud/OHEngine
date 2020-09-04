@@ -12,8 +12,8 @@ public:
 	void Bind() const;
 	static void Activate(unsigned int num);
 private:
-	unsigned int m_id_;
-	GLenum format;
+	unsigned int m_ID;
+	GLenum m_Format;
 };
 
 #endif // !TEXTURE_H

@@ -15,7 +15,7 @@ class Shader
 {
 public:
 	//The shader program ID
-	unsigned m_id_;
+	unsigned m_ID;
 	//Shader constructor that reads the shader files and compile it
 	Shader(const char* vertexPath, const char* fragmentPath);
 	//To use the shader program

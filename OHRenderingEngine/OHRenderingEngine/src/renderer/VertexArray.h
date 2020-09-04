@@ -13,7 +13,7 @@ public:
 	void Unbind() const;
 	void AddBuffer(VertexBuffer &vb, VertexBufferLayout &vbl);
 private:
-	unsigned int m_id_;
+	unsigned int m_ID;
 };
 
 #endif	//VERTEX_ARRAY_H

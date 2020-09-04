@@ -14,7 +14,7 @@ public:
 	void Unbind() const;
 	void BufferSubData(void *data, unsigned int size, unsigned int offset) const;
 private:
-	unsigned int m_id_;
+	unsigned int m_ID;
 };
 
 #endif	//VERTEX_BUFFER_H

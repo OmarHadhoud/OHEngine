@@ -20,19 +20,19 @@ class Camera
 {
 //Public variables
 public:
-	float m_camera_speed_;
-	float m_pitch_;
-	float m_yaw_;
-	float m_last_x_;
-	float m_last_y_;
-	bool m_first_mouse_;
-	float m_zoom_val_;
-	float m_sensetivity_;
-	glm::vec3 m_camera_pos_;
-	glm::vec3 m_camera_up_;
-	glm::vec3 m_camera_front_;
-	glm::vec3 m_camera_right_;
-	glm::vec3 m_direction_;
+	float m_CameraSpeed;
+	float m_Pitch;
+	float m_Yaw;
+	float m_LastX;
+	float m_LastY;
+	bool m_FirstMouseMotion;
+	float m_FOV;
+	float m_Sensetivity;
+	glm::vec3 m_Pos;
+	glm::vec3 m_Up;
+	glm::vec3 m_Camerafront;
+	glm::vec3 m_Right;
+	glm::vec3 m_Direction;
 //Public functions
 public:
 	Camera(float sensetivity=NORMAL_SENSETIVITY, float speed=NORMAL_CAM_SPEED);
@@ -43,6 +43,7 @@ public:
 	void UpdatePosition(MovementDirection dir, float delta_time);
 	void UpdateSpeed(float speed);
 	void ResetSpeed();
+	void UpdateCameraVectors();
 	glm::mat4 GetViewMatrix() const;
 	//Updates the zoom 
 	void Zoom();

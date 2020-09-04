@@ -5,33 +5,33 @@
 
 IndexBuffer::IndexBuffer()
 {
-	GlCall(glGenBuffers(1, &m_id_));
-	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id_));
+	GlCall(glGenBuffers(1, &m_ID));
+	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));
 }
 
 IndexBuffer::IndexBuffer(unsigned int size, GLenum usage = GL_STATIC_DRAW)
 {
-	GlCall(glGenBuffers(1, &m_id_));
-	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id_));
+	GlCall(glGenBuffers(1, &m_ID));
+	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));
 	GlCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, nullptr, usage));
 }
 
 IndexBuffer::IndexBuffer(void * data, unsigned int size, GLenum usage = GL_STATIC_DRAW)
 {
-	GlCall(glGenBuffers(1, &m_id_));
-	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id_));
+	GlCall(glGenBuffers(1, &m_ID));
+	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));
 	GlCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage));
 }
 
 
 IndexBuffer::~IndexBuffer()
 {
-	GlCall(glDeleteBuffers(1, &m_id_));
+	GlCall(glDeleteBuffers(1, &m_ID));
 }
 
 void IndexBuffer::Bind() const
 {
-	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id_));
+	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));
 }
 
 void IndexBuffer::Unbind() const

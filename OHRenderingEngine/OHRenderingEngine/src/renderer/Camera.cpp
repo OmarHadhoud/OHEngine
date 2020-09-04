@@ -1,18 +1,17 @@
 #include "Camera.h"
 
 Camera::Camera(float sensetivity, float speed):
-	m_sensetivity_(sensetivity),
-	m_camera_speed_(speed),
-	m_camera_pos_(glm::vec3(0.0f,0.0f,10.0f)),
-	m_camera_up_(glm::vec3(0.0f, 1.0f, 0.0f)),
-	m_camera_front_(glm::vec3(0.0f, 0.0f, -1.0f)),
-	m_camera_right_(glm::vec3(1.0f,0.0f,0.0f)),
-	m_zoom_val_(45.0f),
-	m_first_mouse_(true),
-	m_yaw_(-90),
-	m_pitch_(0)
+	m_Sensetivity(sensetivity),
+	m_CameraSpeed(speed),
+	m_Pos(glm::vec3(0.0f,0.0f,10.0f)),
+	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
+	m_Camerafront(glm::vec3(0.0f, 0.0f, -1.0f)),
+	m_Right(glm::vec3(1.0f,0.0f,0.0f)),
+	m_FOV(45.0f),
+	m_FirstMouseMotion(true),
+	m_Yaw(-90),
+	m_Pitch(0)
 {
-
 }
 
 
@@ -23,80 +22,89 @@ Camera::~Camera()
 void Camera::Update(double xpos, double ypos)
 {
 	//If first time to hold the cursor in the window
-	if (m_first_mouse_)
+	if (m_FirstMouseMotion)
 	{
-		m_last_x_ = xpos;
-		m_last_y_ = ypos;
-		m_first_mouse_ = false;
+		m_LastX = xpos;
+		m_LastY = ypos;
+		m_FirstMouseMotion = false;
 	}
 	//Get the offset of the mouse from last position to move the camera
-	float xOffset = xpos - m_last_x_;
-	float yOffset = m_last_y_ - ypos;
-	m_last_x_ = xpos;
-	m_last_y_ = ypos;
+	float xOffset = xpos - m_LastX;
+	float yOffset = m_LastY - ypos;
+	m_LastX = xpos;
+	m_LastY = ypos;
 
 	//Update using the mouse sensitivity
-	xOffset *= m_sensetivity_;
-	yOffset *= m_sensetivity_;
+	xOffset *= m_Sensetivity;
+	yOffset *= m_Sensetivity;
 	
 	//Update the rotation angles
-	m_yaw_ += xOffset;
-	m_pitch_ += yOffset;
-	m_pitch_ = m_pitch_ > 89.0f ? 89.0f : m_pitch_;
-	m_pitch_ = m_pitch_ < -89.0f ? -89.0f : m_pitch_;
-	m_direction_.y = sin(glm::radians(m_pitch_));
-	m_direction_.x = cos(glm::radians(m_pitch_)) * cos(glm::radians(m_yaw_));
-	m_direction_.z = cos(glm::radians(m_pitch_)) * sin(glm::radians(m_yaw_));
+	m_Yaw += xOffset;
+	m_Pitch += yOffset;
+
+	m_Yaw = m_Yaw > 360.0f ? m_Yaw - 360.f : m_Yaw;
+	m_Yaw = m_Yaw < 0.0f ? m_Yaw + 360.f : m_Yaw;
+	m_Pitch = m_Pitch > 89.0f ? 89.0f : m_Pitch;
+	m_Pitch = m_Pitch < -89.0f ? -89.0f : m_Pitch;
 	
-	m_camera_front_ = glm::normalize(m_direction_);
+	UpdateCameraVectors();
 }
 
 void Camera::UpdatePosition(MovementDirection dir, float delta_time)
 {
-	m_camera_right_ = glm::normalize(glm::cross(m_camera_front_, m_camera_up_));
-	m_camera_up_ = glm::normalize(glm::cross(m_camera_right_, m_camera_front_));
 	switch (dir)
 	{
 	case kForward: 
-		m_camera_pos_ += m_camera_speed_ * delta_time * m_camera_front_;
+		m_Pos += m_Camerafront * m_CameraSpeed * delta_time;
 		break;
 	case kBackward: 
-		m_camera_pos_ -= m_camera_speed_ * delta_time * m_camera_front_;
+		m_Pos -= m_Camerafront * m_CameraSpeed * delta_time;
 		break;
 	case kRight: 
-		m_camera_pos_ += m_camera_right_ * delta_time * m_camera_speed_;
+		m_Pos += m_Right * delta_time * m_CameraSpeed;
 		break;
 	case kLeft: 
-		m_camera_pos_ -= m_camera_right_ * delta_time * m_camera_speed_;
+		m_Pos -= m_Right * delta_time * m_CameraSpeed;
 		break;
 	}
 }
 
 void Camera::UpdateSpeed(float speed)
 {
-	m_camera_speed_ = speed > 0 ? speed : m_camera_speed_;
+	m_CameraSpeed = speed > 0 ? speed : m_CameraSpeed;
 }
 
 void Camera::ResetSpeed()
 {
-	m_camera_speed_ = NORMAL_CAM_SPEED;
+	m_CameraSpeed = NORMAL_CAM_SPEED;
+}
+
+void Camera::UpdateCameraVectors()
+{
+	m_Direction.y = sin(glm::radians(m_Pitch));
+	m_Direction.x = cos(glm::radians(m_Pitch)) * cos(glm::radians(m_Yaw));
+	m_Direction.z = cos(glm::radians(m_Pitch)) * sin(glm::radians(m_Yaw));
+
+	m_Camerafront = glm::normalize(m_Direction);
+	m_Right = glm::normalize(glm::cross(m_Camerafront, glm::vec3(0,1,0)));
+	m_Up = glm::normalize(glm::cross(m_Right, m_Camerafront));
 }
 
 glm::mat4 Camera::GetViewMatrix() const
 {
-	return glm::lookAt(m_camera_pos_, m_camera_pos_ + m_camera_front_, m_camera_up_);
+	return glm::lookAt(m_Pos, m_Pos + m_Camerafront, m_Up);
 }
 
 
 void Camera::Zoom()
 {
-	this->m_zoom_val_--;
-	if (this->m_zoom_val_ <= 20.0f)
-		this->m_zoom_val_ = 20.0f;
+	this->m_FOV--;
+	if (this->m_FOV <= 20.0f)
+		this->m_FOV = 20.0f;
 }
 
 void Camera::ResetZoom()
 {
-	this->m_zoom_val_ = 45.0f;
+	this->m_FOV = 45.0f;
 }
 

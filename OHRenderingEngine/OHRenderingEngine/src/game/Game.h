@@ -11,8 +11,8 @@
 const unsigned int MAJOR = 3; 
 const unsigned int MINOR = 3;
 //Window size
-const unsigned int WIDTH = 720;
-const unsigned int HEIGHT = 720;
+const unsigned int WIDTH = 1920;
+const unsigned int HEIGHT = 1080;
 
 class Game
 {
@@ -22,14 +22,14 @@ public:
 	bool GameEnded();
 	int Run();
 private:
-	Camera m_camera_;
-	bool m_game_ended_;
-	GLFWwindow *m_current_window_;
-	unsigned int m_window_width_;
-	unsigned int m_window_height_;
-	float m_delta_time_;
-	float m_last_time_;
-	float m_current_frame_;
+	Camera m_Camera;
+	bool m_GameEnded;
+	GLFWwindow *m_CurrentWindow;
+	unsigned int m_WindowWidth;
+	unsigned int m_WindowHeight;
+	float m_DeltaTime;
+	float m_LastFrame;
+	float m_CurrentFrame;
 	void InitializeGLFW(int major, int minor) const;
 	void CreateWindow();
 	int RunLevel();

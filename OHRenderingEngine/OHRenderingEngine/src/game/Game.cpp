@@ -13,12 +13,11 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui.h"
 
-Camera *current_camera;
-
-Game::Game(): m_window_width_(WIDTH), m_window_height_(HEIGHT)
+Camera *g_CurrentCamera;
+Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT)
 {
 	InitializeGLFW(MAJOR, MINOR);
-	current_camera = &m_camera_;
+	g_CurrentCamera = &m_Camera;
 }
 
 
@@ -29,7 +28,7 @@ Game::~Game()
 
 bool Game::GameEnded()
 {
-	return m_game_ended_;
+	return m_GameEnded;
 }
 
 
@@ -117,14 +116,14 @@ int Game::RunLevel()
 
 	glm::vec3 offset[] = { glm::vec3(0.0f), glm::vec3(0.0f) };
 	
-	m_last_time_ = glfwGetTime();
+	m_LastFrame = glfwGetTime();
 
-	while (!glfwWindowShouldClose(m_current_window_))
+	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
 		//Update time
-		m_current_frame_ = glfwGetTime();
-		m_delta_time_ = m_current_frame_ - m_last_time_;
-		m_last_time_ = m_current_frame_;
+		m_CurrentFrame = glfwGetTime();
+		m_DeltaTime = m_CurrentFrame - m_LastFrame;
+		m_LastFrame = m_CurrentFrame;
 
 		//Start new frame for IMGUI
 		ImGui_ImplOpenGL3_NewFrame();
@@ -140,15 +139,18 @@ int Game::RunLevel()
 		ImGui::End();
 
 		//Clear screen using openGL
-		Renderer::ClearScreen(0.4f, 0.2f, 0.4f, 1.0f);
+		Renderer::SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
+		Renderer::EnableClearColor();
+		Renderer::EnableClearDepth();
+		Renderer::Clear();
 
 		//Transformations
 		glm::mat4 model = glm::mat4(1.0);
 		glm::mat4 view = glm::mat4(1.0);
 		glm::mat4 projection = glm::mat4(1.0);
 		model = glm::translate(model, offset[0]);
-		view = m_camera_.GetViewMatrix();
-		projection = glm::perspective(glm::radians(m_camera_.m_zoom_val_), (float)m_window_width_/(float)m_window_height_, 0.1f, 100.0f);
+		view = m_Camera.GetViewMatrix();
+		projection = glm::perspective(glm::radians(m_Camera.m_FOV), (float)m_WindowWidth/(float)m_WindowHeight, 0.1f, 100.0f);
 		simple_shader.SetMat4("model", model);
 		simple_shader.SetMat4("view", view);
 		simple_shader.SetMat4("projection", projection);
@@ -160,18 +162,18 @@ int Game::RunLevel()
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		glfwSwapBuffers(m_current_window_);
+		glfwSwapBuffers(m_CurrentWindow);
 		glfwPollEvents();
 		ProcessInput();
 	}
-	m_game_ended_ = true;
+	m_GameEnded = true;
 	return 0;
 }
 
 int Game::Run()
 {
 	CreateWindow();
-	if (m_current_window_ == nullptr)
+	if (m_CurrentWindow == nullptr)
 	{
 		std::cout << "ERROR: COULDN'T CREATE WINDOW" << std::endl;
 		return -1;
@@ -184,6 +186,7 @@ int Game::Run()
 		return -1;
 	}
 	SetupIMGUI();
+	Renderer::SetAntiAliasingSamples(16);
 	Renderer::EnableDepthTesting();
 	return RunLevel();
 }
@@ -199,26 +202,26 @@ void Game::InitializeGLFW(int major = 3, int minor = 3) const
 void Game::CreateWindow()
 {
 	//If we have an open window
-	if (m_current_window_ != nullptr) return;
-	m_current_window_= glfwCreateWindow(m_window_width_, m_window_height_, "Demo Window", nullptr, nullptr);
-	if (m_current_window_ == nullptr) 
+	if (m_CurrentWindow != nullptr) return;
+	m_CurrentWindow= glfwCreateWindow(m_WindowWidth, m_WindowHeight, "Demo Window", nullptr, nullptr);
+	if (m_CurrentWindow == nullptr) 
 		return;
-	glfwMakeContextCurrent(m_current_window_);
-	glfwSetInputMode(m_current_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwMakeContextCurrent(m_CurrentWindow);
+	glfwSetInputMode(m_CurrentWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Game::ProcessInput()
 {
-	if (glfwGetKey(m_current_window_, GLFW_KEY_ESCAPE))
-		glfwSetWindowShouldClose(m_current_window_, true);
-	if (glfwGetKey(m_current_window_, GLFW_KEY_W))
-		m_camera_.UpdatePosition(kForward, m_delta_time_);
-	if (glfwGetKey(m_current_window_, GLFW_KEY_S))
-		m_camera_.UpdatePosition(kBackward, m_delta_time_);
-	if (glfwGetKey(m_current_window_, GLFW_KEY_D))
-		m_camera_.UpdatePosition(kRight, m_delta_time_);
-	if (glfwGetKey(m_current_window_, GLFW_KEY_A))
-		m_camera_.UpdatePosition(kLeft, m_delta_time_);
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_ESCAPE))
+		glfwSetWindowShouldClose(m_CurrentWindow, true);
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_W))
+		m_Camera.UpdatePosition(kForward, m_DeltaTime);
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_S))
+		m_Camera.UpdatePosition(kBackward, m_DeltaTime);
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_D))
+		m_Camera.UpdatePosition(kRight, m_DeltaTime);
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_A))
+		m_Camera.UpdatePosition(kLeft, m_DeltaTime);
 
 }
 
@@ -226,8 +229,8 @@ void Game::ProcessInput()
 
 void Game::AssignGLFWCallbacks() const
 {
-	glfwSetWindowSizeCallback(m_current_window_, window_size_callback);
-	glfwSetCursorPosCallback(m_current_window_, cursor_position_callback);
+	glfwSetWindowSizeCallback(m_CurrentWindow, window_size_callback);
+	glfwSetCursorPosCallback(m_CurrentWindow, cursor_position_callback);
 }
 
 void Game::SetupIMGUI() const
@@ -239,7 +242,7 @@ void Game::SetupIMGUI() const
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(m_current_window_, true);
+	ImGui_ImplGlfw_InitForOpenGL(m_CurrentWindow, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
@@ -251,5 +254,5 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	current_camera->Update(xpos, ypos);
+	g_CurrentCamera->Update(xpos, ypos);
 }
