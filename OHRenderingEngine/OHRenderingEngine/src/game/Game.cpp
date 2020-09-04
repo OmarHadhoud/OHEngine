@@ -44,38 +44,26 @@ int Game::RunLevel()
 		glm::vec3(-0.5f,-0.5f,0.0f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	1,	//1
 		glm::vec3(0.5f,-0.5f,0.0f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	1,	//2
 		glm::vec3(0.5f,0.5f,0.0f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	1,	//3
-		glm::vec3(2-0.5f,2+0.5f,0.0f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	2,	//4
-		glm::vec3(2-0.5f,2-0.5f,0.0f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	2,	//5
-		glm::vec3(2+0.5f,2-0.5f,0.0f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	2,	//6
-		glm::vec3(2+0.5f,2+0.5f,0.0f),	glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	2	//7
 	};
 	unsigned int indices[] = {
 		0, 1, 3,
-		1, 2, 3,
-		4, 5, 7,
-		5, 6, 7
+		1, 2, 3
 	};
 	VertexArray vao;
 
 	Shader simple_shader("res/shaders/simple.vert", "res/shaders/simple.frag");
 	stbi_set_flip_vertically_on_load_thread(1);
-	Texture tex1("res/textures/1.jpg");
-	Texture tex2("res/textures/2.jpg");
+	Texture tex1("res/textures/2.jpg");
 
 	tex1.Activate(0);
 	tex1.Bind();
 	simple_shader.SetInt("texture0", 0);
 
-	tex2.Activate(1);
-	tex2.Bind();
-	simple_shader.SetInt("texture1", 1);
-
-
 
 	VertexBufferLayout vbl;
-	VertexBuffer vb(vertices, 9 * 8 * sizeof(float), GL_STATIC_DRAW);
+	VertexBuffer vb(vertices, 9 * 4 * sizeof(float), GL_STATIC_DRAW);
 	
-	IndexBuffer ib(indices, 12 * sizeof(unsigned int), GL_STATIC_DRAW);
+	IndexBuffer ib(indices, 6 * sizeof(unsigned int), GL_STATIC_DRAW);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(2, false);
@@ -83,7 +71,7 @@ int Game::RunLevel()
 	
 	vao.AddBuffer(vb, vbl);
 
-	glm::vec3 offset = glm::vec3(0.0f);
+	glm::vec3 offset[] = { glm::vec3(0.0f), glm::vec3(0.0f) };
 
 
 	while (!glfwWindowShouldClose(m_current_window_))
@@ -95,11 +83,14 @@ int Game::RunLevel()
 		//Render IMGUI GUI
 		ImGui::Begin("Editor");
 		{
-			ImGui::SliderFloat("X offset", &offset.x, -3.0f, 3.0f);            
-			ImGui::SliderFloat("Y offset", &offset.y, -3.0f, 3.0f);           
+			ImGui::SliderFloat("X offset 1", &offset[0].x, -3.0f, 3.0f);
+			ImGui::SliderFloat("Y offset 1", &offset[0].y, -3.0f, 3.0f);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 		ImGui::End();
+
+
+		vb.BufferSubData(vertices, 9 * 4 * sizeof(float), 0);
 
 		//Clear screen using openGL
 		Renderer::ClearScreen(0.4f, 0.2f, 0.4f, 1.0f);
@@ -109,13 +100,13 @@ int Game::RunLevel()
 		glm::mat4 view = glm::mat4(1.0); //TODO: to be implemented
 		glm::mat4 projection = glm::mat4(1.0); //TODO: to be implemented
 		model = glm::scale(model, glm::vec3(0.2f));
-		model = glm::translate(model, offset);
+		model = glm::translate(model, offset[0]);
 		simple_shader.SetMat4("model", model);
 		simple_shader.SetMat4("view", view);
 		simple_shader.SetMat4("projection", projection);
 
 		//Render using openGL
-		Renderer::Draw(vao, simple_shader, 12, 0);
+		Renderer::Draw(vao, simple_shader, 6, 0);
 
 		//Render GUI onto screen
 		ImGui::Render();
