@@ -110,6 +110,7 @@ int Game::RunLevel()
 	
 	Shader lamp_shader("res/shaders/lamp.vert", "res/shaders/lamp.frag");
 	Shader simple_shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
+	Shader border_shader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
 	stbi_set_flip_vertically_on_load_thread(1);
 	Texture tex1("res/textures/container.png");
 	Texture tex2("res/textures/container_specular.png");
@@ -119,6 +120,7 @@ int Game::RunLevel()
 	tex2.Activate(1);
 	tex2.Bind();
 
+	simple_shader.Use();
 	simple_shader.SetInt("material.diffuseMap", 0);
 	simple_shader.SetInt("material.specularMap", 1);
 
@@ -150,6 +152,7 @@ int Game::RunLevel()
 		Renderer::SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
 		Renderer::EnableClearColorBuffer();
 		Renderer::EnableClearDepthBuffer();
+		Renderer::EnableClearStencilBuffer();
 		Renderer::Clear();
 
 		//Transformations
@@ -183,10 +186,32 @@ int Game::RunLevel()
 		simple_shader.SetFloat("spotLights[0].inner_cutoff", cos(glm::radians(25.0f)));
 		simple_shader.SetInt("n_PointLights", 1);
 
+
+		//Setup for border (part 1)
+		Renderer::EnableStencilTesting();
+		Renderer::SetStencilFunc(kAlways, 1, 0xff);
+		Renderer::SetStencilMask(0xff);
+		Renderer::SetStencilOp(kKeep, kKeep, kReplace);
+
 		
 		//Render using openGL
 		Renderer::Draw(vao, simple_shader, 6 * 6, 0);
 
+		//Border 
+		model = glm::scale(model, glm::vec3(1.05f)); //Border is larger
+		border_shader.Use();
+		border_shader.SetMat4("model", model);
+		border_shader.SetMat4("view", view);
+		border_shader.SetMat4("projection", projection);
+		border_shader.SetVec3("BorderColor", glm::vec3(0.4,0.4,0.1));
+
+		Renderer::DisableDepthTesting();
+		Renderer::SetStencilFunc(kNotEqual, 1, 0xff);
+		Renderer::SetStencilMask(0x00);
+		Renderer::Draw(vao, border_shader, 6 * 6, 0);
+		Renderer::EnableDepthTesting();
+		Renderer::SetStencilMask(0xff);
+		
 		//Draw lamp
 		lamp_shader.Use();
 		model = glm::mat4(1.0f);

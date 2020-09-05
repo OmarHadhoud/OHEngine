@@ -34,7 +34,11 @@ public:
 	static void DisableDepthTesting();
 	static void EnableStencilTesting();
 	static void DisableStencilTesting();
-
+	static void SetDepthMask(bool mask);
+	static void SetDepthFunc(ComparisonFunc fn);
+	static void SetStencilMask(unsigned int mask);
+	static void SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask);
+	static void SetStencilOp(TestOption sfail, TestOption dpthfail, TestOption dpthpass);
 private:
 	Renderer();
 	~Renderer();

@@ -17,6 +17,29 @@ enum MovementDirection
 	kLeft = 3
 };
 
+enum ComparisonFunc 
+{
+	kLess = GL_LESS,
+	kEqual = GL_EQUAL,
+	kLEqual = GL_LEQUAL,
+	kGreater = GL_GREATER,
+	kGEqual = GL_GEQUAL,
+	kAlways = GL_ALWAYS,
+	kNever = GL_NEVER,
+	kNotEqual = GL_NOTEQUAL
+};
+
+enum TestOption
+{
+	kKeep = GL_KEEP,
+	kZero = GL_ZERO,
+	kReplace = GL_REPLACE,
+	kIncr = GL_INCR,
+	KIncrWrap = GL_INCR_WRAP,
+	kDecr = GL_DECR,
+	kDecrWrap = GL_DECR_WRAP,
+	kInvert = GL_INVERT
+};
 
 #endif // !ENUMS_H
 

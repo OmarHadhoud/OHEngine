@@ -100,6 +100,31 @@ void Renderer::DisableStencilTesting()
 	GlCall(glDisable(GL_STENCIL_TEST));
 }
 
+void Renderer::SetDepthFunc(ComparisonFunc fn)
+{
+	GlCall(glDepthFunc(fn));
+}
+
+void Renderer::SetStencilOp(TestOption sfail, TestOption dpthfail, TestOption dpthpass)
+{
+	GlCall(glStencilOp(sfail, dpthfail, dpthpass));
+}
+
+void Renderer::SetStencilMask(unsigned int mask)
+{
+	GlCall(glStencilMask(mask));
+}
+
+void Renderer::SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask)
+{
+	GlCall(glStencilFunc(fn, ref, mask));
+}
+
+void Renderer::SetDepthMask(bool mask)
+{
+	GlCall(glDepthFunc(mask));
+}
+
 void Renderer::EnableAntiAliasing()
 {
 	GlCall(glEnable(GL_MULTISAMPLE));
