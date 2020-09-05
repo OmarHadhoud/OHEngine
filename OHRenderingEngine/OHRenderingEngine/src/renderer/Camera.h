@@ -5,16 +5,11 @@
 #include <glm/glm_util.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "renderer/enums.h"
+
 const float NORMAL_SENSETIVITY = 0.2f;
 const float NORMAL_CAM_SPEED = 5.5f;
 
-enum MovementDirection
-{
-	kForward = 0,
-	kBackward = 1,
-	kRight = 2,
-	kLeft = 3
-};
 
 class Camera
 {

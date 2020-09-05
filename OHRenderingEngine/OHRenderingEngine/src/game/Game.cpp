@@ -97,9 +97,9 @@ int Game::RunLevel()
 
 
 	VertexBufferLayout vbl;
-	VertexBuffer vb(vertices, 24 * sizeof(Vertex), GL_STATIC_DRAW);
+	VertexBuffer vb(vertices, 24 * sizeof(Vertex), kStaticDraw);
 	
-	IndexBuffer ib(indices, 6 * 6 * sizeof(unsigned int), GL_STATIC_DRAW);
+	IndexBuffer ib(indices, 6 * 6 * sizeof(unsigned int), kStaticDraw);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(2, false);
@@ -148,8 +148,8 @@ int Game::RunLevel()
 
 		//Clear screen using openGL
 		Renderer::SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
-		Renderer::EnableClearColor();
-		Renderer::EnableClearDepth();
+		Renderer::EnableClearColorBuffer();
+		Renderer::EnableClearDepthBuffer();
 		Renderer::Clear();
 
 		//Transformations

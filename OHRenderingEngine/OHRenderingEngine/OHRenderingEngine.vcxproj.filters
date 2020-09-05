@@ -40,5 +40,6 @@
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\renderer\Renderer.h" />
     <ClInclude Include="src\renderer\Camera.h" />
+    <ClInclude Include="src\renderer\enums.h" />
   </ItemGroup>
 </Project>

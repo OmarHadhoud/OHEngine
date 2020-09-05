@@ -4,8 +4,9 @@
 #include <GLFW/glfw3.h>
 
 //Initialize static variables
-bool Renderer::s_ClearColorEnabled = true;
-bool Renderer::s_ClearDepthEnabled = true;
+bool Renderer::s_ClearColorBufferEnabled = true;
+bool Renderer::s_ClearDepthBufferEnabled = true;
+bool Renderer::s_ClearStencilBufferEnabled = true;
 glm::vec4 Renderer::s_ClearColor= glm::vec4(0.0f);
 
 
@@ -24,35 +25,46 @@ void Renderer::SetClearColor(float r, float g, float b, float a)
 	s_ClearColor = glm::vec4(r, g, b, a);
 }
 
-void Renderer::EnableClearColor()
+void Renderer::EnableClearColorBuffer()
 {
-	s_ClearColorEnabled = true;
+	s_ClearColorBufferEnabled = true;
 }
 
-void Renderer::DisableClearColor()
+void Renderer::DisableClearColorBuffer()
 {
-	s_ClearColorEnabled = false;
+	s_ClearColorBufferEnabled = false;
 }
 
-void Renderer::EnableClearDepth()
+void Renderer::EnableClearDepthBuffer()
 {
-	s_ClearDepthEnabled = true;
+	s_ClearDepthBufferEnabled = true;
 }
 
-void Renderer::DisableClearDepth()
+void Renderer::DisableClearDepthBuffer()
 {
-	s_ClearDepthEnabled = false;
+	s_ClearDepthBufferEnabled = false;
+}
+
+void Renderer::EnableClearStencilBuffer()
+{
+	s_ClearStencilBufferEnabled = true;
+}
+
+void Renderer::DisableClearStencilBuffer()
+{
+	s_ClearStencilBufferEnabled = false;
 }
 
 void Renderer::Clear()
 {
 	GlCall(glClearColor(s_ClearColor.x, s_ClearColor.y , s_ClearColor.z, s_ClearColor.a));
 	unsigned int clear_flag = 0;
-	if (s_ClearColorEnabled)
+	if (s_ClearColorBufferEnabled)
 		clear_flag |= GL_COLOR_BUFFER_BIT;
-	if (s_ClearDepthEnabled)
+	if (s_ClearDepthBufferEnabled)
 		clear_flag |= GL_DEPTH_BUFFER_BIT;
-
+	if (s_ClearStencilBufferEnabled)
+		clear_flag |= GL_STENCIL_BUFFER_BIT;
 	GlCall(glClear(clear_flag));
 }
 
@@ -73,9 +85,29 @@ void Renderer::EnableDepthTesting()
 	GlCall(glEnable(GL_DEPTH_TEST));
 }
 
+void Renderer::DisableDepthTesting()
+{
+	GlCall(glDisable(GL_DEPTH_TEST));
+}
+
+void Renderer::EnableStencilTesting()
+{
+	GlCall(glEnable(GL_STENCIL_TEST));
+}
+
+void Renderer::DisableStencilTesting()
+{
+	GlCall(glDisable(GL_STENCIL_TEST));
+}
+
 void Renderer::EnableAntiAliasing()
 {
 	GlCall(glEnable(GL_MULTISAMPLE));
+}
+
+void Renderer::DisableAntiAliasing()
+{
+	GlCall(glDisable(GL_MULTISAMPLE));
 }
 
 void Renderer::SetAntiAliasingSamples(unsigned int n)

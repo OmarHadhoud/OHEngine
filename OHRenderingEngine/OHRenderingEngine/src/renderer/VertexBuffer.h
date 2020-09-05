@@ -3,12 +3,14 @@
 
 #include <glad/glad.h>
 
+#include "renderer/enums.h"
+
 class VertexBuffer
 {
 public:
 	VertexBuffer();
-	VertexBuffer(unsigned int size, GLenum usage);
-	VertexBuffer(void *data, unsigned int size, GLenum usage);
+	VertexBuffer(unsigned int size, BUFFER_USAGE usage);
+	VertexBuffer(void *data, unsigned int size, BUFFER_USAGE usage);
 	~VertexBuffer();
 	void Bind() const;
 	void Unbind() const;

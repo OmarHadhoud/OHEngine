@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\renderer\Camera.h" />
+    <ClInclude Include="src\renderer\enums.h" />
     <ClInclude Include="src\renderer\Renderer.h" />
     <ClInclude Include="src\game\Game.h" />
     <ClInclude Include="src\dependencies\utils\glm_util.h" />

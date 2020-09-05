@@ -9,14 +9,14 @@ IndexBuffer::IndexBuffer()
 	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));
 }
 
-IndexBuffer::IndexBuffer(unsigned int size, GLenum usage = GL_STATIC_DRAW)
+IndexBuffer::IndexBuffer(unsigned int size, BUFFER_USAGE usage = kStaticDraw)
 {
 	GlCall(glGenBuffers(1, &m_ID));
 	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));
 	GlCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, nullptr, usage));
 }
 
-IndexBuffer::IndexBuffer(void * data, unsigned int size, GLenum usage = GL_STATIC_DRAW)
+IndexBuffer::IndexBuffer(void * data, unsigned int size, BUFFER_USAGE usage = kStaticDraw)
 {
 	GlCall(glGenBuffers(1, &m_ID));
 	GlCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));

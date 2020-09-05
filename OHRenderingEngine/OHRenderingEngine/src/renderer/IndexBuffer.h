@@ -1,12 +1,14 @@
 #ifndef INDEX_BUFFER_H
 #define INDEX_BUFFER_H
 
+#include "renderer/enums.h"
+
 class IndexBuffer
 {
 public:
 	IndexBuffer();
-	IndexBuffer(unsigned int size, GLenum usage);
-	IndexBuffer(void *data, unsigned int size, GLenum usage);
+	IndexBuffer(unsigned int size, BUFFER_USAGE usage);
+	IndexBuffer(void *data, unsigned int size, BUFFER_USAGE usage);
 	~IndexBuffer();
 	void Bind() const;
 	void Unbind() const;
