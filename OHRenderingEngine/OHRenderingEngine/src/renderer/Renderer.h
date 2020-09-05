@@ -14,8 +14,6 @@
 class Renderer
 {
 public:
-	Renderer();
-	~Renderer();
 	static void SetClearColor(float r, float g, float b, float a);
 	static void EnableClearColor();
 	static void DisableClearColor();
@@ -28,6 +26,8 @@ public:
 	static void SetAntiAliasingSamples(unsigned int n);
 	static void EnableAntiAliasing();
 private:
+	Renderer();
+	~Renderer();
 	static glm::vec4 s_ClearColor;
 	static bool s_ClearColorEnabled;
 	static bool s_ClearDepthEnabled;
