@@ -169,6 +169,7 @@ int Game::RunLevel()
 		simple_shader.SetMat4("normal", normal);
 		simple_shader.SetVec3("viewPos", m_Camera.m_Pos);
 
+		simple_shader.SetFloat("material.shineness", 32);
 		simple_shader.SetFloat("pointLights[0].ambient", 0.2f);
 		simple_shader.SetFloat("pointLights[0].diffuse", 0.8f);
 		simple_shader.SetFloat("pointLights[0].specular",1.0f);

@@ -57,6 +57,7 @@ struct Material
 {
 	sampler2D diffuseMap;
 	sampler2D specularMap;
+	float shineness;
 };
 
 
@@ -121,7 +122,7 @@ vec3 ComputeDirectionalLight()
 		vec3 viewDir = normalize(viewPos - fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
-		specular = vec3(pow(specular_dot,32)* directionalLighting[i].specular) * vec3(texture(material.specularMap, v_TexCoords));
+		specular = vec3(pow(specular_dot,material.shineness)* directionalLighting[i].specular) * vec3(texture(material.specularMap, v_TexCoords));
 		ret += directionalLighting[i].color * (ambient+diffuse+specular);
 	}
 	
@@ -154,7 +155,7 @@ vec3 ComputePointLights()
 		vec3 viewDir = normalize(viewPos - fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
-		specular = vec3(pow(specular_dot,32)* pointLights[i].specular) * vec3(texture(material.specularMap, v_TexCoords));
+		specular = vec3(pow(specular_dot,material.shineness)* pointLights[i].specular) * vec3(texture(material.specularMap, v_TexCoords));
 		//Attenuate
 		float dist = distance(fragPos, pointLights[i].position);
 		float f_attn = 1.0f / (pointLights[i].kC + pointLights[i].kL * dist + pointLights[i].kQ * dist * dist); 
@@ -191,7 +192,7 @@ vec3 ComputeSpotLights()
 		vec3 viewDir = normalize(viewPos - fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
-		specular = vec3(pow(specular_dot,32)* spotLights[i].specular) * vec3(texture(material.specularMap, v_TexCoords));
+		specular = vec3(pow(specular_dot,material.shineness)* spotLights[i].specular) * vec3(texture(material.specularMap, v_TexCoords));
 		//Attenuate
 		float dist = distance(fragPos, spotLights[i].position);
 		float f_attn = 1.0f / (spotLights[i].kC + spotLights[i].kL * dist + spotLights[i].kQ * dist * dist); 
