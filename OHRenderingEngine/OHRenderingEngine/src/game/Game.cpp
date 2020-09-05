@@ -112,10 +112,15 @@ int Game::RunLevel()
 	Shader simple_shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
 	stbi_set_flip_vertically_on_load_thread(1);
 	Texture tex1("res/textures/container.png");
+	Texture tex2("res/textures/container_specular.png");
 
 	tex1.Activate(0);
 	tex1.Bind();
-	simple_shader.SetInt("texture0", 0);
+	tex2.Activate(1);
+	tex2.Bind();
+
+	simple_shader.SetInt("material.diffuseMap", 0);
+	simple_shader.SetInt("material.specularMap", 1);
 
 	glm::vec3 offset[] = { glm::vec3(0.0f), glm::vec3(0.0f) };
 	
@@ -152,7 +157,7 @@ int Game::RunLevel()
 		glm::mat4 view = glm::mat4(1.0);
 		glm::mat4 projection = glm::mat4(1.0);
 		glm::mat4 normal = glm::mat4(glm::transpose(glm::inverse(model)));
-		glm::vec3 lightPos = glm::vec3(0 /* cos(glfwGetTime())*/, 0/*sin(glfwGetTime())*/, 1);
+		glm::vec3 lightPos = glm::vec3(0 /* cos(glfwGetTime())*/, 2/*sin(glfwGetTime())*/, 2);
 		glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0);
 		model = glm::translate(model, offset[0]);
 		view = m_Camera.GetViewMatrix();
@@ -164,18 +169,18 @@ int Game::RunLevel()
 		simple_shader.SetMat4("normal", normal);
 		simple_shader.SetVec3("viewPos", m_Camera.m_Pos);
 
-		simple_shader.SetFloat("spotLights[0].ambient", 0.1f);
-		simple_shader.SetFloat("spotLights[0].diffuse", 0.5f);
-		simple_shader.SetFloat("spotLights[0].specular",0.5f);
-		simple_shader.SetVec3("spotLights[0].position", lightPos);
+		simple_shader.SetFloat("pointLights[0].ambient", 0.2f);
+		simple_shader.SetFloat("pointLights[0].diffuse", 0.8f);
+		simple_shader.SetFloat("pointLights[0].specular",1.0f);
+		simple_shader.SetVec3("pointLights[0].position", lightPos);
 		simple_shader.SetVec3("spotLights[0].direction", glm::vec3(0,0,-1));
-		simple_shader.SetVec3("spotLights[0].color", lightColor);
-		simple_shader.SetFloat("spotLights[0].kC", 1);
-		simple_shader.SetFloat("spotLights[0].kL", 0.09f);
-		simple_shader.SetFloat("spotLights[0].kQ", 0.032f);
+		simple_shader.SetVec3("pointLights[0].color", lightColor);
+		simple_shader.SetFloat("pointLights[0].kC", 1);
+		simple_shader.SetFloat("pointLights[0].kL", 0.0045f);
+		simple_shader.SetFloat("pointLights[0].kQ", 0.00075f);
 		simple_shader.SetFloat("spotLights[0].outer_cutoff", cos(glm::radians(35.0f)));
 		simple_shader.SetFloat("spotLights[0].inner_cutoff", cos(glm::radians(25.0f)));
-		simple_shader.SetInt("n_SpotLights", 1);
+		simple_shader.SetInt("n_PointLights", 1);
 
 		
 		//Render using openGL
