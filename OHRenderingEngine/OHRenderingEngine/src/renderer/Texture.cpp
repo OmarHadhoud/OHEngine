@@ -49,7 +49,13 @@ unsigned int Texture::GetId() const
 
 void Texture::Bind() const
 {
-	GlCall(glBindTexture(GL_TEXTURE_2D,m_ID));
+	GlCall(glBindTexture(GL_TEXTURE_2D, m_ID));
+}
+
+void Texture::Unbind()
+{
+	GlCall(glBindTexture(GL_TEXTURE_2D,0));
+
 }
 
 void Texture::Activate(unsigned int num)
