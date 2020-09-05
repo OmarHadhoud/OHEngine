@@ -41,5 +41,85 @@ enum TestOption
 	kInvert = GL_INVERT
 };
 
+enum WrapDir
+{
+	kS = GL_TEXTURE_WRAP_S,
+	kR = GL_TEXTURE_WRAP_R,
+	kT = GL_TEXTURE_WRAP_T
+};
+
+enum WrapType
+{
+	kRepeat = GL_REPEAT,
+	kMirroredRepeat = GL_MIRRORED_REPEAT,
+	kClampToEdge = GL_CLAMP_TO_EDGE,
+	kClampToBorer = GL_CLAMP_TO_BORDER
+};
+
+enum TextureFilter
+{
+	kNearest = GL_NEAREST,
+	kLinear = GL_LINEAR,
+	kNearestMipmapNearest = GL_NEAREST_MIPMAP_NEAREST,
+	kNearestMipmapLinear = GL_NEAREST_MIPMAP_LINEAR,
+	kLinearMipmapNearest = GL_LINEAR_MIPMAP_NEAREST,
+	kLinearMipmapLinear = GL_LINEAR_MIPMAP_LINEAR ,
+};
+
+enum BufferType
+{
+	kNone,
+	kColor,
+	kDepth,
+	kStencil,
+	kDepthStencil
+};
+
+enum FrameBufferTarget
+{
+	kRead = GL_READ_FRAMEBUFFER,
+	kDraw = GL_DRAW_FRAMEBUFFER,
+	kReadDraw = GL_FRAMEBUFFER
+};
+
+enum FrameBufferAttachement
+{
+	kColorAttach0 = GL_COLOR_ATTACHMENT0,
+	kColorAttach1 = GL_COLOR_ATTACHMENT1,
+	kColorAttach2 = GL_COLOR_ATTACHMENT2,
+	kColorAttach3 = GL_COLOR_ATTACHMENT3,
+	kColorAttach4 = GL_COLOR_ATTACHMENT4,
+	kColorAttach5 = GL_COLOR_ATTACHMENT5,
+	kColorAttach6 = GL_COLOR_ATTACHMENT6,
+	kColorAttach7 = GL_COLOR_ATTACHMENT7,
+	kColorAttach8 = GL_COLOR_ATTACHMENT8,
+	kColorAttach9 = GL_COLOR_ATTACHMENT9,
+	kColorAttach10 = GL_COLOR_ATTACHMENT10,
+	kColorAttach11 = GL_COLOR_ATTACHMENT11,
+	kColorAttach12 = GL_COLOR_ATTACHMENT12,
+	kColorAttach13 = GL_COLOR_ATTACHMENT13,
+	kColorAttach14 = GL_COLOR_ATTACHMENT14,
+	kColorAttach15 = GL_COLOR_ATTACHMENT15,
+	kColorAttach16 = GL_COLOR_ATTACHMENT16,
+	kColorAttach17 = GL_COLOR_ATTACHMENT17,
+	kColorAttach18 = GL_COLOR_ATTACHMENT18,
+	kColorAttach19 = GL_COLOR_ATTACHMENT19,
+	kColorAttach20 = GL_COLOR_ATTACHMENT20,
+	kColorAttach21 = GL_COLOR_ATTACHMENT21,
+	kColorAttach22 = GL_COLOR_ATTACHMENT22,
+	kColorAttach23 = GL_COLOR_ATTACHMENT23,
+	kColorAttach24 = GL_COLOR_ATTACHMENT24,
+	kColorAttach25 = GL_COLOR_ATTACHMENT25,
+	kColorAttach26 = GL_COLOR_ATTACHMENT26,
+	kColorAttach27 = GL_COLOR_ATTACHMENT27,
+	kColorAttach28 = GL_COLOR_ATTACHMENT28,
+	kColorAttach29 = GL_COLOR_ATTACHMENT29,
+	kColorAttach30 = GL_COLOR_ATTACHMENT30,
+	kColorAttach31 = GL_COLOR_ATTACHMENT31,
+	kDepthAttach = GL_DEPTH_ATTACHMENT,
+	kStencilAttach = GL_STENCIL_ATTACHMENT,
+	kDepthStencilAttach = GL_DEPTH_STENCIL_ATTACHMENT
+};
+
 #endif // !ENUMS_H
 

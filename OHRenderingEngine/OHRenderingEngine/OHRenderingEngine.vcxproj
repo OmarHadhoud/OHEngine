@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="src\renderer\Camera.cpp" />
+    <ClCompile Include="src\renderer\FrameBuffer.cpp" />
+    <ClCompile Include="src\renderer\RenderBuffer.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
     <ClCompile Include="src\dependencies\utils\glad.c" />
@@ -40,6 +42,8 @@
   <ItemGroup>
     <ClInclude Include="src\renderer\Camera.h" />
     <ClInclude Include="src\renderer\enums.h" />
+    <ClInclude Include="src\renderer\FrameBuffer.h" />
+    <ClInclude Include="src\renderer\RenderBuffer.h" />
     <ClInclude Include="src\renderer\Renderer.h" />
     <ClInclude Include="src\game\Game.h" />
     <ClInclude Include="src\dependencies\utils\glm_util.h" />

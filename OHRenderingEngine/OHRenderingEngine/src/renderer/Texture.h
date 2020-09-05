@@ -3,14 +3,22 @@
 
 #include <glad/glad.h>
 
+#include "renderer/enums.h"
+
 class Texture
 {
 public:
+	Texture();
 	Texture(const char * path);
 	~Texture();
 	unsigned int GetId() const;
+	//Creates the texture with the passed screen size for the passed buffer type
+	void CreateTexImage(float width, float height, BufferType bType) const;
 	//Binds the 2D texture to this texture
 	void Bind() const;
+	void SetWrap(WrapDir dir, WrapType type) const;
+	void SetMinFilter(TextureFilter filter) const;
+	void SetMagFilter(TextureFilter filter) const;
 	//Unbinds the current 2D texture
 	static void Unbind();
 	//Activates the texture with number passed

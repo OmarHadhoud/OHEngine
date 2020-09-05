@@ -5,6 +5,18 @@
 #include "Texture.h"
 
 
+Texture::Texture()
+{
+	//Generate the texture and bind it
+	GlCall(glGenTextures(1, &m_ID));
+	GlCall(glBindTexture(GL_TEXTURE_2D, m_ID));
+	//If not specefied, wrap with repeat and linear filters
+	SetWrap(kS, kRepeat);
+	SetWrap(kT, kRepeat);
+	SetMinFilter(kLinear);
+	SetMagFilter(kLinear);
+}
+
 Texture::Texture(const char *path)
 {
 	//Generate the texture and bind it
@@ -47,9 +59,48 @@ unsigned int Texture::GetId() const
 	return m_ID;
 }
 
+void Texture::CreateTexImage(float width, float height, BufferType bType) const
+{
+	if (bType == kColor)
+	{
+		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+	}
+	else if (bType == kDepth)
+	{
+		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
+	}
+	else if (bType == kStencil)
+	{
+		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
+	}
+	else if (bType == kDepthStencil)
+	{
+		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL_ATTACHMENT, GL_UNSIGNED_INT_24_8, NULL));
+	}
+}
+
 void Texture::Bind() const
 {
 	GlCall(glBindTexture(GL_TEXTURE_2D, m_ID));
+}
+
+void Texture::SetWrap(WrapDir dir, WrapType type) const
+{
+	//Set the texture wrapping Settings
+	GlCall(glTexParameteri(GL_TEXTURE_2D, dir, type));
+	GlCall(glTexParameteri(GL_TEXTURE_2D, dir, type));
+}
+
+void Texture::SetMinFilter(TextureFilter filter) const
+{	
+	//Set the texture filtering Settings
+	GlCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter));
+}
+
+void Texture::SetMagFilter(TextureFilter filter) const
+{
+	//Set the texture filtering Settings
+	GlCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter));
 }
 
 void Texture::Unbind()

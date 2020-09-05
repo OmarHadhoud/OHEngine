@@ -18,6 +18,8 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
     <ClCompile Include="src\renderer\Camera.cpp" />
+    <ClCompile Include="src\renderer\RenderBuffer.cpp" />
+    <ClCompile Include="src\renderer\FrameBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dependencies\utils\glm_util.h" />
@@ -41,5 +43,7 @@
     <ClInclude Include="src\renderer\Renderer.h" />
     <ClInclude Include="src\renderer\Camera.h" />
     <ClInclude Include="src\renderer\enums.h" />
+    <ClInclude Include="src\renderer\RenderBuffer.h" />
+    <ClInclude Include="src\renderer\FrameBuffer.h" />
   </ItemGroup>
 </Project>
