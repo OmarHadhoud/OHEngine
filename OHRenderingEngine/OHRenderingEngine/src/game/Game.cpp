@@ -211,6 +211,7 @@ int Game::RunLevel()
 		Renderer::Draw(vao, border_shader, 6 * 6, 0);
 		Renderer::EnableDepthTesting();
 		Renderer::SetStencilMask(0xff);
+		Renderer::DisableStencilTesting();
 		
 		//Draw lamp
 		lamp_shader.Use();

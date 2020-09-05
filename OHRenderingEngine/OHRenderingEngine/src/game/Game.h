@@ -19,7 +19,9 @@ class Game
 public:
 	Game();
 	~Game();
+	//Checks if the game has ended or not.
 	bool GameEnded();
+	//Runs the game and returns -1 if failed.
 	int Run();
 private:
 	Camera m_Camera;
@@ -30,11 +32,16 @@ private:
 	float m_DeltaTime;
 	float m_LastFrame;
 	float m_CurrentFrame;
+	//Initializes GLFW with the passed openGL core version.
 	void InitializeGLFW(int major, int minor) const;
 	void CreateWindow();
+	//Runs the game level.
 	int RunLevel();
+	//Processes user input from keyboard.
 	void ProcessInput();
+	//Assigns all the callbacks written to GLFW.
 	void AssignGLFWCallbacks() const;
+	//Setups IMGUI that is used for GUI.
 	void SetupIMGUI() const;
 };
 

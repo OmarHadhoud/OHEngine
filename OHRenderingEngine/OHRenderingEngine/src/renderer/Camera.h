@@ -32,17 +32,28 @@ public:
 public:
 	Camera(float sensetivity=NORMAL_SENSETIVITY, float speed=NORMAL_CAM_SPEED);
 	~Camera();
-	//Updates the camera each frame
+	//Updates the camera after moving mouse
+	//xpos: The mouse x coordinate
+	//ypos: The mouse y coordinate.
 	void Update(double xpos, double ypos);
-	//Updates the camera rotation
+	//Updates the camera after moving it
+	//dir: Enum for direction of movement, forward/backward/right/left
+	//delta_time: Time between frames
 	void UpdatePosition(MovementDirection dir, float delta_time);
+	//Updates the current camera walking speed
+	//speed: The new camera speed
 	void UpdateSpeed(float speed);
+	//Resets the camera walking speed to the default one
 	void ResetSpeed();
-	void UpdateCameraVectors();
+	//Gets the view matrix for the camera
 	glm::mat4 GetViewMatrix() const;
 	//Updates the zoom 
 	void Zoom();
+	//Resets the zoom value for the camera
 	void ResetZoom();
+private:
+	//Updates all the vectors that are used within the camera.
+	void UpdateCameraVectors();
 };
 
 #endif // !CAMERA_H

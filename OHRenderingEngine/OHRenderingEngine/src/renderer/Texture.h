@@ -9,7 +9,10 @@ public:
 	Texture(const char * path);
 	~Texture();
 	unsigned int GetId() const;
+	//Binds the 2D texture to this texture
 	void Bind() const;
+	//Activates the texture with number passed
+	//num: The number of texture to be active (ex: 0 = GL_TEXTURE0)
 	static void Activate(unsigned int num);
 private:
 	unsigned int m_ID;

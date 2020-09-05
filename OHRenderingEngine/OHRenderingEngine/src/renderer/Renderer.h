@@ -24,8 +24,15 @@ public:
 	static void DisableClearStencilBuffer();
 	static void Clear();
 	//General functions
+	//Draws using the passed shader and vertex array
+	//vao: The vertex array to be used to draw
+	//shader: The shader to be used to draw
+	//count: The number of vertices to draw
+	//offset: The offset in the vao to draw
 	static void Draw(const VertexArray &vao, const Shader &shader, unsigned int count, unsigned int offset);
 	static void ResizeWindow(int width, int height);
+	//Sets the number of anit aliasing samples
+	//n: The number of samples for anti aliasing
 	static void SetAntiAliasingSamples(unsigned int n);
 	static void EnableAntiAliasing();
 	static void DisableAntiAliasing();
@@ -38,7 +45,7 @@ public:
 	static void SetDepthFunc(ComparisonFunc fn);
 	static void SetStencilMask(unsigned int mask);
 	static void SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask);
-	static void SetStencilOp(TestOption sfail, TestOption dpthfail, TestOption dpthpass);
+	static void SetStencilOp(TestOption stencilFail, TestOption depthFail, TestOption stencilDepthPass);
 private:
 	Renderer();
 	~Renderer();
