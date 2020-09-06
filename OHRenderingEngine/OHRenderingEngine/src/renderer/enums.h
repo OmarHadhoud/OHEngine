@@ -121,5 +121,11 @@ enum FrameBufferAttachement
 	kDepthStencilAttach = GL_DEPTH_STENCIL_ATTACHMENT
 };
 
+enum TextureType
+{
+	k2D = GL_TEXTURE_2D,
+	kCubeMap = GL_TEXTURE_CUBE_MAP
+};
+
 #endif // !ENUMS_H
 

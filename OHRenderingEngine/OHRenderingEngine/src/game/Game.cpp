@@ -144,8 +144,10 @@ int Game::RunLevel()
 	Texture tex1("res/textures/container.png");
 	Texture tex2("res/textures/container_specular.png");
 
+	tex1.SetType(k2D);
 	tex1.Activate(0);
 	tex1.Bind();
+	tex2.SetType(k2D);
 	tex2.Activate(1);
 	tex2.Bind();
 
@@ -160,7 +162,9 @@ int Game::RunLevel()
 	
 	//Post processing getting ready by creating custom frame buffer
 	
-	Texture colorTex(2);
+	Texture colorTex;
+	colorTex.SetType(k2D);
+	colorTex.Activate(2);
 	colorTex.Bind();
 	colorTex.SetWrap(kS, kRepeat);
 	colorTex.SetWrap(kT, kRepeat);
