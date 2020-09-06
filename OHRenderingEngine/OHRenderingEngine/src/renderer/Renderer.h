@@ -1,14 +1,18 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "renderer/Shader.h"
 #include "renderer/VertexBuffer.h"
 #include "renderer/IndexBuffer.h"
+#include "renderer/RenderBuffer.h"
+#include "renderer/FrameBuffer.h"
 #include "renderer/VertexArray.h"
 #include "renderer/VertexBufferLayout.h"
+#include "renderer/Shader.h"
 #include "renderer/Texture.h"
 #include "renderer/Camera.h"
 #include "renderer/Debugger.h"
+
+#include "enums.h"
 
 
 class Renderer

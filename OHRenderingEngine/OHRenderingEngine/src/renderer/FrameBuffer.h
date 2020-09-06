@@ -18,6 +18,8 @@ public:
 	void AttachTexture(Texture &tex, FrameBufferAttachement attach) const;
 	//Attaches render object to frame buffer
 	void AttachRenderObject(RenderBuffer &rbo, FrameBufferAttachement attach) const;
+	//Checks if the frame buffer is complete
+	bool IsComplete() const;
 private:
 	unsigned int m_ID;
 	FrameBufferTarget m_Target;

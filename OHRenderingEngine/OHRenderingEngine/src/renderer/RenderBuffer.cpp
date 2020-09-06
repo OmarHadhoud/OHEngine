@@ -29,3 +29,20 @@ void RenderBuffer::Unbind() const
 	GlCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 }
 
+void RenderBuffer::Create(float width, float height, BufferType bType) const
+{
+	Bind();
+	if (bType == kDepth)
+	{
+		GlCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH, width, height));
+	}
+	else if (bType == kStencil)
+	{
+		GlCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL, width, height));
+	}
+	else if (bType == kDepthStencil)
+	{
+		GlCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+	}
+}
+

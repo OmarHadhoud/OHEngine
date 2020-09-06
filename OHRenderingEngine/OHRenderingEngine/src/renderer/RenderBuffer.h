@@ -13,6 +13,8 @@ public:
 	void Bind() const;
 	//Unbinds the render buffer
 	void Unbind() const;
+	//Creates the render buffer object
+	void Create(float width, float height, BufferType bType) const;
 private:
 	unsigned int m_ID;
 };

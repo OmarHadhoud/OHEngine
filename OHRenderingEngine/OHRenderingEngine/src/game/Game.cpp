@@ -42,6 +42,34 @@ int Game::RunLevel()
 		glm::vec4 normal_coord;
 		int tex_num;
 	};
+	//Post procesing data
+	float quadVertices[] = 
+	{
+		-1.0f,  1.0f,	0.0f, 1.0f,		//0
+		-1.0f, -1.0f,	0.0f, 0.0f,		//1
+		 1.0f,  1.0f,	1.0f, 1.0f,		//2
+								   		
+		-1.0f, -1.0f,	0.0f, 0.0f,		//3
+		 1.0f, -1.0f,	1.0f, 0.0f,		//4
+		 1.0f,  1.0f,	1.0f, 1.0f 		//5
+	};
+
+	unsigned int quadIndices[] = {
+		0, 1, 2,
+		3, 4, 5,
+	};
+
+	VertexArray vaoQuad;
+
+
+	VertexBufferLayout vblQuad;
+	VertexBuffer vbQuad(quadVertices, 6 * 4 * sizeof(float), kStaticDraw);
+
+	IndexBuffer ibQuad(quadIndices, 6 * 1 * sizeof(unsigned int), kStaticDraw);
+	vblQuad.Push<float>(2, false);
+	vblQuad.Push<float>(2, false);
+	vaoQuad.AddBuffer(vbQuad, vblQuad);
+
 	Vertex vertices[] = {
 		//Front face
 		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(0.0f,0.0f,1.0f,0.0f),  1,	//0
@@ -111,6 +139,7 @@ int Game::RunLevel()
 	Shader lamp_shader("res/shaders/lamp.vert", "res/shaders/lamp.frag");
 	Shader simple_shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
 	Shader border_shader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
+	Shader post_process("res/shaders/post_process.vert", "res/shaders/post_process.frag");
 	stbi_set_flip_vertically_on_load_thread(1);
 	Texture tex1("res/textures/container.png");
 	Texture tex2("res/textures/container_specular.png");
@@ -124,9 +153,31 @@ int Game::RunLevel()
 	simple_shader.SetInt("material.diffuseMap", 0);
 	simple_shader.SetInt("material.specularMap", 1);
 
+
 	glm::vec3 offset[] = { glm::vec3(0.0f), glm::vec3(0.0f) };
 	
 	m_LastFrame = glfwGetTime();
+	
+	//Post processing getting ready by creating custom frame buffer
+	
+	Texture colorTex(2);
+	colorTex.Bind();
+	colorTex.SetWrap(kS, kRepeat);
+	colorTex.SetWrap(kT, kRepeat);
+	colorTex.SetMinFilter(kLinear);
+	colorTex.SetMagFilter(kLinear);
+	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+	post_process.Use();
+	post_process.SetInt("quadTex", 2);
+
+	RenderBuffer rbo;
+	rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+
+	FrameBuffer fbo;
+	fbo.AttachRenderObject(rbo, kDepthStencilAttach);
+	fbo.AttachTexture(colorTex, kColorAttach0);
+	if (!fbo.IsComplete())
+		return -1;
 
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
@@ -149,10 +200,13 @@ int Game::RunLevel()
 		ImGui::End();
 
 		//Clear screen using openGL
+		fbo.Bind();
+		vao.Bind();
 		Renderer::SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
 		Renderer::EnableClearColorBuffer();
 		Renderer::EnableClearDepthBuffer();
 		Renderer::EnableClearStencilBuffer();
+		Renderer::EnableDepthTesting();
 		Renderer::Clear();
 
 		//Transformations
@@ -222,8 +276,14 @@ int Game::RunLevel()
 		lamp_shader.SetMat4("view", view);
 		lamp_shader.SetMat4("projection", projection);
 		lamp_shader.SetVec3("lightColor", lightColor);
-
 		Renderer::Draw(vao, lamp_shader, 6 * 6, 0);
+
+		////Post processing
+		fbo.Unbind();
+		post_process.Use();
+		vaoQuad.Bind();
+		Renderer::DisableDepthTesting();
+		Renderer::Draw(vaoQuad, post_process, 6 * 1, 0);
 
 		//Render GUI onto screen
 		ImGui::Render();

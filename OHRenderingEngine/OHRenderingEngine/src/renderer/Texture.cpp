@@ -5,11 +5,15 @@
 #include "Texture.h"
 
 
-Texture::Texture()
+Texture::Texture(unsigned int activeTex)
 {
 	//Generate the texture and bind it
 	GlCall(glGenTextures(1, &m_ID));
-	GlCall(glBindTexture(GL_TEXTURE_2D, m_ID));
+	if (activeTex == -1) //Don't initialize yet
+		return;
+	//Activate before binding
+	Activate(activeTex);
+	Bind();
 	//If not specefied, wrap with repeat and linear filters
 	SetWrap(kS, kRepeat);
 	SetWrap(kT, kRepeat);
@@ -61,6 +65,7 @@ unsigned int Texture::GetId() const
 
 void Texture::CreateTexImage(float width, float height, BufferType bType) const
 {
+	Bind();
 	if (bType == kColor)
 	{
 		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
@@ -86,6 +91,7 @@ void Texture::Bind() const
 
 void Texture::SetWrap(WrapDir dir, WrapType type) const
 {
+	Bind();
 	//Set the texture wrapping Settings
 	GlCall(glTexParameteri(GL_TEXTURE_2D, dir, type));
 	GlCall(glTexParameteri(GL_TEXTURE_2D, dir, type));
@@ -93,12 +99,14 @@ void Texture::SetWrap(WrapDir dir, WrapType type) const
 
 void Texture::SetMinFilter(TextureFilter filter) const
 {	
+	Bind();
 	//Set the texture filtering Settings
 	GlCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter));
 }
 
 void Texture::SetMagFilter(TextureFilter filter) const
 {
+	Bind();
 	//Set the texture filtering Settings
 	GlCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter));
 }

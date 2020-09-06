@@ -8,7 +8,7 @@
 class Texture
 {
 public:
-	Texture();
+	Texture(unsigned int activeTex = 0);
 	Texture(const char * path);
 	~Texture();
 	unsigned int GetId() const;

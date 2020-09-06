@@ -35,4 +35,16 @@ void FrameBuffer::AttachRenderObject(RenderBuffer & rbo, FrameBufferAttachement 
 	GlCall(glFramebufferRenderbuffer(m_Target, attach, GL_RENDERBUFFER, rbo.GetId()));
 }
 
+bool FrameBuffer::IsComplete() const
+{
+	bool ret = false;
+	GLenum status;
+	GlCall(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
+	if (status == GL_FRAMEBUFFER_COMPLETE)
+		ret = true;
+	else
+		std::cout << "OPENGL ISSUE: FRAME BUFFER STATUS IS: " << status << std::endl;
+	return ret;
+}
+
 
