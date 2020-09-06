@@ -126,10 +126,9 @@ void Texture::LoadCubemapImages(std::vector<std::string> images)
 	Bind();
 	//Load and generate the texture
 	int width, height, nrChannels;
-	unsigned char *data;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < images.size(); i++)
 	{
-		data = stbi_load(images[i].c_str(), &width, &height, &nrChannels, 0);
+		unsigned char *data = stbi_load(images[i].c_str(), &width, &height, &nrChannels, 0);
 		if (data)
 		{
 			if (nrChannels == 1)
@@ -138,7 +137,7 @@ void Texture::LoadCubemapImages(std::vector<std::string> images)
 				m_Format = GL_RGB;
 			else if (nrChannels == 4)
 				m_Format = GL_RGBA;
-			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, m_Format, width, height, 0, m_Format, GL_UNSIGNED_BYTE, data));
+			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X +i, 0, m_Format, width, height, 0, m_Format, GL_UNSIGNED_BYTE, data));
 			stbi_image_free(data);
 		}
 		else

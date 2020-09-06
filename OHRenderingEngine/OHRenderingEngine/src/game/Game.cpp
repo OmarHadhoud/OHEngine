@@ -42,6 +42,101 @@ int Game::RunLevel()
 		glm::vec4 normal_coord;
 		int tex_num;
 	};
+	//Skybox data
+	float skyboxVertices[] = 
+	{
+	-1.0f,  1.0f, -1.0f,	//0
+	-1.0f, -1.0f, -1.0f,	//1
+	 1.0f, -1.0f, -1.0f,	//2
+	 1.0f, -1.0f, -1.0f,	//3
+	 1.0f,  1.0f, -1.0f,	//4
+	-1.0f,  1.0f, -1.0f,	//5
+							
+	-1.0f, -1.0f,  1.0f,	//6
+	-1.0f, -1.0f, -1.0f,	//7
+	-1.0f,  1.0f, -1.0f,	//8
+	-1.0f,  1.0f, -1.0f,	//9
+	-1.0f,  1.0f,  1.0f,	//10
+	-1.0f, -1.0f,  1.0f,	//11
+							
+	 1.0f, -1.0f, -1.0f,	//12
+	 1.0f, -1.0f,  1.0f,	//13
+	 1.0f,  1.0f,  1.0f,	//14
+	 1.0f,  1.0f,  1.0f,	//15
+	 1.0f,  1.0f, -1.0f,	//16
+	 1.0f, -1.0f, -1.0f,	//17
+							
+	-1.0f, -1.0f,  1.0f,	//18
+	-1.0f,  1.0f,  1.0f,	//19
+	 1.0f,  1.0f,  1.0f,	//20
+	 1.0f,  1.0f,  1.0f,	//21
+	 1.0f, -1.0f,  1.0f,	//22
+	-1.0f, -1.0f,  1.0f,	//23
+							
+	-1.0f,  1.0f, -1.0f,	//24
+	 1.0f,  1.0f, -1.0f,	//25
+	 1.0f,  1.0f,  1.0f,	//26
+	 1.0f,  1.0f,  1.0f,	//27
+	-1.0f,  1.0f,  1.0f,	//28
+	-1.0f,  1.0f, -1.0f,	//29
+							
+	-1.0f, -1.0f, -1.0f,	//30
+	-1.0f, -1.0f,  1.0f,	//31
+	 1.0f, -1.0f, -1.0f,	//32
+	 1.0f, -1.0f, -1.0f,	//33
+	-1.0f, -1.0f,  1.0f,	//34
+	 1.0f, -1.0f,  1.0f		//35
+	};
+
+	unsigned int skyboxIndices[] =
+	{
+		0,1,2,
+		3,4,5,
+		6,7,8,
+		9,10,11,
+		12,13,14,
+		15,16,17,
+		18,19,20,
+		21,22,23,
+		24,25,26,
+		27,28,29,
+		30,31,32,
+		33,34,35
+	};
+
+	VertexArray vaoSkybox;
+
+
+	VertexBufferLayout vblSkybox;
+	VertexBuffer vbSkybox(skyboxVertices, 6 * 6 * 3 * sizeof(float), kStaticDraw);
+
+	IndexBuffer ibSkybox(skyboxIndices, 6 * 2 * 3 * sizeof(unsigned int), kStaticDraw);
+	vblSkybox.Push<float>(3, false);
+	vaoSkybox.AddBuffer(vbSkybox, vblSkybox);
+
+	std::vector<std::string> cubeMapPaths = {
+		"res/textures/right.jpg",
+		"res/textures/left.jpg",
+		"res/textures/top.jpg",
+		"res/textures/bottom.jpg",
+		"res/textures/front.jpg",
+		"res/textures/back.jpg"
+	};
+
+	Texture cubeMapTex;
+	cubeMapTex.SetType(kCubeMap);
+	cubeMapTex.Bind();
+	cubeMapTex.LoadCubemapImages(cubeMapPaths);
+	cubeMapTex.SetWrap(kS, kClampToEdge);
+	cubeMapTex.SetWrap(kR, kClampToEdge);
+	cubeMapTex.SetWrap(kT, kClampToEdge);
+	cubeMapTex.SetMinFilter(kLinear);
+	cubeMapTex.SetMagFilter(kLinear);
+
+	Shader skyboxShader("res/shaders/cubemap.vert", "res/shaders/cubemap.frag");
+	skyboxShader.Use();
+	skyboxShader.SetInt("skybox", 0);
+
 	//Post procesing data
 	float quadVertices[] = 
 	{
@@ -218,7 +313,7 @@ int Game::RunLevel()
 		glm::mat4 view = glm::mat4(1.0);
 		glm::mat4 projection = glm::mat4(1.0);
 		glm::mat4 normal = glm::mat4(glm::transpose(glm::inverse(model)));
-		glm::vec3 lightPos = glm::vec3(0 /* cos(glfwGetTime())*/, 2/*sin(glfwGetTime())*/, 2);
+		glm::vec3 lightPos = glm::vec3(-5 /* cos(glfwGetTime())*/, 5/*sin(glfwGetTime())*/, -5);
 		glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0);
 		model = glm::translate(model, offset[0]);
 		view = m_Camera.GetViewMatrix();
@@ -255,7 +350,7 @@ int Game::RunLevel()
 		//Render using openGL
 		Renderer::Draw(vao, simple_shader, 6 * 6, 0);
 
-		//Border 
+		//Border : TODO: Not working at the moment because of the skybox, should be handled to work with the skybox.
 		model = glm::scale(model, glm::vec3(1.05f)); //Border is larger
 		border_shader.Use();
 		border_shader.SetMat4("model", model);
@@ -281,6 +376,19 @@ int Game::RunLevel()
 		lamp_shader.SetMat4("projection", projection);
 		lamp_shader.SetVec3("lightColor", lightColor);
 		Renderer::Draw(vao, lamp_shader, 6 * 6, 0);
+		vao.Unbind();
+
+		//Cubemap
+		Renderer::SetDepthFunc(kLEqual);
+		skyboxShader.Use();
+		skyboxShader.SetMat4("view", glm::mat4(glm::mat3(view)));
+		skyboxShader.SetMat4("projection", projection);
+		vaoSkybox.Bind();
+		cubeMapTex.Activate(0);
+		cubeMapTex.Bind();
+		Renderer::Draw(vaoSkybox, skyboxShader, 6*6, 0);
+		vaoSkybox.Unbind();
+		Renderer::SetDepthFunc(kLess);
 
 		////Post processing
 		fbo.Unbind();
@@ -288,7 +396,7 @@ int Game::RunLevel()
 		vaoQuad.Bind();
 		Renderer::DisableDepthTesting();
 		Renderer::Draw(vaoQuad, post_process, 6 * 1, 0);
-
+		
 		//Render GUI onto screen
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
