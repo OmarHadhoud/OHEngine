@@ -24,6 +24,7 @@ public:
 	void SetMinFilter(TextureFilter filter) const;
 	void SetMagFilter(TextureFilter filter) const;
 	void SetType(TextureType type);
+	void SetMultiSamples(unsigned int samples);
 	//Unbinds the current 2D texture
 	void Unbind();
 	//Activates the texture with number passed
@@ -31,10 +32,14 @@ public:
 	static void Activate(unsigned int num);
 	//Loads the images passed to the cubemap
 	void LoadCubemapImages(std::vector<std::string> images);
+	bool IsMultiSampled() const;
 private:
 	unsigned int m_ID;
+	unsigned int m_NumSamples;
 	GLenum m_Format;
 	TextureType m_Type;
+	void CreateTexImageNonSampled(float width, float height, BufferType bType) const;
+	void CreateTexImageSampled(float width, float height, BufferType bType) const;
 };
 
 #endif // !TEXTURE_H

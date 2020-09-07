@@ -258,24 +258,42 @@ int Game::RunLevel()
 	//Post processing getting ready by creating custom frame buffer
 	
 	Texture colorTex;
-	colorTex.SetType(k2D);
-	colorTex.Activate(2);
+	colorTex.SetType(k2DMS);
+	colorTex.SetMultiSamples(16);
 	colorTex.Bind();
-	colorTex.SetWrap(kS, kRepeat);
-	colorTex.SetWrap(kT, kRepeat);
-	colorTex.SetMinFilter(kLinear);
-	colorTex.SetMagFilter(kLinear);
 	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
-	post_process.Use();
-	post_process.SetInt("quadTex", 2);
 
 	RenderBuffer rbo;
+	rbo.EnableMultiSampled();
+	rbo.SetMultiSamples(16);
 	rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 
 	FrameBuffer fbo;
 	fbo.AttachRenderObject(rbo, kDepthStencilAttach);
 	fbo.AttachTexture(colorTex, kColorAttach0);
 	if (!fbo.IsComplete())
+		return -1;
+
+	//Intermediate buffer to be able to make post processing with multisampling
+	Texture colorTexInttermediate;
+	colorTexInttermediate.SetType(k2D);
+	colorTexInttermediate.Activate(2);
+	colorTexInttermediate.Bind();
+	colorTexInttermediate.SetWrap(kS, kRepeat);
+	colorTexInttermediate.SetWrap(kT, kRepeat);
+	colorTexInttermediate.SetMinFilter(kLinear);
+	colorTexInttermediate.SetMagFilter(kLinear);
+	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+	post_process.Use();
+	post_process.SetInt("quadTex", 2);
+
+	RenderBuffer rboInttermediate;
+	rboInttermediate.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+
+	FrameBuffer fboInttermediate;
+	fboInttermediate.AttachRenderObject(rboInttermediate, kDepthStencilAttach);
+	fboInttermediate.AttachTexture(colorTexInttermediate, kColorAttach0);
+	if (!fboInttermediate.IsComplete())
 		return -1;
 
 	int glfwWidth;
@@ -289,7 +307,9 @@ int Game::RunLevel()
 		{
 			UpdateWindowSize(glfwWidth, glfwHeight);
 			rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+			rboInttermediate.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
 		}
 		//Update time
 		m_CurrentFrame = glfwGetTime();
@@ -405,6 +425,12 @@ int Game::RunLevel()
 		Renderer::SetStencilMask(0xff);
 		Renderer::DisableStencilTesting();
 
+		//Copying from MS buffer to normal one
+		fbo.Bind(kRead);
+		fboInttermediate.Bind(kDraw);
+		glBlitFramebuffer(0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+
 		////Post processing
 		fbo.Unbind();
 		post_process.Use();
@@ -440,8 +466,8 @@ int Game::Run()
 		return -1;
 	}
 	SetupIMGUI();
-	Renderer::SetAntiAliasingSamples(16);
-	Renderer::EnableDepthTesting();
+	Renderer::EnableAntiAliasing();
+	Renderer::SetAntiAliasingSamples(4);
 	return RunLevel();
 }
 

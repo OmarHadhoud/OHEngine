@@ -5,7 +5,7 @@
 #include "Texture.h"
 
 
-Texture::Texture()
+Texture::Texture(): m_NumSamples(1), m_Type(k2D)
 {
 	//Generate the texture
 	GlCall(glGenTextures(1, &m_ID));
@@ -61,22 +61,10 @@ TextureType Texture::GetType() const
 void Texture::CreateTexImage(float width, float height, BufferType bType) const
 {
 	Bind();
-	if (bType == kColor)
-	{
-		GlCall(glTexImage2D(m_Type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
-	}
-	else if (bType == kDepth)
-	{
-		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
-	}
-	else if (bType == kStencil)
-	{
-		GlCall(glTexImage2D(m_Type, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
-	}
-	else if (bType == kDepthStencil)
-	{
-		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL_ATTACHMENT, GL_UNSIGNED_INT_24_8, NULL));
-	}
+	if (m_Type == k2DMS)
+		CreateTexImageSampled(width, height, bType);
+	else
+		CreateTexImageNonSampled(width, height, bType);
 }
 
 void Texture::Bind() const
@@ -109,6 +97,12 @@ void Texture::SetType(TextureType type)
 {
 	m_Type = type;
 }
+
+void Texture::SetMultiSamples(unsigned int samples)
+{
+	m_NumSamples = samples;
+}
+
 
 void Texture::Unbind()
 {
@@ -146,5 +140,50 @@ void Texture::LoadCubemapImages(std::vector<std::string> images)
 			stbi_image_free(data);
 		}
 
+	}
+}
+
+bool Texture::IsMultiSampled() const
+{
+	return m_Type==k2DMS;
+}
+
+void Texture::CreateTexImageNonSampled(float width, float height, BufferType bType) const
+{
+	if (bType == kColor)
+	{
+		GlCall(glTexImage2D(m_Type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+	}
+	else if (bType == kDepth)
+	{
+		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
+	}
+	else if (bType == kStencil)
+	{
+		GlCall(glTexImage2D(m_Type, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
+	}
+	else if (bType == kDepthStencil)
+	{
+		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL_ATTACHMENT, GL_UNSIGNED_INT_24_8, NULL));
+	}
+}
+
+void Texture::CreateTexImageSampled(float width, float height, BufferType bType) const
+{
+	if (bType == kColor)
+	{
+		GlCall(glTexImage2DMultisample(m_Type, m_NumSamples, GL_RGB, width, height, GL_TRUE));
+	}
+	else if (bType == kDepth)
+	{
+		GlCall(glTexImage2DMultisample(m_Type, m_NumSamples, GL_DEPTH_COMPONENT, width, height, GL_TRUE));
+	}																						    
+	else if (bType == kStencil)																    
+	{																						    
+		GlCall(glTexImage2DMultisample(m_Type, m_NumSamples, GL_STENCIL_INDEX, width, height, GL_TRUE));
+	}										   												   
+	else if (bType == kDepthStencil)		   												   
+	{										 												   
+		GlCall(glTexImage2DMultisample(m_Type, m_NumSamples, GL_DEPTH24_STENCIL8, width, height, GL_TRUE));
 	}
 }

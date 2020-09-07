@@ -15,8 +15,16 @@ public:
 	void Unbind() const;
 	//Creates the render buffer object
 	void Create(float width, float height, BufferType bType) const;
+	void EnableMultiSampled();
+	void DisableMultiSampled();
+	void SetMultiSamples(unsigned int samples);
+	bool IsMultiSampled() const;
 private:
 	unsigned int m_ID;
+	unsigned int m_NumSamples;
+	bool m_MultiSampledEnabled;
+	void CreateMultiSampled(float width, float height, BufferType bType) const;
+	void CreateNonSampled(float width, float height, BufferType bType) const;
 };
 
 #endif	//RENDER_BUFFER_H

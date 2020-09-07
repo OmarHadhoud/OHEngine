@@ -12,6 +12,7 @@ public:
 	~FrameBuffer();
 	//Binds the current frame buffer to this
 	void Bind() const;
+	void Bind(FrameBufferTarget target) const;
 	//Unbinds the frame buffer
 	void Unbind() const;
 	//Attaches texture object to frame buffer

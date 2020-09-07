@@ -57,6 +57,8 @@ private:
 	static bool s_ClearColorBufferEnabled;
 	static bool s_ClearDepthBufferEnabled;
 	static bool s_ClearStencilBufferEnabled;
+	static bool s_AntiAliasingEnabled;
+	static unsigned int s_MultiSamples;
 };
 
 #endif // !RENDERER_H

@@ -124,8 +124,10 @@ enum FrameBufferAttachement
 enum TextureType
 {
 	k2D = GL_TEXTURE_2D,
+	k2DMS = GL_TEXTURE_2D_MULTISAMPLE,
 	kCubeMap = GL_TEXTURE_CUBE_MAP
 };
+
 
 #endif // !ENUMS_H
 

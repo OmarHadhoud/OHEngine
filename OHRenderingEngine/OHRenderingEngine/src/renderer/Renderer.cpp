@@ -7,6 +7,8 @@
 bool Renderer::s_ClearColorBufferEnabled = true;
 bool Renderer::s_ClearDepthBufferEnabled = true;
 bool Renderer::s_ClearStencilBufferEnabled = true;
+bool Renderer::s_AntiAliasingEnabled = false;
+unsigned int Renderer::s_MultiSamples = 1;
 glm::vec4 Renderer::s_ClearColor= glm::vec4(0.0f);
 
 
@@ -128,14 +130,16 @@ void Renderer::SetDepthMask(bool mask)
 void Renderer::EnableAntiAliasing()
 {
 	GlCall(glEnable(GL_MULTISAMPLE));
+	s_AntiAliasingEnabled = true;
 }
 
 void Renderer::DisableAntiAliasing()
 {
 	GlCall(glDisable(GL_MULTISAMPLE));
+	s_AntiAliasingEnabled = false;
 }
 
 void Renderer::SetAntiAliasingSamples(unsigned int n)
 {
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	s_MultiSamples = n;
 }

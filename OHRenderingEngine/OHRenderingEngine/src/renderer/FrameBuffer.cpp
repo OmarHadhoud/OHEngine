@@ -20,6 +20,11 @@ void FrameBuffer::Bind() const
 	GlCall(glBindFramebuffer(m_Target, m_ID));
 }
 
+void FrameBuffer::Bind(FrameBufferTarget target) const
+{
+	GlCall(glBindFramebuffer(target, m_ID));
+}
+
 void FrameBuffer::Unbind() const
 {
 	GlCall(glBindFramebuffer(m_Target, 0));
@@ -27,7 +32,14 @@ void FrameBuffer::Unbind() const
 
 void FrameBuffer::AttachTexture(Texture & tex, FrameBufferAttachement attach) const
 {
-	GlCall(glFramebufferTexture2D(m_Target, attach, GL_TEXTURE_2D, tex.GetId(), 0));
+	if (tex.IsMultiSampled())
+	{
+		GlCall(glFramebufferTexture2D(m_Target, attach, GL_TEXTURE_2D_MULTISAMPLE, tex.GetId(), 0));
+	}
+	else
+	{
+		GlCall(glFramebufferTexture2D(m_Target, attach, GL_TEXTURE_2D, tex.GetId(), 0));
+	}
 }
 
 void FrameBuffer::AttachRenderObject(RenderBuffer & rbo, FrameBufferAttachement attach) const
