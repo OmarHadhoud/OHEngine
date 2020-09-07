@@ -115,12 +115,12 @@ int Game::RunLevel()
 	vaoSkybox.AddBuffer(vbSkybox, vblSkybox);
 
 	std::vector<std::string> cubeMapPaths = {
-		"res/textures/right.jpg",
-		"res/textures/left.jpg",
-		"res/textures/top.jpg",
-		"res/textures/bottom.jpg",
-		"res/textures/front.jpg",
-		"res/textures/back.jpg"
+		"res/textures/skype_right.png",
+		"res/textures/skype_left.png",
+		"res/textures/skype_top.png",
+		"res/textures/skype_bottom.png",
+		"res/textures/skype_front.png",
+		"res/textures/skype_back.png"
 	};
 
 	Texture cubeMapTex;
@@ -350,23 +350,9 @@ int Game::RunLevel()
 		//Render using openGL
 		Renderer::Draw(vao, simple_shader, 6 * 6, 0);
 
-		//Border : TODO: Not working at the moment because of the skybox, should be handled to work with the skybox.
-		model = glm::scale(model, glm::vec3(1.05f)); //Border is larger
-		border_shader.Use();
-		border_shader.SetMat4("model", model);
-		border_shader.SetMat4("view", view);
-		border_shader.SetMat4("projection", projection);
-		border_shader.SetVec3("BorderColor", glm::vec3(0.4,0.4,0.1));
-
-		Renderer::DisableDepthTesting();
-		Renderer::SetStencilFunc(kNotEqual, 1, 0xff);
-		Renderer::SetStencilMask(0x00);
-		Renderer::Draw(vao, border_shader, 6 * 6, 0);
-		Renderer::EnableDepthTesting();
-		Renderer::SetStencilMask(0xff);
-		Renderer::DisableStencilTesting();
 		
 		//Draw lamp
+		Renderer::SetStencilMask(0x00);
 		lamp_shader.Use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
@@ -389,6 +375,24 @@ int Game::RunLevel()
 		Renderer::Draw(vaoSkybox, skyboxShader, 6*6, 0);
 		vaoSkybox.Unbind();
 		Renderer::SetDepthFunc(kLess);
+
+		//Border for the main cube
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, offset[0]);
+		model = glm::scale(model, glm::vec3(1.05f)); //Border is larger
+		border_shader.Use();
+		border_shader.SetMat4("model", model);
+		border_shader.SetMat4("view", view);
+		border_shader.SetMat4("projection", projection);
+		border_shader.SetVec3("BorderColor", glm::vec3(0.4, 0.4, 0.1));
+
+		//Renderer::DisableDepthTesting();
+		Renderer::SetStencilFunc(kNotEqual, 1, 0xff);
+		Renderer::SetStencilMask(0x00);
+		Renderer::Draw(vao, border_shader, 6 * 6, 0);
+		Renderer::EnableDepthTesting();
+		Renderer::SetStencilMask(0xff);
+		Renderer::DisableStencilTesting();
 
 		////Post processing
 		fbo.Unbind();
