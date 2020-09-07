@@ -43,6 +43,8 @@ private:
 	void AssignGLFWCallbacks() const;
 	//Setups IMGUI that is used for GUI.
 	void SetupIMGUI() const;
+	//Updates window size
+	void UpdateWindowSize(int width, int height);
 };
 
 //GLFW callback functions

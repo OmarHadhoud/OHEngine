@@ -278,8 +278,19 @@ int Game::RunLevel()
 	if (!fbo.IsComplete())
 		return -1;
 
+	int glfwWidth;
+	int glfwHeight;
+
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
+		glfwGetWindowSize(m_CurrentWindow, &glfwWidth, &glfwHeight);
+		if (glfwWidth != m_WindowWidth || glfwHeight != m_WindowHeight)
+			//Should be done in a better modular way
+		{
+			UpdateWindowSize(glfwWidth, glfwHeight);
+			rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+		}
 		//Update time
 		m_CurrentFrame = glfwGetTime();
 		m_DeltaTime = m_CurrentFrame - m_LastFrame;
@@ -487,6 +498,13 @@ void Game::SetupIMGUI() const
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(m_CurrentWindow, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
+}
+
+void Game::UpdateWindowSize(int width, int height)
+{
+	m_WindowWidth = width;
+	m_WindowHeight = height;
+
 }
 
 //GLFW Callback functions
