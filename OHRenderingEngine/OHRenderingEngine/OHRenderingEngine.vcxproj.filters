@@ -20,6 +20,8 @@
     <ClCompile Include="src\renderer\Camera.cpp" />
     <ClCompile Include="src\renderer\RenderBuffer.cpp" />
     <ClCompile Include="src\renderer\FrameBuffer.cpp" />
+    <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
+    <ClCompile Include="src\renderer\MultiSampledTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dependencies\utils\glm_util.h" />
@@ -45,5 +47,7 @@
     <ClInclude Include="src\renderer\enums.h" />
     <ClInclude Include="src\renderer\RenderBuffer.h" />
     <ClInclude Include="src\renderer\FrameBuffer.h" />
+    <ClInclude Include="src\renderer\CubeMapTexture.h" />
+    <ClInclude Include="src\renderer\MultiSampledTexture.h" />
   </ItemGroup>
 </Project>

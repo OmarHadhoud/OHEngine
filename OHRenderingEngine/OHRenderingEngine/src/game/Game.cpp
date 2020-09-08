@@ -126,10 +126,7 @@ int Game::RunLevel()
 		"res/textures/skype_back.png"
 	};
 
-	Texture cubeMapTex;
-	cubeMapTex.SetType(kCubeMap);
-	cubeMapTex.Bind();
-	cubeMapTex.LoadCubemapImages(cubeMapPaths);
+	CubeMapTexture cubeMapTex(cubeMapPaths);
 	cubeMapTex.SetWrap(kS, kClampToEdge);
 	cubeMapTex.SetWrap(kR, kClampToEdge);
 	cubeMapTex.SetWrap(kT, kClampToEdge);
@@ -261,11 +258,11 @@ int Game::RunLevel()
 	
 	//Post processing getting ready by creating custom frame buffer
 	
-	Texture colorTex;
+	MultiSampledTexture colorTex;
 	colorTex.SetType(k2DMS);
 	colorTex.SetMultiSamples(16);
-	colorTex.Bind();
 	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+	colorTex.Bind();
 
 	RenderBuffer rbo;
 	rbo.EnableMultiSampled();
@@ -288,6 +285,7 @@ int Game::RunLevel()
 	colorTexInttermediate.SetMinFilter(kLinear);
 	colorTexInttermediate.SetMagFilter(kLinear);
 	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+	colorTexInttermediate.Bind();
 	post_process.Use();
 	post_process.SetInt("quadTex", 2);
 
@@ -314,6 +312,7 @@ int Game::RunLevel()
 			rboInttermediate.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
 			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+			colorTexInttermediate.Bind();
 		}
 		//Update time
 		m_CurrentFrame = glfwGetTime();

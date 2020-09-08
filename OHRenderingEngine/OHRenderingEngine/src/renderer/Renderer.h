@@ -9,6 +9,8 @@
 #include "renderer/VertexBufferLayout.h"
 #include "renderer/Shader.h"
 #include "renderer/Texture.h"
+#include "renderer/CubeMapTexture.h"
+#include "renderer/MultiSampledTexture.h"
 #include "renderer/Camera.h"
 #include "renderer/Debugger.h"
 
