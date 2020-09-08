@@ -14,12 +14,12 @@
 class Shader
 {
 public:
-	//The shader program ID
-	unsigned m_ID;
 	//Shader constructor that reads the shader files and compile it
 	Shader(const char* vertexPath, const char* fragmentPath);
+	~Shader();
 	//To use the shader program
 	void Use() const;
+	unsigned int GetID() const;
 	//Utility uniform functions
 	void SetBool(const std::string &name, bool value) const;
 	void SetInt(const std::string &name, int value) const;
@@ -30,7 +30,9 @@ public:
 	void SetMat2(const std::string &name, glm::mat2 value) const;
 	void SetMat3(const std::string &name, glm::mat3 value) const;
 	void SetMat4(const std::string &name, glm::mat4 value) const;
-	~Shader();
+private:
+	//The shader program ID
+	unsigned int m_ID;
 };
 
 #endif	//SHADER_H

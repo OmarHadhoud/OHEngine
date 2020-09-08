@@ -86,12 +86,18 @@ Shader::Shader(const char * vertexPath, const char * fragmentPath)
 
 Shader::~Shader()
 {
+	GlCall(glDeleteProgram(m_ID));
 }
 
 void Shader::Use() const
 {
 	//Activate this shader
 	GlCall(glUseProgram(this->m_ID));
+}
+
+unsigned int Shader::GetID() const
+{
+	return m_ID;
 }
 
 

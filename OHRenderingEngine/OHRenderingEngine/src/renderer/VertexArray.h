@@ -15,7 +15,6 @@ public:
 	void Unbind() const;
 	//Adds a vertex buffer to this vertex array
 	//vb: The vertex buffer to be added
-	//vbl: The vertex buffer layout
 	void AddBuffer(const VertexBuffer &vb);
 private:
 	unsigned int m_ID;
