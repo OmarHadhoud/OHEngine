@@ -10,6 +10,7 @@ class FrameBuffer
 public:
 	FrameBuffer(FrameBufferTarget target = kReadDraw);
 	~FrameBuffer();
+	unsigned int GetID() const;
 	//Binds the current frame buffer to this
 	void Bind() const;
 	void Bind(FrameBufferTarget target) const;

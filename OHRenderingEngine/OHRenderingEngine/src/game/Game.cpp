@@ -13,11 +13,16 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui.h"
 
+//Global variables needed in GLFW callbacks.
+//TODO: Better design, maybe a callback class
 Camera *g_CurrentCamera;
+Renderer *g_CurrentRenderer;
+
 Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT)
 {
 	InitializeGLFW(MAJOR, MINOR);
 	g_CurrentCamera = &m_Camera;
+	g_CurrentRenderer = &renderer;
 }
 
 
@@ -34,6 +39,7 @@ bool Game::GameEnded()
 
 int Game::RunLevel()
 {
+	renderer.SetActiveWindow(m_CurrentWindow);
 	struct Vertex
 	{
 		glm::vec3 pos;
@@ -335,12 +341,12 @@ int Game::RunLevel()
 		//Clear screen using openGL
 		fbo.Bind();
 		vao.Bind();
-		Renderer::SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
-		Renderer::EnableClearColorBuffer();
-		Renderer::EnableClearDepthBuffer();
-		Renderer::EnableClearStencilBuffer();
-		Renderer::EnableDepthTesting();
-		Renderer::Clear();
+		renderer.SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
+		renderer.EnableClearColorBuffer();
+		renderer.EnableClearDepthBuffer();
+		renderer.EnableClearStencilBuffer();
+		renderer.EnableDepthTesting();
+		renderer.Clear();
 
 		//Transformations
 		glm::mat4 model = glm::mat4(1.0);
@@ -375,18 +381,18 @@ int Game::RunLevel()
 
 
 		//Setup for border (part 1)
-		Renderer::EnableStencilTesting();
-		Renderer::SetStencilFunc(kAlways, 1, 0xff);
-		Renderer::SetStencilMask(0xff);
-		Renderer::SetStencilOp(kKeep, kKeep, kReplace);
+		renderer.EnableStencilTesting();
+		renderer.SetStencilFunc(kAlways, 1, 0xff);
+		renderer.SetStencilMask(0xff);
+		renderer.SetStencilOp(kKeep, kKeep, kReplace);
 
 		
 		//Render using openGL
-		Renderer::Draw(vao, simple_shader, 6 * 6, 0);
+		renderer.Draw(vao, simple_shader, 6 * 6, 0);
 
 		
 		//Draw lamp
-		Renderer::SetStencilMask(0x00);
+		renderer.SetStencilMask(0x00);
 		lamp_shader.Use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
@@ -395,20 +401,20 @@ int Game::RunLevel()
 		lamp_shader.SetMat4("view", view);
 		lamp_shader.SetMat4("projection", projection);
 		lamp_shader.SetVec3("lightColor", lightColor);
-		Renderer::Draw(vao, lamp_shader, 6 * 6, 0);
+		renderer.Draw(vao, lamp_shader, 6 * 6, 0);
 		vao.Unbind();
 
 		//Cubemap
-		Renderer::SetDepthFunc(kLEqual);
+		renderer.SetDepthFunc(kLEqual);
 		skyboxShader.Use();
 		skyboxShader.SetMat4("view", glm::mat4(glm::mat3(view)));
 		skyboxShader.SetMat4("projection", projection);
 		vaoSkybox.Bind();
 		cubeMapTex.Activate(0);
 		cubeMapTex.Bind();
-		Renderer::Draw(vaoSkybox, skyboxShader, 6*6, 0);
+		renderer.Draw(vaoSkybox, skyboxShader, 6*6, 0);
 		vaoSkybox.Unbind();
-		Renderer::SetDepthFunc(kLess);
+		renderer.SetDepthFunc(kLess);
 
 		//Border for the main cube
 		model = glm::mat4(1.0f);
@@ -420,26 +426,23 @@ int Game::RunLevel()
 		border_shader.SetMat4("projection", projection);
 		border_shader.SetVec3("BorderColor", glm::vec3(0.4, 0.4, 0.1));
 
-		//Renderer::DisableDepthTesting();
-		Renderer::SetStencilFunc(kNotEqual, 1, 0xff);
-		Renderer::SetStencilMask(0x00);
-		Renderer::Draw(vao, border_shader, 6 * 6, 0);
-		Renderer::EnableDepthTesting();
-		Renderer::SetStencilMask(0xff);
-		Renderer::DisableStencilTesting();
+		//renderer.DisableDepthTesting();
+		renderer.SetStencilFunc(kNotEqual, 1, 0xff);
+		renderer.SetStencilMask(0x00);
+		renderer.Draw(vao, border_shader, 6 * 6, 0);
+		renderer.EnableDepthTesting();
+		renderer.SetStencilMask(0xff);
+		renderer.DisableStencilTesting();
 
 		//Copying from MS buffer to normal one
-		fbo.Bind(kRead);
-		fboInttermediate.Bind(kDraw);
-		glBlitFramebuffer(0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
+		renderer.BlitNamedFrameBuffer(fbo, fboInttermediate, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
 
 		////Post processing
 		fbo.Unbind();
 		post_process.Use();
 		vaoQuad.Bind();
-		Renderer::DisableDepthTesting();
-		Renderer::Draw(vaoQuad, post_process, 6 * 1, 0);
+		renderer.DisableDepthTesting();
+		renderer.Draw(vaoQuad, post_process, 6 * 1, 0);
 		
 		//Render GUI onto screen
 		ImGui::Render();
@@ -469,8 +472,8 @@ int Game::Run()
 		return -1;
 	}
 	SetupIMGUI();
-	Renderer::EnableAntiAliasing();
-	Renderer::SetAntiAliasingSamples(4);
+	renderer.EnableAntiAliasing();
+	renderer.SetAntiAliasingSamples(4);
 	return RunLevel();
 }
 
@@ -539,7 +542,7 @@ void Game::UpdateWindowSize(int width, int height)
 //GLFW Callback functions
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
-	Renderer::ResizeWindow(width, height);
+	g_CurrentRenderer->ResizeWindow(width, height);
 }
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)

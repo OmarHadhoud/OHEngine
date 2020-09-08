@@ -15,6 +15,11 @@ FrameBuffer::~FrameBuffer()
 	GlCall(glDeleteFramebuffers(1, &m_ID));
 }
 
+unsigned int FrameBuffer::GetID() const
+{
+	return m_ID;
+}
+
 void FrameBuffer::Bind() const
 {
 	GlCall(glBindFramebuffer(m_Target, m_ID));

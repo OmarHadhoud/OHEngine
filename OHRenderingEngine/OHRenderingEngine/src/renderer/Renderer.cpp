@@ -3,22 +3,28 @@
 
 #include <GLFW/glfw3.h>
 
-//Initialize static variables
-bool Renderer::s_ClearColorBufferEnabled = true;
-bool Renderer::s_ClearDepthBufferEnabled = true;
-bool Renderer::s_ClearStencilBufferEnabled = true;
-bool Renderer::s_AntiAliasingEnabled = false;
-unsigned int Renderer::s_MultiSamples = 1;
-glm::vec4 Renderer::s_ClearColor= glm::vec4(0.0f);
 
 
-Renderer::Renderer()
+Renderer::Renderer():
+	m_ActiveWindow(nullptr),
+	s_ClearColor(glm::vec4(0.0f)),
+	s_ClearColorBufferEnabled(true),
+	s_ClearDepthBufferEnabled(true),
+	s_ClearStencilBufferEnabled(true),
+	s_AntiAliasingEnabled(true),
+	s_MultiSamples(1)
 {
 }
 
 
 Renderer::~Renderer()
 {
+}
+
+
+void Renderer::SetActiveWindow(GLFWwindow*& window)
+{
+	m_ActiveWindow = window;
 }
 
 
@@ -110,6 +116,13 @@ void Renderer::SetDepthFunc(ComparisonFunc fn)
 void Renderer::SetStencilOp(TestOption sfail, TestOption dpthfail, TestOption dpthpass)
 {
 	GlCall(glStencilOp(sfail, dpthfail, dpthpass));
+}
+
+void Renderer::BlitNamedFrameBuffer(const FrameBuffer & fboRead, const FrameBuffer & fboDraw, unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1, unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1)
+{
+	fboRead.Bind(kRead);
+	fboDraw.Bind(kDraw);
+	GlCall(glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, GL_COLOR_BUFFER_BIT, GL_NEAREST));
 }
 
 void Renderer::SetStencilMask(unsigned int mask)
