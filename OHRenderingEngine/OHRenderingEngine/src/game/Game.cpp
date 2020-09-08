@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "dependencies/utils/glm_util.h"
 #include "renderer/Renderer.h"
+#include "game/model.h"
 
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -242,6 +243,7 @@ int Game::RunLevel()
 	Shader simple_shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
 	Shader border_shader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
 	Shader post_process("res/shaders/post_process.vert", "res/shaders/post_process.frag");
+	Shader model_simple_shader("res/shaders/modelsimple.vert", "res/shaders/modelsimple.frag");
 	stbi_set_flip_vertically_on_load_thread(1);
 	Texture tex1("res/textures/container.png");
 	Texture tex2("res/textures/container_specular.png");
@@ -306,6 +308,7 @@ int Game::RunLevel()
 
 	int glfwWidth;
 	int glfwHeight;
+	Model rex("res/objects/rex/REX.obj");
 
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
@@ -399,6 +402,17 @@ int Game::RunLevel()
 		lamp_shader.SetVec3("lightColor", lightColor);
 		m_Renderer.Draw(vao, lamp_shader, 6 * 6, 0);
 		vao.Unbind();
+		
+
+		//Draw REX
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, -lightPos);
+		model_simple_shader.Use();
+		model_simple_shader.SetMat4("model", model);
+		model_simple_shader.SetMat4("view", view);
+		model_simple_shader.SetMat4("projection", projection);
+		model_simple_shader.SetVec3("lightColor", lightColor);
+		rex.Draw(model_simple_shader);
 
 		//Cubemap
 		m_Renderer.SetDepthFunc(kLEqual);

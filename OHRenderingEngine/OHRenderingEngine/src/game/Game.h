@@ -3,7 +3,6 @@
 
 
 #include "renderer/Renderer.h"
-#include "game/Mesh.h"
 
 #include <GLFW/glfw3.h>
 
