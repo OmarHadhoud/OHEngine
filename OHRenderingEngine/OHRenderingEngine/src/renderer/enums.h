@@ -128,6 +128,12 @@ enum TextureType
 	kCubeMap = GL_TEXTURE_CUBE_MAP
 };
 
+enum kBitMask
+{
+	kColorBufferBit = GL_COLOR_BUFFER_BIT,
+	kDepthBufferBit = GL_DEPTH_BUFFER_BIT,
+	kStencilBufferBit = GL_STENCIL_BUFFER_BIT
+};
 
 #endif // !ENUMS_H
 
