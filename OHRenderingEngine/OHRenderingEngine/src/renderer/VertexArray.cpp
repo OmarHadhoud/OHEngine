@@ -21,6 +21,15 @@ static unsigned int GLSizeOf(unsigned int type)
 	case GL_UNSIGNED_INT:
 		return sizeof(unsigned int);
 		break;
+	case GL_FLOAT_VEC2:
+		return sizeof(glm::vec2);
+		break;
+	case GL_FLOAT_VEC3:
+		return sizeof(glm::vec3);
+		break;
+	case GL_FLOAT_VEC4:
+		return sizeof(glm::vec4);
+		break;
 	default:
 		break;
 	}

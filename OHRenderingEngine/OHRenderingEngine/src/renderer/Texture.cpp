@@ -5,13 +5,13 @@
 #include "Texture.h"
 
 
-Texture::Texture():m_Type(k2D)
+Texture::Texture():m_Type(k2D), m_Path("")
 {
 	//Generate the texture
 	GlCall(glGenTextures(1, &m_ID));
 }
 
-Texture::Texture(const char *path)
+Texture::Texture(const char *path): m_Path(path)
 {
 	//Generate the texture and bind it
 	GlCall(glGenTextures(1, &m_ID));
@@ -53,6 +53,11 @@ Texture::~Texture()
 unsigned int Texture::GetId() const
 {
 	return m_ID;
+}
+
+std::string Texture::GetPath() const
+{
+	return m_Path;
 }
 
 GLenum Texture::GetFormat() const

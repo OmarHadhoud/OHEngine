@@ -26,38 +26,38 @@ public:
 	~Renderer();
 	void SetActiveWindow(GLFWwindow *&window);
 	//Clear related functions
-	 void Clear(unsigned int flag, glm::vec4 color);
+	static void Clear(unsigned int flag, glm::vec4 color);
 	//General functions
 	//Draws using the passed shader and vertex array
 	//vao: The vertex array to be used to draw
 	//shader: The shader to be used to draw
 	//count: The number of vertices to draw
 	//offset: The offset in the vao to draw
-	 void Draw(const VertexArray &vao, const Shader &shader, unsigned int count, unsigned int offset);
-	 void ResizeWindow(int width, int height);
+	static void Draw(const VertexArray &vao, const Shader &shader, unsigned int count, unsigned int offset);
+	static void ResizeWindow(int width, int height);
 	//Sets the number of anit aliasing samples
 	//n: The number of samples for anti aliasing
-	 void SetAntiAliasingSamples(unsigned int n);
-	 void EnableAntiAliasing();
-	 void DisableAntiAliasing();
+	void SetAntiAliasingSamples(unsigned int n);
+	void EnableAntiAliasing();
+	void DisableAntiAliasing();
 	//Tests related functions
-	 void EnableDepthTesting();
-	 void DisableDepthTesting();
-	 void EnableStencilTesting();
-	 void DisableStencilTesting();
-	 void SetDepthMask(bool mask);
-	 void SetDepthFunc(ComparisonFunc fn);
-	 void SetStencilMask(unsigned int mask);
-	 void SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask);
-	 void SetStencilOp(TestOption stencilFail, TestOption depthFail, TestOption stencilDepthPass);
-	 //Framebuffers related functions
-	 void BlitNamedFrameBuffer(const FrameBuffer &fboRead, const FrameBuffer &fboDraw,
-		 unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1,
-		 unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1);
+	static void EnableDepthTesting() ;
+	static void DisableDepthTesting() ;
+	static void EnableStencilTesting() ;
+	static void DisableStencilTesting() ;
+	static void SetDepthMask(bool mask) ;
+	static void SetDepthFunc(ComparisonFunc fn) ;
+	static void SetStencilMask(unsigned int mask) ;
+	static void SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask) ;
+	static void SetStencilOp(TestOption stencilFail, TestOption depthFail, TestOption stencilDepthPass) ;
+	//Framebuffers related functions
+	static void BlitNamedFrameBuffer(const FrameBuffer &fboRead, const FrameBuffer &fboDraw,
+		unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1,
+		unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1) ;
 private:
-	 GLFWwindow *m_ActiveWindow;
-	 bool s_AntiAliasingEnabled;
-	 unsigned int s_MultiSamples;
+	GLFWwindow *m_ActiveWindow;
+	bool s_AntiAliasingEnabled;
+	unsigned int s_MultiSamples;
 };
 
 #endif // !RENDERER_H

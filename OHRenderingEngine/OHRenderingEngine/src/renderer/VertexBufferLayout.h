@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 struct VertexBufferElement {
 	unsigned int type;
@@ -58,6 +59,33 @@ public:
 		e.normalized = normalized;
 		m_Elements.push_back(e);
 		m_Stride += count * sizeof(unsigned int);
+	}
+	template<> void Push<glm::vec2>(unsigned int count, bool normalized)
+	{
+		VertexBufferElement e;
+		e.count = count;
+		e.type = GL_FLOAT_VEC2;
+		e.normalized = normalized;
+		m_Elements.push_back(e);
+		m_Stride += count * sizeof(glm::vec2);
+	}
+	template<> void Push<glm::vec3>(unsigned int count, bool normalized)
+	{
+		VertexBufferElement e;
+		e.count = count;
+		e.type = GL_FLOAT_VEC3;
+		e.normalized = normalized;
+		m_Elements.push_back(e);
+		m_Stride += count * sizeof(glm::vec3);
+	}
+	template<> void Push<glm::vec4>(unsigned int count, bool normalized)
+	{
+		VertexBufferElement e;
+		e.count = count;
+		e.type = GL_FLOAT_VEC4;
+		e.normalized = normalized;
+		m_Elements.push_back(e);
+		m_Stride += count * sizeof(glm::vec4);
 	}
 	void Clear()
 	{

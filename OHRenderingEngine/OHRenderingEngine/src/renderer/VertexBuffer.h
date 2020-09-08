@@ -10,6 +10,7 @@ class VertexBuffer
 {
 public:
 	VertexBuffer();
+	VertexBuffer(BUFFER_USAGE usage);
 	VertexBuffer(unsigned int size, BUFFER_USAGE usage);
 	VertexBuffer(void* data, unsigned int size, BUFFER_USAGE usage);
 	~VertexBuffer();

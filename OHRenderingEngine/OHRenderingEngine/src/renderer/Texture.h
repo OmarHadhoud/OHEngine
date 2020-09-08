@@ -15,6 +15,7 @@ public:
 	Texture(const char * path);
 	virtual ~Texture();
 	unsigned int GetId() const;
+	std::string GetPath() const;
 	virtual TextureType GetType() const;
 	//Creates the texture with the passed screen size for the passed buffer type
 	virtual void CreateTexImage(float width, float height, BufferType bType) const;
@@ -34,6 +35,7 @@ private:
 	unsigned int m_ID;
 	GLenum m_Format;
 	TextureType m_Type;
+	std::string m_Path;
 protected:
 	GLenum GetFormat() const;
 	void SetFormat(GLenum format);
