@@ -43,3 +43,13 @@ void VertexBuffer::BufferSubData(void * data, unsigned int size, unsigned int of
 {
 	GlCall(glBufferSubData(GL_ARRAY_BUFFER, offset, size, data));
 }
+
+const VertexBufferLayout& VertexBuffer::GetLayout() const
+{
+	return m_Layout;
+}
+
+void VertexBuffer::SetLayout(VertexBufferLayout & layout)
+{
+	m_Layout = layout;
+}

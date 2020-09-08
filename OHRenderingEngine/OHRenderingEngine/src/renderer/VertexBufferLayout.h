@@ -59,6 +59,11 @@ public:
 		m_Elements.push_back(e);
 		m_Stride += count * sizeof(unsigned int);
 	}
+	void Clear()
+	{
+		m_Stride = 0;
+		m_Elements.clear();
+	}
 private:
 	std::vector<VertexBufferElement> m_Elements;
 	unsigned int m_Stride;

@@ -10,13 +10,13 @@ const float offset = 1.0f / 300.0f;
 vec2 dir[9] = vec2[]
 (
 	vec2(-offset,	 offset),	//Top left
-	vec2(-offset,	 0),			//Left
+	vec2(-offset,	 0),		//Left
 	vec2(-offset,	-offset),	//Bottom left
 	vec2(0,			 offset),	//Top
-	vec2(0,			 0),			//This pixel
+	vec2(0,			 0),		//This pixel
 	vec2(0,			-offset),	//Bottom
 	vec2(offset,	 offset),	//Top right
-	vec2(offset,	 0),			//Reft
+	vec2(offset,	 0),		//Reft
 	vec2(offset,	-offset)	//Bottom right
 );
 

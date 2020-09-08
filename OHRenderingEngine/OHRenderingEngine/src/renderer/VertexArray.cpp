@@ -43,12 +43,13 @@ void VertexArray::Unbind() const
 	GlCall(glBindVertexArray(0));
 }
 
-void VertexArray::AddBuffer(VertexBuffer & vb, VertexBufferLayout & vbl)
+void VertexArray::AddBuffer(const VertexBuffer & vb)
 {
+	const VertexBufferLayout* vbl = &vb.GetLayout();
 	Bind();
 	vb.Bind();
-	unsigned int stride = vbl.GetStride();
-	std::vector<VertexBufferElement> elements = vbl.GetElements();
+	unsigned int stride = vbl->GetStride();
+	std::vector<VertexBufferElement> elements = vbl->GetElements();
 	unsigned int offset = 0;
 	for (int i = 0; i < elements.size(); i++)
 	{

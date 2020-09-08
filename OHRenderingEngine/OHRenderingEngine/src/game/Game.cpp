@@ -107,12 +107,15 @@ int Game::RunLevel()
 	VertexArray vaoSkybox;
 
 
-	VertexBufferLayout vblSkybox;
+	VertexBufferLayout vbl;
 	VertexBuffer vbSkybox(skyboxVertices, 6 * 6 * 3 * sizeof(float), kStaticDraw);
 
 	IndexBuffer ibSkybox(skyboxIndices, 6 * 2 * 3 * sizeof(unsigned int), kStaticDraw);
-	vblSkybox.Push<float>(3, false);
-	vaoSkybox.AddBuffer(vbSkybox, vblSkybox);
+	vbl.Push<float>(3, false);
+	vbSkybox.SetLayout(vbl);
+	vbl.Clear();
+
+	vaoSkybox.AddBuffer(vbSkybox);
 
 	std::vector<std::string> cubeMapPaths = {
 		"res/textures/skype_right.png",
@@ -157,13 +160,14 @@ int Game::RunLevel()
 	VertexArray vaoQuad;
 
 
-	VertexBufferLayout vblQuad;
 	VertexBuffer vbQuad(quadVertices, 6 * 4 * sizeof(float), kStaticDraw);
 
 	IndexBuffer ibQuad(quadIndices, 6 * 1 * sizeof(unsigned int), kStaticDraw);
-	vblQuad.Push<float>(2, false);
-	vblQuad.Push<float>(2, false);
-	vaoQuad.AddBuffer(vbQuad, vblQuad);
+	vbl.Push<float>(2, false);
+	vbl.Push<float>(2, false);
+	vbQuad.SetLayout(vbl);
+	vbl.Clear();
+	vaoQuad.AddBuffer(vbQuad);
 
 	Vertex vertices[] = {
 		//Front face
@@ -219,7 +223,6 @@ int Game::RunLevel()
 	VertexArray vao;
 
 
-	VertexBufferLayout vbl;
 	VertexBuffer vb(vertices, 24 * sizeof(Vertex), kStaticDraw);
 	
 	IndexBuffer ib(indices, 6 * 6 * sizeof(unsigned int), kStaticDraw);
@@ -228,8 +231,9 @@ int Game::RunLevel()
 	vbl.Push<float>(2, false);
 	vbl.Push<float>(4, false);
 	vbl.Push<float>(1, false);
-	
-	vao.AddBuffer(vb, vbl);
+	vb.SetLayout(vbl);
+
+	vao.AddBuffer(vb);
 	
 	Shader lamp_shader("res/shaders/lamp.vert", "res/shaders/lamp.frag");
 	Shader simple_shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
@@ -348,13 +352,13 @@ int Game::RunLevel()
 		glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0);
 		model = glm::translate(model, offset[0]);
 		view = m_Camera.GetViewMatrix();
-		projection = glm::perspective(glm::radians(m_Camera.m_FOV), (float)m_WindowWidth/(float)m_WindowHeight, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(m_Camera.GetFOV()), (float)m_WindowWidth/(float)m_WindowHeight, 0.1f, 100.0f);
 		simple_shader.Use();
 		simple_shader.SetMat4("model", model);
 		simple_shader.SetMat4("view", view);
 		simple_shader.SetMat4("projection", projection);
 		simple_shader.SetMat4("normal", normal);
-		simple_shader.SetVec3("viewPos", m_Camera.m_Pos);
+		simple_shader.SetVec3("viewPos", m_Camera.GetPosition());
 
 		simple_shader.SetFloat("material.shineness", 32);
 		simple_shader.SetFloat("pointLights[0].ambient", 0.2f);
@@ -541,5 +545,5 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	g_CurrentCamera->Update(xpos, ypos);
+	g_CurrentCamera->UpdateRotation(xpos, ypos);
 }

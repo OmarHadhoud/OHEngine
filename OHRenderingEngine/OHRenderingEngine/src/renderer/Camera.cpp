@@ -1,16 +1,19 @@
 #include "Camera.h"
 
 Camera::Camera(float sensetivity, float speed):
-	m_Sensetivity(sensetivity),
 	m_CameraSpeed(speed),
+	m_Yaw(-90),
+	m_Pitch(0),
+	m_LastX(0),
+	m_LastY(0),
+	m_FirstMouseMotion(true),
+	m_FOV(45.0f),
+	m_Sensetivity(sensetivity),
 	m_Pos(glm::vec3(0.0f,0.0f,10.0f)),
 	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
 	m_Camerafront(glm::vec3(0.0f, 0.0f, -1.0f)),
 	m_Right(glm::vec3(1.0f,0.0f,0.0f)),
-	m_FOV(45.0f),
-	m_FirstMouseMotion(true),
-	m_Yaw(-90),
-	m_Pitch(0)
+	m_Direction(glm::vec3(0.0f))
 {
 }
 
@@ -19,7 +22,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::Update(double xpos, double ypos)
+void Camera::UpdateRotation(double xpos, double ypos)
 {
 	//If first time to hold the cursor in the window
 	if (m_FirstMouseMotion)
@@ -69,11 +72,6 @@ void Camera::UpdatePosition(MovementDirection dir, float delta_time)
 	}
 }
 
-void Camera::UpdateSpeed(float speed)
-{
-	m_CameraSpeed = speed > 0 ? speed : m_CameraSpeed;
-}
-
 void Camera::ResetSpeed()
 {
 	m_CameraSpeed = NORMAL_CAM_SPEED;
@@ -95,6 +93,11 @@ glm::mat4 Camera::GetViewMatrix() const
 	return glm::lookAt(m_Pos, m_Pos + m_Camerafront, m_Up);
 }
 
+void Camera::SetCameraSpeed(float value)
+{
+	m_CameraSpeed = value > 0 ? value : m_CameraSpeed;
+}
+
 
 void Camera::Zoom()
 {
@@ -106,5 +109,25 @@ void Camera::Zoom()
 void Camera::ResetZoom()
 {
 	this->m_FOV = 45.0f;
+}
+
+float Camera::GetSpeed() const
+{
+	return m_CameraSpeed;
+}
+
+float Camera::GetFOV() const
+{
+	return m_FOV;
+}
+
+float Camera::GetSensetivity() const
+{
+	return m_Sensetivity;
+}
+
+glm::vec3 Camera::GetPosition() const
+{
+	return m_Pos;
 }
 

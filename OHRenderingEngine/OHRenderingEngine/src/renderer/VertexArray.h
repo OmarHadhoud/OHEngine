@@ -16,7 +16,7 @@ public:
 	//Adds a vertex buffer to this vertex array
 	//vb: The vertex buffer to be added
 	//vbl: The vertex buffer layout
-	void AddBuffer(VertexBuffer &vb, VertexBufferLayout &vbl);
+	void AddBuffer(const VertexBuffer &vb);
 private:
 	unsigned int m_ID;
 };
