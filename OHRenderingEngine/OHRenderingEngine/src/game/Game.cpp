@@ -22,7 +22,7 @@ Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT)
 {
 	InitializeGLFW(MAJOR, MINOR);
 	g_CurrentCamera = &m_Camera;
-	g_CurrentRenderer = &renderer;
+	g_CurrentRenderer = &m_Renderer;
 }
 
 
@@ -39,7 +39,7 @@ bool Game::GameEnded()
 
 int Game::RunLevel()
 {
-	renderer.SetActiveWindow(m_CurrentWindow);
+	m_Renderer.SetActiveWindow(m_CurrentWindow);
 	struct Vertex
 	{
 		glm::vec3 pos;
@@ -341,12 +341,8 @@ int Game::RunLevel()
 		//Clear screen using openGL
 		fbo.Bind();
 		vao.Bind();
-		renderer.SetClearColor(0.4f, 0.2f, 0.4f, 1.0f);
-		renderer.EnableClearColorBuffer();
-		renderer.EnableClearDepthBuffer();
-		renderer.EnableClearStencilBuffer();
-		renderer.EnableDepthTesting();
-		renderer.Clear();
+		m_Renderer.EnableDepthTesting();
+		m_Renderer.Clear(kColorBufferBit | kDepthBufferBit | kStencilBufferBit, glm::vec4(0.4f, 0.2f, 0.4f, 1.0f));
 
 		//Transformations
 		glm::mat4 model = glm::mat4(1.0);
@@ -381,18 +377,18 @@ int Game::RunLevel()
 
 
 		//Setup for border (part 1)
-		renderer.EnableStencilTesting();
-		renderer.SetStencilFunc(kAlways, 1, 0xff);
-		renderer.SetStencilMask(0xff);
-		renderer.SetStencilOp(kKeep, kKeep, kReplace);
+		m_Renderer.EnableStencilTesting();
+		m_Renderer.SetStencilFunc(kAlways, 1, 0xff);
+		m_Renderer.SetStencilMask(0xff);
+		m_Renderer.SetStencilOp(kKeep, kKeep, kReplace);
 
 		
 		//Render using openGL
-		renderer.Draw(vao, simple_shader, 6 * 6, 0);
+		m_Renderer.Draw(vao, simple_shader, 6 * 6, 0);
 
 		
 		//Draw lamp
-		renderer.SetStencilMask(0x00);
+		m_Renderer.SetStencilMask(0x00);
 		lamp_shader.Use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
@@ -401,20 +397,20 @@ int Game::RunLevel()
 		lamp_shader.SetMat4("view", view);
 		lamp_shader.SetMat4("projection", projection);
 		lamp_shader.SetVec3("lightColor", lightColor);
-		renderer.Draw(vao, lamp_shader, 6 * 6, 0);
+		m_Renderer.Draw(vao, lamp_shader, 6 * 6, 0);
 		vao.Unbind();
 
 		//Cubemap
-		renderer.SetDepthFunc(kLEqual);
+		m_Renderer.SetDepthFunc(kLEqual);
 		skyboxShader.Use();
 		skyboxShader.SetMat4("view", glm::mat4(glm::mat3(view)));
 		skyboxShader.SetMat4("projection", projection);
 		vaoSkybox.Bind();
 		cubeMapTex.Activate(0);
 		cubeMapTex.Bind();
-		renderer.Draw(vaoSkybox, skyboxShader, 6*6, 0);
+		m_Renderer.Draw(vaoSkybox, skyboxShader, 6*6, 0);
 		vaoSkybox.Unbind();
-		renderer.SetDepthFunc(kLess);
+		m_Renderer.SetDepthFunc(kLess);
 
 		//Border for the main cube
 		model = glm::mat4(1.0f);
@@ -426,23 +422,23 @@ int Game::RunLevel()
 		border_shader.SetMat4("projection", projection);
 		border_shader.SetVec3("BorderColor", glm::vec3(0.4, 0.4, 0.1));
 
-		//renderer.DisableDepthTesting();
-		renderer.SetStencilFunc(kNotEqual, 1, 0xff);
-		renderer.SetStencilMask(0x00);
-		renderer.Draw(vao, border_shader, 6 * 6, 0);
-		renderer.EnableDepthTesting();
-		renderer.SetStencilMask(0xff);
-		renderer.DisableStencilTesting();
+		//m_Renderer.DisableDepthTesting();
+		m_Renderer.SetStencilFunc(kNotEqual, 1, 0xff);
+		m_Renderer.SetStencilMask(0x00);
+		m_Renderer.Draw(vao, border_shader, 6 * 6, 0);
+		m_Renderer.EnableDepthTesting();
+		m_Renderer.SetStencilMask(0xff);
+		m_Renderer.DisableStencilTesting();
 
 		//Copying from MS buffer to normal one
-		renderer.BlitNamedFrameBuffer(fbo, fboInttermediate, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
+		m_Renderer.BlitNamedFrameBuffer(fbo, fboInttermediate, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
 
 		////Post processing
 		fbo.Unbind();
 		post_process.Use();
 		vaoQuad.Bind();
-		renderer.DisableDepthTesting();
-		renderer.Draw(vaoQuad, post_process, 6 * 1, 0);
+		m_Renderer.DisableDepthTesting();
+		m_Renderer.Draw(vaoQuad, post_process, 6 * 1, 0);
 		
 		//Render GUI onto screen
 		ImGui::Render();
@@ -472,8 +468,8 @@ int Game::Run()
 		return -1;
 	}
 	SetupIMGUI();
-	renderer.EnableAntiAliasing();
-	renderer.SetAntiAliasingSamples(4);
+	m_Renderer.EnableAntiAliasing();
+	m_Renderer.SetAntiAliasingSamples(4);
 	return RunLevel();
 }
 

@@ -24,7 +24,7 @@ public:
 	//Runs the game and returns -1 if failed.
 	int Run();
 private:
-	Renderer renderer;
+	Renderer m_Renderer;
 	Camera m_Camera;
 	bool m_GameEnded;
 	GLFWwindow *m_CurrentWindow;

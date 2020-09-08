@@ -26,14 +26,7 @@ public:
 	~Renderer();
 	void SetActiveWindow(GLFWwindow *&window);
 	//Clear related functions
-	 void SetClearColor(float r, float g, float b, float a);
-	 void EnableClearColorBuffer();
-	 void DisableClearColorBuffer();
-	 void EnableClearDepthBuffer();
-	 void DisableClearDepthBuffer();
-	 void EnableClearStencilBuffer();
-	 void DisableClearStencilBuffer();
-	 void Clear();
+	 void Clear(unsigned int flag, glm::vec4 color);
 	//General functions
 	//Draws using the passed shader and vertex array
 	//vao: The vertex array to be used to draw
@@ -63,10 +56,6 @@ public:
 		 unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1);
 private:
 	 GLFWwindow *m_ActiveWindow;
-	 glm::vec4 s_ClearColor;
-	 bool s_ClearColorBufferEnabled;
-	 bool s_ClearDepthBufferEnabled;
-	 bool s_ClearStencilBufferEnabled;
 	 bool s_AntiAliasingEnabled;
 	 unsigned int s_MultiSamples;
 };

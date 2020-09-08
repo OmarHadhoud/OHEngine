@@ -7,10 +7,6 @@
 
 Renderer::Renderer():
 	m_ActiveWindow(nullptr),
-	s_ClearColor(glm::vec4(0.0f)),
-	s_ClearColorBufferEnabled(true),
-	s_ClearDepthBufferEnabled(true),
-	s_ClearStencilBufferEnabled(true),
 	s_AntiAliasingEnabled(true),
 	s_MultiSamples(1)
 {
@@ -27,53 +23,10 @@ void Renderer::SetActiveWindow(GLFWwindow*& window)
 	m_ActiveWindow = window;
 }
 
-
-void Renderer::SetClearColor(float r, float g, float b, float a)
+void Renderer::Clear(unsigned int flag, glm::vec4 color)
 {
-	s_ClearColor = glm::vec4(r, g, b, a);
-}
-
-void Renderer::EnableClearColorBuffer()
-{
-	s_ClearColorBufferEnabled = true;
-}
-
-void Renderer::DisableClearColorBuffer()
-{
-	s_ClearColorBufferEnabled = false;
-}
-
-void Renderer::EnableClearDepthBuffer()
-{
-	s_ClearDepthBufferEnabled = true;
-}
-
-void Renderer::DisableClearDepthBuffer()
-{
-	s_ClearDepthBufferEnabled = false;
-}
-
-void Renderer::EnableClearStencilBuffer()
-{
-	s_ClearStencilBufferEnabled = true;
-}
-
-void Renderer::DisableClearStencilBuffer()
-{
-	s_ClearStencilBufferEnabled = false;
-}
-
-void Renderer::Clear()
-{
-	GlCall(glClearColor(s_ClearColor.x, s_ClearColor.y , s_ClearColor.z, s_ClearColor.a));
-	unsigned int clear_flag = 0;
-	if (s_ClearColorBufferEnabled)
-		clear_flag |= GL_COLOR_BUFFER_BIT;
-	if (s_ClearDepthBufferEnabled)
-		clear_flag |= GL_DEPTH_BUFFER_BIT;
-	if (s_ClearStencilBufferEnabled)
-		clear_flag |= GL_STENCIL_BUFFER_BIT;
-	GlCall(glClear(clear_flag));
+	GlCall(glClearColor(color.x, color.y, color.z, color.a));
+	GlCall(glClear(flag));
 }
 
 void Renderer::Draw(const VertexArray & vao, const Shader & shader, unsigned int count, unsigned int offset)
