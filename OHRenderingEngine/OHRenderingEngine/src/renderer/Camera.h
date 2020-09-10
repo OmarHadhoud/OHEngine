@@ -8,7 +8,7 @@
 #include "renderer/enums.h"
 
 const float NORMAL_SENSETIVITY = 0.2f;
-const float NORMAL_CAM_SPEED = 5.5f;
+const float NORMAL_CAM_SPEED = 12.0f;
 
 
 class Camera

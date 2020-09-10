@@ -10,10 +10,20 @@ public:
 	IndexBuffer(unsigned int size, BUFFER_USAGE usage);
 	IndexBuffer(void *data, unsigned int size, BUFFER_USAGE usage);
 	~IndexBuffer();
+	//Copy constructor
+	IndexBuffer(const IndexBuffer& other) = delete;
+	//Move constructor
+	IndexBuffer(IndexBuffer && other) noexcept;
+	//Copy assignment operator
+	IndexBuffer& operator=(const IndexBuffer& other) = delete;
+	//Move assignment operator
+	IndexBuffer& operator=(IndexBuffer&& other) noexcept;
 	//Binds the current index buffer to this
 	void Bind() const;
 	//Unbinds the index buffer
-	void Unbind() const;
+	static void Unbind();
+	//Buffers the data for the buffer
+	void BufferData(void *data, unsigned int size, BUFFER_USAGE usage) const;
 	//Buffers a part of the data
 	//data: The data to be copied to GPU
 	//size: The size of the data in bytes

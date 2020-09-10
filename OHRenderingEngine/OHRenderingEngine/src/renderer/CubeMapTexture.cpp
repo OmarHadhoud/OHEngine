@@ -30,6 +30,7 @@ CubeMapTexture::CubeMapTexture(std::vector<std::string> images)
 			stbi_image_free(data);
 		}
 	}
+	Unbind();
 }
 
 

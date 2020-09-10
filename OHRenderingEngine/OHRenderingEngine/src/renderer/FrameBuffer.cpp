@@ -8,6 +8,7 @@ FrameBuffer::FrameBuffer(FrameBufferTarget target)
 	GlCall(glGenFramebuffers(1, &m_ID));
 	GlCall(glBindFramebuffer(target, m_ID));
 	m_Target = target;
+	Unbind();
 }
 
 FrameBuffer::~FrameBuffer()

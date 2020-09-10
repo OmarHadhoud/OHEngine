@@ -6,7 +6,6 @@
 RenderBuffer::RenderBuffer(): m_MultiSampledEnabled(false), m_NumSamples(1)
 {
 	GlCall(glGenRenderbuffers(1, &m_ID));
-	GlCall(glBindRenderbuffer(GL_RENDERBUFFER, m_ID));
 }
 
 RenderBuffer::~RenderBuffer()
@@ -31,7 +30,6 @@ void RenderBuffer::Unbind() const
 
 void RenderBuffer::Create(float width, float height, BufferType bType) const
 {
-	Bind();
 	if (m_MultiSampledEnabled)
 		CreateMultiSampled(width, height, bType);
 	else

@@ -8,7 +8,7 @@
 #include "Game.h"
 #include "dependencies/utils/glm_util.h"
 #include "renderer/Renderer.h"
-#include "game/model.h"
+#include "renderer/Model.h"
 
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -112,12 +112,15 @@ int Game::RunLevel()
 	};
 
 	VertexArray vaoSkybox;
-
+	vaoSkybox.Bind();
 
 	VertexBufferLayout vbl;
 	VertexBuffer vbSkybox(skyboxVertices, 6 * 6 * 3 * sizeof(float), kStaticDraw);
+	vbSkybox.Bind();
 
 	IndexBuffer ibSkybox(skyboxIndices, 6 * 2 * 3 * sizeof(unsigned int), kStaticDraw);
+	ibSkybox.Bind();
+
 	vbl.Push<float>(3, false);
 	vbSkybox.SetLayout(vbl);
 	vbl.Clear();
@@ -125,15 +128,16 @@ int Game::RunLevel()
 	vaoSkybox.AddBuffer(vbSkybox);
 
 	std::vector<std::string> cubeMapPaths = {
-		"res/textures/skype_right.png",
-		"res/textures/skype_left.png",
-		"res/textures/skype_top.png",
-		"res/textures/skype_bottom.png",
-		"res/textures/skype_front.png",
-		"res/textures/skype_back.png"
+		"res/textures/rainbow_right.png",
+		"res/textures/rainbow_left.png",
+		"res/textures/rainbow_top.png",
+		"res/textures/rainbow_bottom.png",
+		"res/textures/rainbow_front.png",
+		"res/textures/rainbow_back.png"
 	};
 
 	CubeMapTexture cubeMapTex(cubeMapPaths);
+	cubeMapTex.Bind();
 	cubeMapTex.SetWrap(kS, kClampToEdge);
 	cubeMapTex.SetWrap(kR, kClampToEdge);
 	cubeMapTex.SetWrap(kT, kClampToEdge);
@@ -162,11 +166,14 @@ int Game::RunLevel()
 	};
 
 	VertexArray vaoQuad;
-
+	vaoQuad.Bind();
 
 	VertexBuffer vbQuad(quadVertices, 6 * 4 * sizeof(float), kStaticDraw);
+	vbQuad.Bind();
 
 	IndexBuffer ibQuad(quadIndices, 6 * 1 * sizeof(unsigned int), kStaticDraw);
+	ibQuad.Bind();
+	
 	vbl.Push<float>(2, false);
 	vbl.Push<float>(2, false);
 	vbQuad.SetLayout(vbl);
@@ -225,11 +232,14 @@ int Game::RunLevel()
 		21, 22, 23
 	};
 	VertexArray vao;
-
+	vao.Bind();
 
 	VertexBuffer vb(vertices, 24 * sizeof(Vertex), kStaticDraw);
-	
+	vb.Bind();
+
 	IndexBuffer ib(indices, 6 * 6 * sizeof(unsigned int), kStaticDraw);
+	ib.Bind();
+
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(3, false);
 	vbl.Push<float>(2, false);
@@ -256,8 +266,9 @@ int Game::RunLevel()
 	tex2.Bind();
 
 	simple_shader.Use();
-	simple_shader.SetInt("material.diffuseMap", 0);
-	simple_shader.SetInt("material.specularMap", 1);
+	simple_shader.SetInt("material.texture_diffuse1", 0);
+	simple_shader.SetInt("material.texture_specular1", 1);
+
 
 
 	glm::vec3 offset[] = { glm::vec3(0.0f), glm::vec3(0.0f) };
@@ -268,16 +279,18 @@ int Game::RunLevel()
 	
 	MultiSampledTexture colorTex;
 	colorTex.SetType(k2DMS);
+	colorTex.Bind();
 	colorTex.SetMultiSamples(16);
 	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
-	colorTex.Bind();
 
 	RenderBuffer rbo;
+	rbo.Bind();
 	rbo.EnableMultiSampled();
 	rbo.SetMultiSamples(16);
 	rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 
 	FrameBuffer fbo;
+	fbo.Bind();
 	fbo.AttachRenderObject(rbo, kDepthStencilAttach);
 	fbo.AttachTexture(colorTex, kColorAttach0);
 	if (!fbo.IsComplete())
@@ -293,14 +306,15 @@ int Game::RunLevel()
 	colorTexInttermediate.SetMinFilter(kLinear);
 	colorTexInttermediate.SetMagFilter(kLinear);
 	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
-	colorTexInttermediate.Bind();
 	post_process.Use();
 	post_process.SetInt("quadTex", 2);
 
 	RenderBuffer rboInttermediate;
+	rboInttermediate.Bind();
 	rboInttermediate.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 
 	FrameBuffer fboInttermediate;
+	fboInttermediate.Bind();
 	fboInttermediate.AttachRenderObject(rboInttermediate, kDepthStencilAttach);
 	fboInttermediate.AttachTexture(colorTexInttermediate, kColorAttach0);
 	if (!fboInttermediate.IsComplete())
@@ -308,7 +322,8 @@ int Game::RunLevel()
 
 	int glfwWidth;
 	int glfwHeight;
-	Model rex("res/objects/rex/REX.obj");
+	Model rex("res/objects/rex/rex.obj");
+
 
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
@@ -317,11 +332,14 @@ int Game::RunLevel()
 			//Should be done in a better modular way
 		{
 			UpdateWindowSize(glfwWidth, glfwHeight);
+			rbo.Bind();
 			rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+			rboInttermediate.Bind();
 			rboInttermediate.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+			colorTex.Bind();
 			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
-			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
 			colorTexInttermediate.Bind();
+			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
 		}
 		//Update time
 		m_CurrentFrame = glfwGetTime();
@@ -351,17 +369,15 @@ int Game::RunLevel()
 		glm::mat4 model = glm::mat4(1.0);
 		glm::mat4 view = glm::mat4(1.0);
 		glm::mat4 projection = glm::mat4(1.0);
-		glm::mat4 normal = glm::mat4(glm::transpose(glm::inverse(model)));
-		glm::vec3 lightPos = glm::vec3(-5 /* cos(glfwGetTime())*/, 5/*sin(glfwGetTime())*/, -5);
-		glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0);
+		glm::vec3 lightPos = glm::vec3(200  * cos(glfwGetTime()), 200*sin(glfwGetTime()), -5);
+		glm::vec3 lightColor = glm::vec3(0.5+sin(glfwGetTime())/2, 0, 0.5+cos(glfwGetTime())/2);
 		model = glm::translate(model, offset[0]);
 		view = m_Camera.GetViewMatrix();
-		projection = glm::perspective(glm::radians(m_Camera.GetFOV()), (float)m_WindowWidth/(float)m_WindowHeight, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(m_Camera.GetFOV()), (float)m_WindowWidth/(float)m_WindowHeight, 0.1f, 200.0f);
 		simple_shader.Use();
 		simple_shader.SetMat4("model", model);
 		simple_shader.SetMat4("view", view);
 		simple_shader.SetMat4("projection", projection);
-		simple_shader.SetMat4("normal", normal);
 		simple_shader.SetVec3("viewPos", m_Camera.GetPosition());
 
 		simple_shader.SetFloat("material.shineness", 32);
@@ -372,11 +388,18 @@ int Game::RunLevel()
 		simple_shader.SetVec3("spotLights[0].direction", glm::vec3(0,0,-1));
 		simple_shader.SetVec3("pointLights[0].color", lightColor);
 		simple_shader.SetFloat("pointLights[0].kC", 1);
-		simple_shader.SetFloat("pointLights[0].kL", 0.0045f);
-		simple_shader.SetFloat("pointLights[0].kQ", 0.00075f);
+		simple_shader.SetFloat("pointLights[0].kL", 0.00045f);
+		simple_shader.SetFloat("pointLights[0].kQ", 0.000075f);
 		simple_shader.SetFloat("spotLights[0].outer_cutoff", cos(glm::radians(35.0f)));
 		simple_shader.SetFloat("spotLights[0].inner_cutoff", cos(glm::radians(25.0f)));
 		simple_shader.SetInt("n_PointLights", 1);
+
+		simple_shader.SetInt("n_DirectionalLights", 1);
+		simple_shader.SetFloat("directionalLighting[0].ambient", 0.2f);
+		simple_shader.SetFloat("directionalLighting[0].diffuse", 0.8f);
+		simple_shader.SetFloat("directionalLighting[0].specular", 1.0f);
+		simple_shader.SetVec3("directionalLighting[0].direction", glm::vec3(0, 0, -1));
+		simple_shader.SetVec3("directionalLighting[0].color", glm::vec3(1.0f));
 
 
 		//Setup for border (part 1)
@@ -387,7 +410,15 @@ int Game::RunLevel()
 
 		
 		//Render using openGL
-		m_Renderer.Draw(vao, simple_shader, 6 * 6, 0);
+		//m_Renderer.Draw(vao, simple_shader, 6 * 6, 0);
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
+		for (int i = 0; i < 5; i++)
+		{
+			simple_shader.SetMat4("model", model);
+			rex.Draw(simple_shader);
+			model = glm::translate(model, glm::vec3(20.0f, 0.0f, 0.0f));
+		}
 
 		
 		//Draw lamp
@@ -395,7 +426,7 @@ int Game::RunLevel()
 		lamp_shader.Use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::scale(model, glm::vec3(3.5f));
 		lamp_shader.SetMat4("model", model);
 		lamp_shader.SetMat4("view", view);
 		lamp_shader.SetMat4("projection", projection);
@@ -404,15 +435,6 @@ int Game::RunLevel()
 		vao.Unbind();
 		
 
-		//Draw REX
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, -lightPos);
-		model_simple_shader.Use();
-		model_simple_shader.SetMat4("model", model);
-		model_simple_shader.SetMat4("view", view);
-		model_simple_shader.SetMat4("projection", projection);
-		model_simple_shader.SetVec3("lightColor", lightColor);
-		rex.Draw(model_simple_shader);
 
 		//Cubemap
 		m_Renderer.SetDepthFunc(kLEqual);
@@ -439,7 +461,7 @@ int Game::RunLevel()
 		//m_Renderer.DisableDepthTesting();
 		m_Renderer.SetStencilFunc(kNotEqual, 1, 0xff);
 		m_Renderer.SetStencilMask(0x00);
-		m_Renderer.Draw(vao, border_shader, 6 * 6, 0);
+		//m_Renderer.Draw(vao, border_shader, 6 * 6, 0);
 		m_Renderer.EnableDepthTesting();
 		m_Renderer.SetStencilMask(0xff);
 		m_Renderer.DisableStencilTesting();

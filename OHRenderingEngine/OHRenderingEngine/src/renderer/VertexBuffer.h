@@ -10,14 +10,23 @@ class VertexBuffer
 {
 public:
 	VertexBuffer();
-	VertexBuffer(BUFFER_USAGE usage);
 	VertexBuffer(unsigned int size, BUFFER_USAGE usage);
 	VertexBuffer(void* data, unsigned int size, BUFFER_USAGE usage);
 	~VertexBuffer();
+	//Copy constructor
+	VertexBuffer(const VertexBuffer& other) = delete;
+	//Move constructor
+	VertexBuffer(VertexBuffer && other) noexcept;
+	//Copy assignment operator
+	VertexBuffer& operator=(const VertexBuffer& other) = delete;
+	//Move assignment operator
+	VertexBuffer& operator=(VertexBuffer&& other) noexcept;
 	//Binds the current vertex buffer to this
 	void Bind() const;
 	//Unbinds the vertex buffer
-	void Unbind() const;
+	static void Unbind();
+	//Buffers the data for the buffe
+	void BufferData(void* data, unsigned int size, BUFFER_USAGE usage);
 	//Buffers a part of the data
 	//data: The data to be copied to GPU
 	//size: The size of the data in bytes

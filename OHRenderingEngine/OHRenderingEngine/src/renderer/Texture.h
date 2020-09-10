@@ -14,9 +14,19 @@ public:
 	Texture();
 	Texture(const char * path);
 	virtual ~Texture();
+	//Copy constructor
+	Texture(const Texture& other);					
+	//Move constructor
+	Texture(Texture && other) noexcept;
+	//Copy assignment operator
+	Texture& operator=(const Texture& other);		
+	//Move assignment operator
+	Texture& operator=(Texture&& other) noexcept;
 	unsigned int GetId() const;
 	std::string GetPath() const;
 	virtual TextureType GetType() const;
+	//Loads the image texture
+	void CreateTextureFromPath();
 	//Creates the texture with the passed screen size for the passed buffer type
 	virtual void CreateTexImage(float width, float height, BufferType bType) const;
 	//Binds the 2D texture to this texture

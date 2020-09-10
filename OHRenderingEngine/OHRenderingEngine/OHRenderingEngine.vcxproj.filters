@@ -49,5 +49,7 @@
     <ClInclude Include="src\renderer\FrameBuffer.h" />
     <ClInclude Include="src\renderer\CubeMapTexture.h" />
     <ClInclude Include="src\renderer\MultiSampledTexture.h" />
+    <ClInclude Include="src\renderer\Mesh.h" />
+    <ClInclude Include="src\renderer\Model.h" />
   </ItemGroup>
 </Project>

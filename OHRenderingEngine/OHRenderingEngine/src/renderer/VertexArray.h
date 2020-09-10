@@ -9,10 +9,18 @@ class VertexArray
 public:
 	VertexArray();
 	~VertexArray();
+	//Copy constructor
+	VertexArray(const VertexArray& other) = delete;
+	//Move constructor
+	VertexArray(VertexArray && other) noexcept;
+	//Copy assignment operator
+	VertexArray& operator=(const VertexArray& other) = delete;
+	//Move assignment operator
+	VertexArray& operator=(VertexArray&& other) noexcept;
 	//Binds the current vertex array to this one
 	void Bind() const;
 	//Unbinds the current vertex array
-	void Unbind() const;
+	static void Unbind();
 	//Adds a vertex buffer to this vertex array
 	//vb: The vertex buffer to be added
 	void AddBuffer(const VertexBuffer &vb);

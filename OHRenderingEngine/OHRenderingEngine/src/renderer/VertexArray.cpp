@@ -5,7 +5,6 @@
 VertexArray::VertexArray()
 {
 	GlCall(glGenVertexArrays(1, &m_ID));
-	GlCall(glBindVertexArray(m_ID));
 }
 
 static unsigned int GLSizeOf(unsigned int type)
@@ -42,12 +41,33 @@ VertexArray::~VertexArray()
 	GlCall(glDeleteVertexArrays(1, &m_ID));
 }
 
+VertexArray::VertexArray(VertexArray && other) noexcept
+{
+	//Move the ID
+	m_ID = other.m_ID;
+
+	//Clean the other buffer
+	other.m_ID = 0;
+}
+
+VertexArray & VertexArray::operator=(VertexArray && other) noexcept
+{
+	GlCall(glDeleteVertexArrays(1, &m_ID));
+	//Move the ID
+	m_ID = other.m_ID;
+
+	//Clean the other buffer
+	other.m_ID = 0;
+
+	return *this;
+}
+
 void VertexArray::Bind() const
 {
 	GlCall(glBindVertexArray(m_ID));
 }
 
-void VertexArray::Unbind() const
+void VertexArray::Unbind()
 {
 	GlCall(glBindVertexArray(0));
 }
@@ -55,8 +75,6 @@ void VertexArray::Unbind() const
 void VertexArray::AddBuffer(const VertexBuffer & vb)
 {
 	const VertexBufferLayout* vbl = &vb.GetLayout();
-	Bind();
-	vb.Bind();
 	unsigned int stride = vbl->GetStride();
 	std::vector<VertexBufferElement> elements = vbl->GetElements();
 	unsigned int offset = 0;
