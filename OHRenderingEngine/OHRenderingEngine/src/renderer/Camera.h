@@ -55,6 +55,7 @@ private:
 	bool m_FirstMouseMotion;
 	float m_FOV;
 	float m_Sensetivity;
+	bool m_YLocked;
 	glm::vec3 m_Pos;
 	glm::vec3 m_Up;
 	glm::vec3 m_Camerafront;

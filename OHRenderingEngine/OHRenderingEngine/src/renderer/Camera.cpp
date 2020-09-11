@@ -9,6 +9,7 @@ Camera::Camera(float sensetivity, float speed):
 	m_FirstMouseMotion(true),
 	m_FOV(45.0f),
 	m_Sensetivity(sensetivity),
+	m_YLocked(true),
 	m_Pos(glm::vec3(0.0f,0.0f,10.0f)),
 	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
 	m_Camerafront(glm::vec3(0.0f, 0.0f, -1.0f)),
@@ -55,13 +56,15 @@ void Camera::UpdateRotation(double xpos, double ypos)
 
 void Camera::UpdatePosition(MovementDirection dir, float delta_time)
 {
+	glm::vec3 movement_direction = m_Camerafront;
+	if (m_YLocked) movement_direction.y = 0;
 	switch (dir)
 	{
 	case kForward: 
-		m_Pos += m_Camerafront * m_CameraSpeed * delta_time;
+		m_Pos += movement_direction * m_CameraSpeed * delta_time;
 		break;
 	case kBackward: 
-		m_Pos -= m_Camerafront * m_CameraSpeed * delta_time;
+		m_Pos -= movement_direction * m_CameraSpeed * delta_time;
 		break;
 	case kRight: 
 		m_Pos += m_Right * delta_time * m_CameraSpeed;

@@ -255,6 +255,8 @@ int Game::RunLevel()
 	Shader border_shader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
 	Shader post_process("res/shaders/post_process.vert", "res/shaders/post_process.frag");
 	Shader model_simple_shader("res/shaders/modelsimple.vert", "res/shaders/modelsimple.frag");
+	Model vm("res/objects/vending_machine/untitled.obj");
+
 	stbi_set_flip_vertically_on_load_thread(1);
 	Texture tex1("res/textures/container.png");
 	Texture tex2("res/textures/container_specular.png");
@@ -325,12 +327,13 @@ int Game::RunLevel()
 	int glfwWidth;
 	int glfwHeight;
 	Model ground("res/objects/try/ground.obj");
+
 	m_MovingSpeed = 0;
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
 		//If player is moving, apply blur
 		post_process.SetBool("moving", m_Moving);
-		post_process.SetFloat("blurStrength", m_MovingSpeed);
+		post_process.SetFloat("blurStrength", std::max(m_MovingSpeed,0.0f));
 
 		glfwGetWindowSize(m_CurrentWindow, &glfwWidth, &glfwHeight);
 		if (glfwWidth != m_WindowWidth || glfwHeight != m_WindowHeight)
@@ -418,12 +421,13 @@ int Game::RunLevel()
 
 		
 		//Render using openGL
-		//m_Renderer.Draw(vao, simple_shader, 6 * 6, 0);
-		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::scale(model, glm::vec3(5.0f));
+		model = glm::translate(model, glm::vec3(0, 0.3f, 0.0f));
+		simple_shader.SetMat4("model", model);
+		vm.Draw(simple_shader);
 		simple_shader.SetMat4("model", model);
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
 		for (int i = 0; i < 20; i++)
 		{
 			glm::mat4 model2 = model;
@@ -437,7 +441,6 @@ int Game::RunLevel()
 				ground.Draw(simple_shader);
 			}
 		}
-
 		
 		//Draw lamp
 		m_Renderer.SetStencilMask(0x00);
@@ -501,8 +504,8 @@ int Game::RunLevel()
 		glfwSwapBuffers(m_CurrentWindow);
 		glfwPollEvents();
 		ProcessInput();
-		m_MovingSpeed = std::max(m_MovingSpeed, 0.0f);
-		m_MovingSpeed = std::min(m_MovingSpeed, 1.2f);
+		m_MovingSpeed = std::max(m_MovingSpeed, -0.5f);
+		m_MovingSpeed = std::min(m_MovingSpeed, 0.8f);
 	}
 	m_GameEnded = true;
 	return 0;
@@ -556,28 +559,28 @@ void Game::ProcessInput()
 	{
 		m_Camera.UpdatePosition(kForward, m_DeltaTime);
 		m_Moving = true;
-		m_MovingSpeed += 0.01;
+		m_MovingSpeed += 0.005;
 		return;
 	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_S))
 	{
 		m_Camera.UpdatePosition(kBackward, m_DeltaTime);
 		m_Moving = true;
-		m_MovingSpeed += 0.01;
+		m_MovingSpeed += 0.005;
 		return;
 	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_D))
 	{
 		m_Camera.UpdatePosition(kRight, m_DeltaTime);
 		m_Moving = true;
-		m_MovingSpeed += 0.01;
+		m_MovingSpeed += 0.005;
 		return;
 	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_A))
 	{
 		m_Camera.UpdatePosition(kLeft, m_DeltaTime);
 		m_Moving = true;
-		m_MovingSpeed += 0.01;
+		m_MovingSpeed += 0.005;
 		return;
 	}
 	m_MovingSpeed -= 0.05;
