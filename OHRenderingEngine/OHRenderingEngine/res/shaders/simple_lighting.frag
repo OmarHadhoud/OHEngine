@@ -71,7 +71,7 @@ uniform vec3 viewPos;
 uniform int n_DirectionalLights;	//Actual number of directional lights passed
 uniform int n_PointLights;			//Actual number of point lights passed
 uniform int n_SpotLights;			//Actual number of spotlights passed
-uniform DirectionaLighting directionalLighting[MAX_DIRECTIONAL_LIGHTS];
+uniform DirectionaLighting directionalLights[MAX_DIRECTIONAL_LIGHTS];
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOTLIGHTS];
 
@@ -104,24 +104,24 @@ vec3 ComputeDirectionalLight()
 	for(int i = 0; i < n_DirectionalLights; i++)
 	{
 		//Inverse the directional lighting direction
-		vec3 lightDir = - normalize(directionalLighting[i].direction);
+		vec3 lightDir = - normalize(directionalLights[i].direction);
 
 		//Ambient
-		ambient = vec3(directionalLighting[i].ambient) * vec3(texture(material.texture_diffuse1, v_TexCoords));
+		ambient = vec3(directionalLights[i].ambient) * vec3(texture(material.texture_diffuse1, v_TexCoords));
 
 		//Diffuse
 		vec3 normalDir = vec3(normalize(v_NormalDir));
 		float diffuse_dot = max(dot(normalDir, lightDir), 0.0f);
 
-		diffuse = vec3(diffuse_dot*directionalLighting[i].diffuse) *vec3(texture(material.texture_diffuse1, v_TexCoords));
+		diffuse = vec3(diffuse_dot*directionalLights[i].diffuse) *vec3(texture(material.texture_diffuse1, v_TexCoords));
 
 		//Specular
 		vec3 reflectDir = normalize(reflect(-lightDir, normalDir));
 		vec3 viewDir = normalize(viewPos - fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
-		specular = vec3(pow(specular_dot,material.shineness)* directionalLighting[i].specular) * vec3(texture(material.texture_specular1, v_TexCoords));
-		ret += directionalLighting[i].color * (ambient+diffuse+specular);
+		specular = vec3(pow(specular_dot,material.shineness)* directionalLights[i].specular) * vec3(texture(material.texture_specular1, v_TexCoords));
+		ret += directionalLights[i].color * (ambient+diffuse+specular);
 	}
 	
 	return ret;

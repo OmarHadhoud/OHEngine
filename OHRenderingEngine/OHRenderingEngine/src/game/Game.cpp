@@ -42,14 +42,7 @@ int Game::RunLevel()
 {
 	m_Moving = false;
 	m_Renderer.SetActiveWindow(m_CurrentWindow);
-	struct Vertex
-	{
-		glm::vec3 pos;
-		glm::vec3 color;
-		glm::vec2 tex_coord;
-		glm::vec4 normal_coord;
-		int tex_num;
-	};
+	
 	
 
 	std::vector<std::string> cubeMapPaths = {
@@ -61,6 +54,7 @@ int Game::RunLevel()
 		"res/textures/nz.png"
 	};
 	m_Skybox = std::make_unique<Skybox>(cubeMapPaths);
+	m_LightManager = std::make_unique<LightManager>();
 
 
 	//Post procesing data
@@ -97,76 +91,9 @@ int Game::RunLevel()
 	vbl.Clear();
 	vaoQuad.AddBuffer(vbQuad);
 
-	Vertex vertices[] = {
-		//Front face
-		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(0.0f,0.0f,1.0f,0.0f),  1,	//0
-		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	glm::vec4(0.0f,0.0f,1.0f,0.0f),  1,	//1
-		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	glm::vec4(0.0f,0.0f,1.0f,0.0f),  1,	//2
-		glm::vec3(0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	glm::vec4(0.0f,0.0f,1.0f,0.0f),  1,	//3
-		//Back face
-		glm::vec3(-0.5f,0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(0.0f,0.0f,-1.0f,0.0f),  1,//4
-		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	glm::vec4(0.0f,0.0f,-1.0f,0.0f),  1,//5
-		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	glm::vec4(0.0f,0.0f,-1.0f,0.0f),  1,//6
-		glm::vec3(0.5f,0.5f,-0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	glm::vec4(0.0f,0.0f,-1.0f,0.0f),  1,//7
-		//Right face
-		glm::vec3(0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(1.0f,0.0f,0.0f,0.0f),  1,	//8
-		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,0.0f),	glm::vec4(1.0f,0.0f,0.0f,0.0f),  1,	//9
-		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	glm::vec4(1.0f,0.0f,0.0f,0.0f),  1,	//10
-		glm::vec3(0.5f,0.5f,-0.5f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(1.0f,1.0f),	glm::vec4(1.0f,0.0f,0.0f,0.0f),  1,	//11
-		//Left face
-		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(-1.0f,0.0f,0.0f,0.0f),  1,//12
-		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,0.0f),	glm::vec4(-1.0f,0.0f,0.0f,0.0f),  1,//13
-		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	glm::vec4(-1.0f,0.0f,0.0f,0.0f),  1,//14
-		glm::vec3(-0.5f,0.5f,-0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(1.0f,1.0f),	glm::vec4(-1.0f,0.0f,0.0f,0.0f),  1,//15
-		//Upper face
-		glm::vec3(-0.5f,0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(0.0f,1.0f,0.0f,0.0f),  1,	//16
-		glm::vec3(-0.5f,0.5f,0.5f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	glm::vec4(0.0f,1.0f,0.0f,0.0f),  1,	//17
-		glm::vec3(0.5f,0.5f,0.5f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	glm::vec4(0.0f,1.0f,0.0f,0.0f),  1,	//18
-		glm::vec3(0.5f,0.5f,-0.5f),		glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	glm::vec4(0.0f,1.0f,0.0f,0.0f),  1,	//19
-		//Downwards face																				
-		glm::vec3(-0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f,1.0f),	glm::vec4(0.0f,-1.0f,0.0f,0.0f),  1,//20
-		glm::vec3(-0.5f,-0.5f,0.5f),	glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f,0.0f),	glm::vec4(0.0f,-1.0f,0.0f,0.0f),  1,//21
-		glm::vec3(0.5f,-0.5f,0.5f),		glm::vec3(1.0f, 1.0f, 0.0f),	glm::vec2(1.0f,0.0f),	glm::vec4(0.0f,-1.0f,0.0f,0.0f),  1,//22
-		glm::vec3(0.5f,-0.5f,-0.5f),	glm::vec3(1.0f, 0.0f, 1.0f),	glm::vec2(1.0f,1.0f),	glm::vec4(0.0f,-1.0f,0.0f,0.0f),  1	//23
-	};
-	unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3,
-		
-		4, 5, 7,
-		5, 6, 7,
-		
-		8, 9, 11,
-		9, 10, 11,
-
-		12, 13, 15,
-		13, 14, 15,
-
-		16, 17, 19,
-		17, 18, 19,
-
-		20, 21, 23,
-		21, 22, 23
-	};
-	VertexArray vao;
-	vao.Bind();
-
-	VertexBuffer vb(vertices, 24 * sizeof(Vertex), kStaticDraw);
-	vb.Bind();
-
-	IndexBuffer ib(indices, 6 * 6 * sizeof(unsigned int), kStaticDraw);
-	ib.Bind();
-
-	vbl.Push<float>(3, false);
-	vbl.Push<float>(3, false);
-	vbl.Push<float>(2, false);
-	vbl.Push<float>(4, false);
-	vbl.Push<float>(1, false);
-	vb.SetLayout(vbl);
-
-	vao.AddBuffer(vb);
 	
-	Shader lamp_shader("res/shaders/lamp.vert", "res/shaders/lamp.frag");
+	
+	
 	Shader simple_shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
 	Shader border_shader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
 	Shader post_process("res/shaders/post_process.vert", "res/shaders/post_process.frag");
@@ -245,6 +172,7 @@ int Game::RunLevel()
 	Model ground("res/objects/try/ground.obj");
 
 	m_MovingSpeed = 0;
+	m_LightManager->AddLight(&PointLight(glm::vec3(0, 0, 0), glm::vec3(1.0f, 0.0f, 0.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f));
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
 		//If player is moving, apply blur
@@ -285,7 +213,6 @@ int Game::RunLevel()
 
 		//Clear screen using openGL
 		fbo.Bind();
-		vao.Bind();
 		m_Renderer.EnableDepthTesting();
 		m_Renderer.Clear(kColorBufferBit | kDepthBufferBit | kStencilBufferBit, glm::vec4(0.4f, 0.2f, 0.4f, 1.0f));
 
@@ -305,26 +232,7 @@ int Game::RunLevel()
 		simple_shader.SetVec3("viewPos", m_Camera.GetPosition());
 
 		simple_shader.SetFloat("material.shineness", 32);
-		simple_shader.SetFloat("pointLights[0].ambient", 0.2f);
-		simple_shader.SetFloat("pointLights[0].diffuse", 0.8f);
-		simple_shader.SetFloat("pointLights[0].specular",1.0f);
-		simple_shader.SetVec3("pointLights[0].position", lightPos);
-		simple_shader.SetVec3("spotLights[0].direction", glm::vec3(0,0,-1));
-		simple_shader.SetVec3("pointLights[0].color", lightColor);
-		simple_shader.SetFloat("pointLights[0].kC", 1);
-		simple_shader.SetFloat("pointLights[0].kL", 0.00045f);
-		simple_shader.SetFloat("pointLights[0].kQ", 0.000075f);
-		simple_shader.SetFloat("spotLights[0].outer_cutoff", cos(glm::radians(35.0f)));
-		simple_shader.SetFloat("spotLights[0].inner_cutoff", cos(glm::radians(25.0f)));
-		simple_shader.SetInt("n_PointLights", 1);
-
-		simple_shader.SetInt("n_DirectionalLights", 1);
-		simple_shader.SetFloat("directionalLighting[0].ambient", 0.2f);
-		simple_shader.SetFloat("directionalLighting[0].diffuse", 0.8f);
-		simple_shader.SetFloat("directionalLighting[0].specular", 1.0f);
-		simple_shader.SetVec3("directionalLighting[0].direction", glm::vec3(0, 0, -1));
-		simple_shader.SetVec3("directionalLighting[0].color", glm::vec3(1.0f));
-
+		m_LightManager->SetLight(simple_shader);
 
 		
 
@@ -358,19 +266,9 @@ int Game::RunLevel()
 			}
 		}
 		
-		//Draw lamp
+		//Draw lamps
 		m_Renderer.SetStencilMask(0x00);
-		lamp_shader.Use();
-		model = glm::mat4(0.3f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(3.5f));
-		lamp_shader.SetMat4("model", model);
-		lamp_shader.SetMat4("view", view);
-		lamp_shader.SetMat4("projection", projection);
-		lamp_shader.SetVec3("lightColor", lightColor);
-		m_Renderer.Draw(vao, lamp_shader, 6 * 6, 0);
-		vao.Unbind();
-		
+		m_LightManager->DrawLights(view, projection);
 
 
 		//Skybox

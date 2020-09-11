@@ -1,0 +1,32 @@
+#ifndef LIGHT_MANAGER_H
+#define LIGHT_MANAGER_H
+
+#include <vector>
+
+#include "renderer/Renderer.h"
+
+#include "game/DirectionaLight.h"
+#include "game/PointLight.h"
+#include "game/SpotLight.h"
+
+
+class LightManager
+{
+public:
+	LightManager();
+	~LightManager();
+	void AddLight(Light* light);
+	void SetLight(Shader &shader) const;
+	void DrawLights(glm::mat4 view, glm::mat4 projection) const;
+private:
+	std::vector<DirectionaLight> m_DirectionalLights;
+	std::vector<PointLight> m_PointLights;
+	std::vector<SpotLight> m_SpotLights;
+	VertexArray m_VAO;
+	VertexBuffer m_VBO;
+	VertexBufferLayout m_VBL;
+	IndexBuffer m_IBO;
+	Shader m_Shader;
+};
+
+#endif // !LIGHT_MANAGER_H

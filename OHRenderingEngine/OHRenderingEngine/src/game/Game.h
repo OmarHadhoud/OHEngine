@@ -4,6 +4,7 @@
 
 #include "renderer/Renderer.h"
 #include "game/Skybox.h"
+#include "game/LightManager.h"
 
 #include <GLFW/glfw3.h>
 
@@ -31,6 +32,7 @@ private:
 	//Level related
 	bool m_GameEnded;
 	std::unique_ptr<Skybox> m_Skybox;
+	std::unique_ptr<LightManager> m_LightManager;
 	//Player related
 	bool m_Moving;
 	float m_MovingSpeed;
