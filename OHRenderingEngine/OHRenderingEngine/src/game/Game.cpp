@@ -50,83 +50,7 @@ int Game::RunLevel()
 		glm::vec4 normal_coord;
 		int tex_num;
 	};
-	//Skybox data
-	float skyboxVertices[] = 
-	{
-	-1.0f,  1.0f, -1.0f,	//0
-	-1.0f, -1.0f, -1.0f,	//1
-	 1.0f, -1.0f, -1.0f,	//2
-	 1.0f, -1.0f, -1.0f,	//3
-	 1.0f,  1.0f, -1.0f,	//4
-	-1.0f,  1.0f, -1.0f,	//5
-							
-	-1.0f, -1.0f,  1.0f,	//6
-	-1.0f, -1.0f, -1.0f,	//7
-	-1.0f,  1.0f, -1.0f,	//8
-	-1.0f,  1.0f, -1.0f,	//9
-	-1.0f,  1.0f,  1.0f,	//10
-	-1.0f, -1.0f,  1.0f,	//11
-							
-	 1.0f, -1.0f, -1.0f,	//12
-	 1.0f, -1.0f,  1.0f,	//13
-	 1.0f,  1.0f,  1.0f,	//14
-	 1.0f,  1.0f,  1.0f,	//15
-	 1.0f,  1.0f, -1.0f,	//16
-	 1.0f, -1.0f, -1.0f,	//17
-							
-	-1.0f, -1.0f,  1.0f,	//18
-	-1.0f,  1.0f,  1.0f,	//19
-	 1.0f,  1.0f,  1.0f,	//20
-	 1.0f,  1.0f,  1.0f,	//21
-	 1.0f, -1.0f,  1.0f,	//22
-	-1.0f, -1.0f,  1.0f,	//23
-							
-	-1.0f,  1.0f, -1.0f,	//24
-	 1.0f,  1.0f, -1.0f,	//25
-	 1.0f,  1.0f,  1.0f,	//26
-	 1.0f,  1.0f,  1.0f,	//27
-	-1.0f,  1.0f,  1.0f,	//28
-	-1.0f,  1.0f, -1.0f,	//29
-							
-	-1.0f, -1.0f, -1.0f,	//30
-	-1.0f, -1.0f,  1.0f,	//31
-	 1.0f, -1.0f, -1.0f,	//32
-	 1.0f, -1.0f, -1.0f,	//33
-	-1.0f, -1.0f,  1.0f,	//34
-	 1.0f, -1.0f,  1.0f		//35
-	};
-
-	unsigned int skyboxIndices[] =
-	{
-		0,1,2,
-		3,4,5,
-		6,7,8,
-		9,10,11,
-		12,13,14,
-		15,16,17,
-		18,19,20,
-		21,22,23,
-		24,25,26,
-		27,28,29,
-		30,31,32,
-		33,34,35
-	};
-
-	VertexArray vaoSkybox;
-	vaoSkybox.Bind();
-
-	VertexBufferLayout vbl;
-	VertexBuffer vbSkybox(skyboxVertices, 6 * 6 * 3 * sizeof(float), kStaticDraw);
-	vbSkybox.Bind();
-
-	IndexBuffer ibSkybox(skyboxIndices, 6 * 2 * 3 * sizeof(unsigned int), kStaticDraw);
-	ibSkybox.Bind();
-
-	vbl.Push<float>(3, false);
-	vbSkybox.SetLayout(vbl);
-	vbl.Clear();
-
-	vaoSkybox.AddBuffer(vbSkybox);
+	
 
 	std::vector<std::string> cubeMapPaths = {
 		"res/textures/px.png",
@@ -136,18 +60,8 @@ int Game::RunLevel()
 		"res/textures/pz.png",
 		"res/textures/nz.png"
 	};
+	m_Skybox = std::make_unique<Skybox>(cubeMapPaths);
 
-	CubeMapTexture cubeMapTex(cubeMapPaths);
-	cubeMapTex.Bind();
-	cubeMapTex.SetWrap(kS, kClampToEdge);
-	cubeMapTex.SetWrap(kR, kClampToEdge);
-	cubeMapTex.SetWrap(kT, kClampToEdge);
-	cubeMapTex.SetMinFilter(kLinear);
-	cubeMapTex.SetMagFilter(kLinear);
-
-	Shader skyboxShader("res/shaders/cubemap.vert", "res/shaders/cubemap.frag");
-	skyboxShader.Use();
-	skyboxShader.SetInt("skybox", 0);
 
 	//Post procesing data
 	float quadVertices[] = 
@@ -171,6 +85,8 @@ int Game::RunLevel()
 
 	VertexBuffer vbQuad(quadVertices, 6 * 4 * sizeof(float), kStaticDraw);
 	vbQuad.Bind();
+
+	VertexBufferLayout vbl;
 
 	IndexBuffer ibQuad(quadIndices, 6 * 1 * sizeof(unsigned int), kStaticDraw);
 	ibQuad.Bind();
@@ -457,17 +373,8 @@ int Game::RunLevel()
 		
 
 
-		//Cubemap
-		m_Renderer.SetDepthFunc(kLEqual);
-		skyboxShader.Use();
-		skyboxShader.SetMat4("view", glm::mat4(glm::mat3(view)));
-		skyboxShader.SetMat4("projection", projection);
-		vaoSkybox.Bind();
-		cubeMapTex.Activate(0);
-		cubeMapTex.Bind();
-		m_Renderer.Draw(vaoSkybox, skyboxShader, 6*6, 0);
-		vaoSkybox.Unbind();
-		m_Renderer.SetDepthFunc(kLess);
+		//Skybox
+		m_Skybox->Draw(view, projection);
 
 		//Border for the main cube
 		model = glm::mat4(1.0f);

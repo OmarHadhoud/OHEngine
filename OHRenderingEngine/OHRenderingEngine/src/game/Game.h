@@ -3,6 +3,7 @@
 
 
 #include "renderer/Renderer.h"
+#include "game/Skybox.h"
 
 #include <GLFW/glfw3.h>
 
@@ -24,14 +25,20 @@ public:
 	//Runs the game and returns -1 if failed.
 	int Run();
 private:
+	//Rendering related
 	Renderer m_Renderer;
 	Camera m_Camera;
+	//Level related
 	bool m_GameEnded;
+	std::unique_ptr<Skybox> m_Skybox;
+	//Player related
 	bool m_Moving;
 	float m_MovingSpeed;
+	//Window related
 	GLFWwindow *m_CurrentWindow;
 	unsigned int m_WindowWidth;
 	unsigned int m_WindowHeight;
+	//Time related
 	float m_DeltaTime;
 	float m_LastFrame;
 	float m_CurrentFrame;

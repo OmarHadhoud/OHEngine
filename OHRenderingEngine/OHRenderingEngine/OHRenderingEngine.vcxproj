@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="src\game\Skybox.cpp" />
     <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
     <ClCompile Include="src\renderer\Camera.cpp" />
     <ClCompile Include="src\renderer\FrameBuffer.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="src\renderer\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\Skybox.h" />
     <ClInclude Include="src\renderer\Mesh.h" />
     <ClInclude Include="src\renderer\Model.h" />
     <ClInclude Include="src\renderer\CubeMapTexture.h" />

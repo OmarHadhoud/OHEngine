@@ -22,6 +22,7 @@
     <ClCompile Include="src\renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
     <ClCompile Include="src\renderer\MultiSampledTexture.cpp" />
+    <ClCompile Include="src\game\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dependencies\utils\glm_util.h" />
@@ -51,5 +52,6 @@
     <ClInclude Include="src\renderer\MultiSampledTexture.h" />
     <ClInclude Include="src\renderer\Mesh.h" />
     <ClInclude Include="src\renderer\Model.h" />
+    <ClInclude Include="src\game\Skybox.h" />
   </ItemGroup>
 </Project>
