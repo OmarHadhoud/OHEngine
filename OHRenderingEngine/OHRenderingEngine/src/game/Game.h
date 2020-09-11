@@ -27,6 +27,8 @@ private:
 	Renderer m_Renderer;
 	Camera m_Camera;
 	bool m_GameEnded;
+	bool m_Moving;
+	float m_MovingSpeed;
 	GLFWwindow *m_CurrentWindow;
 	unsigned int m_WindowWidth;
 	unsigned int m_WindowHeight;

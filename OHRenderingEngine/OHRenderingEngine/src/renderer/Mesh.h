@@ -10,7 +10,7 @@
 #include "renderer/IndexBuffer.h"
 #include "renderer/VertexBuffer.h"
 #include "renderer/VertexBufferLayout.h"
-#include"renderer/VertexArray.h"
+#include "renderer/VertexArray.h"
 #include "renderer/Shader.h"
 #include "renderer/Texture.h"
 

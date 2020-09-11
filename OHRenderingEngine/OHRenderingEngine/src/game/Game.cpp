@@ -19,7 +19,7 @@
 Camera *g_CurrentCamera;
 Renderer *g_CurrentRenderer;
 
-Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT)
+Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT), m_Moving(false)
 {
 	InitializeGLFW(MAJOR, MINOR);
 	g_CurrentCamera = &m_Camera;
@@ -40,6 +40,7 @@ bool Game::GameEnded()
 
 int Game::RunLevel()
 {
+	m_Moving = false;
 	m_Renderer.SetActiveWindow(m_CurrentWindow);
 	struct Vertex
 	{
@@ -128,12 +129,12 @@ int Game::RunLevel()
 	vaoSkybox.AddBuffer(vbSkybox);
 
 	std::vector<std::string> cubeMapPaths = {
-		"res/textures/rainbow_right.png",
-		"res/textures/rainbow_left.png",
-		"res/textures/rainbow_top.png",
-		"res/textures/rainbow_bottom.png",
-		"res/textures/rainbow_front.png",
-		"res/textures/rainbow_back.png"
+		"res/textures/px.png",
+		"res/textures/nx.png",
+		"res/textures/py.png",
+		"res/textures/ny.png",
+		"res/textures/pz.png",
+		"res/textures/nz.png"
 	};
 
 	CubeMapTexture cubeMapTex(cubeMapPaths);
@@ -308,6 +309,7 @@ int Game::RunLevel()
 	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
 	post_process.Use();
 	post_process.SetInt("quadTex", 2);
+	post_process.SetBool("moving", false);
 
 	RenderBuffer rboInttermediate;
 	rboInttermediate.Bind();
@@ -322,11 +324,14 @@ int Game::RunLevel()
 
 	int glfwWidth;
 	int glfwHeight;
-	Model rex("res/objects/rex/rex.obj");
-
-
+	Model ground("res/objects/try/ground.obj");
+	m_MovingSpeed = 0;
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
+		//If player is moving, apply blur
+		post_process.SetBool("moving", m_Moving);
+		post_process.SetFloat("blurStrength", m_MovingSpeed);
+
 		glfwGetWindowSize(m_CurrentWindow, &glfwWidth, &glfwHeight);
 		if (glfwWidth != m_WindowWidth || glfwHeight != m_WindowHeight)
 			//Should be done in a better modular way
@@ -369,7 +374,7 @@ int Game::RunLevel()
 		glm::mat4 model = glm::mat4(1.0);
 		glm::mat4 view = glm::mat4(1.0);
 		glm::mat4 projection = glm::mat4(1.0);
-		glm::vec3 lightPos = glm::vec3(200  * cos(glfwGetTime()), 200*sin(glfwGetTime()), -5);
+		glm::vec3 lightPos = glm::vec3(10 , 10, -5);
 		glm::vec3 lightColor = glm::vec3(0.5+sin(glfwGetTime())/2, 0, 0.5+cos(glfwGetTime())/2);
 		model = glm::translate(model, offset[0]);
 		view = m_Camera.GetViewMatrix();
@@ -402,6 +407,9 @@ int Game::RunLevel()
 		simple_shader.SetVec3("directionalLighting[0].color", glm::vec3(1.0f));
 
 
+		
+
+
 		//Setup for border (part 1)
 		m_Renderer.EnableStencilTesting();
 		m_Renderer.SetStencilFunc(kAlways, 1, 0xff);
@@ -411,20 +419,30 @@ int Game::RunLevel()
 		
 		//Render using openGL
 		//m_Renderer.Draw(vao, simple_shader, 6 * 6, 0);
+		model = glm::scale(model, glm::vec3(0.2f));
+		simple_shader.SetMat4("model", model);
 		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
-		for (int i = 0; i < 5; i++)
+		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0,1,0));
+		for (int i = 0; i < 20; i++)
 		{
+			glm::mat4 model2 = model;
 			simple_shader.SetMat4("model", model);
-			rex.Draw(simple_shader);
-			model = glm::translate(model, glm::vec3(20.0f, 0.0f, 0.0f));
+			ground.Draw(simple_shader);
+			model = glm::translate(model, glm::vec3(21.f, 0.0f, 0.0f));
+			for (int j = 0; j < 20; j++)
+			{
+				model2 = glm::translate(model2, glm::vec3(0, 0, 17.0f));
+				simple_shader.SetMat4("model", model2);
+				ground.Draw(simple_shader);
+			}
 		}
 
 		
 		//Draw lamp
 		m_Renderer.SetStencilMask(0x00);
 		lamp_shader.Use();
-		model = glm::mat4(1.0f);
+		model = glm::mat4(0.3f);
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(3.5f));
 		lamp_shader.SetMat4("model", model);
@@ -483,6 +501,8 @@ int Game::RunLevel()
 		glfwSwapBuffers(m_CurrentWindow);
 		glfwPollEvents();
 		ProcessInput();
+		m_MovingSpeed = std::max(m_MovingSpeed, 0.0f);
+		m_MovingSpeed = std::min(m_MovingSpeed, 1.2f);
 	}
 	m_GameEnded = true;
 	return 0;
@@ -533,14 +553,34 @@ void Game::ProcessInput()
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(m_CurrentWindow, true);
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_W))
+	{
 		m_Camera.UpdatePosition(kForward, m_DeltaTime);
+		m_Moving = true;
+		m_MovingSpeed += 0.01;
+		return;
+	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_S))
+	{
 		m_Camera.UpdatePosition(kBackward, m_DeltaTime);
+		m_Moving = true;
+		m_MovingSpeed += 0.01;
+		return;
+	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_D))
+	{
 		m_Camera.UpdatePosition(kRight, m_DeltaTime);
+		m_Moving = true;
+		m_MovingSpeed += 0.01;
+		return;
+	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_A))
+	{
 		m_Camera.UpdatePosition(kLeft, m_DeltaTime);
-
+		m_Moving = true;
+		m_MovingSpeed += 0.01;
+		return;
+	}
+	m_MovingSpeed -= 0.05;
 }
 
 

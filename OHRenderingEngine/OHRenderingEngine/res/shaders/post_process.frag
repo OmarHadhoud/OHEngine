@@ -4,6 +4,8 @@ out vec4 FragColor;
 in vec2 v_TexCoords;
 
 uniform sampler2D quadTex;
+uniform bool moving;
+uniform float blurStrength;
 
 const float offset = 1.0f / 300.0f;
 
@@ -22,12 +24,12 @@ vec2 dir[9] = vec2[]
 
 float kernel[9] = float[]
 (
-	 0,0,0,
-	 0,1,0,
-	 0,0,0
+	 1,2,1,
+	 2,4,2,
+	 1,2,1
 );
 
-float kernelConstant = 1;
+float kernelConstant = 1.0f/16.0f;
 
 vec3 pixels[9];
 
@@ -37,6 +39,10 @@ void main()
 		pixels[i] = vec3(texture(quadTex, v_TexCoords.xy+dir[i]));
 	FragColor = vec4(0.0f,0.0f,0.0f,1.0f);
 	for(int i = 0; i < 9; i++)
-		FragColor += kernel[i]*vec4(pixels[i], 0.0f);
+	{
+		vec4 col = kernel[i] * vec4(pixels[i], 0.0f);
+		FragColor += col;
+	}
 	FragColor *= vec4(vec3(kernelConstant),1.0f);
+	FragColor = (1-blurStrength)*vec4(pixels[4],1.0f) + blurStrength*FragColor;
 }
