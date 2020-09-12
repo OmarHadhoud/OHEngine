@@ -38,6 +38,6 @@ Simple motion blur in effect.
 Same scene without the motion blur.
 ![image](/Screenshots/6.png?raw=true)
 Yokohama. Beautiful.
-![gif](/Screenshots/gif.gif)
+![gif](/Screenshots/gif.gif)  
 Point lights are actually changing their colors here! Also might notice some of the blur.
 
