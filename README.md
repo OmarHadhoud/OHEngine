@@ -27,17 +27,17 @@ This project uses imgui for the GUI, stbi for image loading, and assimp for mode
 Just download the project and run using visual studio in debug mode/ release mode. Release mode is preferred as it is much faster specially to loading models using assimp.
 # Screenshots/GIFS
 ![image](/Screenshots/1.png?raw=true)
-A pink point light, a white directional light from the left side, both reflecting on the ground. Skybox made of a Yokohama panorama picture can be seen.
+A pink point light, a white directional light from the left side, both reflecting on the ground. Skybox made of a Yokohama panorama picture can be seen.    
 ![image](/Screenshots/2.png?raw=true)
-On the left we can see 2 point lights, with 1 green spotlight -thus rotated- on the right side. In the middle there's a bad vending machine model that I just created in blender.
+On the left we can see 2 point lights, with 1 green spotlight -thus rotated- on the right side. In the middle there's a bad vending machine model that I just created in blender.    
 ![image](/Screenshots/3.png?raw=true)
-Same scene, just behind the poor vending machine.
+Same scene, just behind the poor vending machine.    
 ![image](/Screenshots/4.png?raw=true)
-Simple motion blur in effect.
+Simple motion blur in effect.    
 ![image](/Screenshots/5.png?raw=true)
-Same scene without the motion blur.
+Same scene without the motion blur.    
 ![image](/Screenshots/6.png?raw=true)
-Yokohama. Beautiful.
+Yokohama. Beautiful.    
 ![gif](/Screenshots/gif.gif)  
 Point lights are actually changing their colors here! Also might notice some of the blur.
 
