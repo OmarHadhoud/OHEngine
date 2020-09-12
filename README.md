@@ -4,12 +4,17 @@ Inspired by Cherno's abstraction of openGL in his openGL series, I decided to im
 This engine is simply a wrapper for openGL API. I implemented what I studied from learnopengl.com in it.  
 Currently it doesn't support a lot of features, as I'm still developing it while learning computer graphics concept.  
 I also implemented a simple game manager to have a simple game scene as a test environment.  
-**Note:** It is just a test scene, it isn't well designed as I haven't put much thought into it.
+**Note:** It is just a test scene, it isn't well designed as I haven't put much thought into it.  
+**Note:** Ignore the name. Didn't know what to name it, so called it *O*mar *H*adhoud rendering engine. Just Ignore.
 # Features
 - A high level of abstraction for the API and its enums. Custom enums are used instead.
 - Supporting different texture types, like CubeMaps and Multisampled textures. This allows us to have Skyboxes and AntiAliasing in the project.
 - Supporting drawing to custom textures and/or render buffers. This allows the use of custom frame buffers which opens the possibility of post processing.
 - The game manager has a simple light manager to manage setting and drawing the lights with the shaders implemented.
+# Features to be implemented
+- Implement shadows support.
+- Implement blending support.
+- Implement simple form of collision detection.
 # Scene Controls
 **W**: Move forward  
 **A**: Move Left  
