@@ -6,8 +6,8 @@ PointLight::PointLight()
 {
 }
 
-PointLight::PointLight(glm::vec3 pos, glm::vec3 color, float ambient, float diffuse, float specular, float kC, float kL, float kQ)
-	: Light(color, ambient, diffuse, specular),m_Position(pos), m_kC(kC), m_kL(kL), m_kQ(kQ)
+PointLight::PointLight(glm::vec3 pos, glm::vec3 color, float ambient, float diffuse, float specular, float kC, float kL, float kQ, bool enabled)
+	: Light(color, ambient, diffuse, specular, enabled),m_Position(pos), m_kC(kC), m_kL(kL), m_kQ(kQ)
 {
 }
 

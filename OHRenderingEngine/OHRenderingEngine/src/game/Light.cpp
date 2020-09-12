@@ -10,8 +10,8 @@ Light::Light():
 {
 }
 
-Light::Light(glm::vec3 color, float ambient, float diffuse, float specular)
-	: m_Color(color), m_Ambient(ambient), m_Diffuse(diffuse), m_Specular(specular)
+Light::Light(glm::vec3 color, float ambient, float diffuse, float specular, bool enabled)
+	: m_Color(color), m_Ambient(ambient), m_Diffuse(diffuse), m_Specular(specular), m_Enabled(enabled)
 {
 }
 
@@ -40,6 +40,11 @@ float Light::GetSpecular() const
 	return m_Specular;
 }
 
+bool Light::IsEnabled() const
+{
+	return m_Enabled;
+}
+
 void Light::SetColor(glm::vec3 color)
 {
 	m_Color = color;
@@ -58,4 +63,14 @@ void Light::SetDiffuse(float diffuse)
 void Light::SetSpecular(float specular)
 {
 	m_Specular = specular;
+}
+
+void Light::Enable()
+{
+	m_Enabled = true;
+}
+
+void Light::Disable()
+{
+	m_Enabled = false;
 }

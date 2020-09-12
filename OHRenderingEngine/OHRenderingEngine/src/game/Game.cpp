@@ -172,7 +172,12 @@ int Game::RunLevel()
 	Model ground("res/objects/try/ground.obj");
 
 	m_MovingSpeed = 0;
-	m_LightManager->AddLight(&PointLight(glm::vec3(0, 0, 0), glm::vec3(1.0f, 0.0f, 0.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f));
+	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
+	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
+	SpotLight l3(glm::vec3(55, 5, 0), glm::vec3(1, -1, -1), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::radians(55.0f), glm::radians(75.0f), true);
+	m_LightManager->AddLight(l1);
+	m_LightManager->AddLight(l2);
+	m_LightManager->AddLight(l3);
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
 		//If player is moving, apply blur
@@ -232,6 +237,10 @@ int Game::RunLevel()
 		simple_shader.SetVec3("viewPos", m_Camera.GetPosition());
 
 		simple_shader.SetFloat("material.shineness", 32);
+
+		//Setup lights
+		l1.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
+		l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
 		m_LightManager->SetLight(simple_shader);
 
 		
@@ -246,7 +255,8 @@ int Game::RunLevel()
 		
 		//Render using openGL
 		model = glm::scale(model, glm::vec3(5.0f));
-		model = glm::translate(model, glm::vec3(0, 0.3f, 0.0f));
+		model = glm::translate(model, glm::vec3(9, 0.3f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		simple_shader.SetMat4("model", model);
 		vm.Draw(simple_shader);
 		simple_shader.SetMat4("model", model);
@@ -266,7 +276,7 @@ int Game::RunLevel()
 			}
 		}
 		
-		//Draw lamps
+		//Draw light
 		m_Renderer.SetStencilMask(0x00);
 		m_LightManager->DrawLights(view, projection);
 

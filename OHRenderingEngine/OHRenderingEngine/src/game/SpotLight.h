@@ -7,7 +7,7 @@ class SpotLight :	public PointLight
 {
 public:
 	SpotLight();
-	SpotLight(glm::vec3 pos, glm::vec3 dir, glm::vec3 color, float ambient, float diffuse, float specular, float kC, float kL, float kQ, float inner_cutoff, float outer_cutoff);
+	SpotLight(glm::vec3 pos, glm::vec3 dir, glm::vec3 color, float ambient, float diffuse, float specular, float kC, float kL, float kQ, float inner_cutoff, float outer_cutoff, bool enabled);
 	~SpotLight();
 	glm::vec3 GetDirection() const;
 	float GetInnerCutoff() const;

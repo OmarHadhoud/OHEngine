@@ -7,21 +7,24 @@
 
 #include "game/DirectionaLight.h"
 #include "game/PointLight.h"
-#include "game/SpotLight.h"
+#include "game/SpotLight.h" 
 
+#define MAX_DIRECTIONAL_LIGHTS  5
+#define MAX_POINT_LIGHTS  20
+#define MAX_SPOTLIGHTS 20
 
 class LightManager
 {
 public:
 	LightManager();
 	~LightManager();
-	void AddLight(Light* light);
+	void AddLight(Light &light);
 	void SetLight(Shader &shader) const;
 	void DrawLights(glm::mat4 view, glm::mat4 projection) const;
 private:
-	std::vector<DirectionaLight> m_DirectionalLights;
-	std::vector<PointLight> m_PointLights;
-	std::vector<SpotLight> m_SpotLights;
+	std::vector<DirectionaLight*> m_DirectionalLights;
+	std::vector<PointLight*> m_PointLights;
+	std::vector<SpotLight*> m_SpotLights;
 	VertexArray m_VAO;
 	VertexBuffer m_VBO;
 	VertexBufferLayout m_VBL;

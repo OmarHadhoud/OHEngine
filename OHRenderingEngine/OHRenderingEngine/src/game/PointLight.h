@@ -8,7 +8,7 @@ class PointLight : public Light
 {
 public:
 	PointLight();
-	PointLight(glm::vec3 pos, glm::vec3 color, float ambient, float diffuse, float specular, float kC, float kL, float kQ);
+	PointLight(glm::vec3 pos, glm::vec3 color, float ambient, float diffuse, float specular, float kC, float kL, float kQ, bool enabled);
 	~PointLight();
 	glm::vec3 GetPosition() const;
 	float GetConstant() const;

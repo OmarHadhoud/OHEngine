@@ -7,8 +7,8 @@ DirectionaLight::DirectionaLight()
 {
 }
 
-DirectionaLight::DirectionaLight(glm::vec3 direction, glm::vec3 color, float ambient, float diffuse, float specular):
-	Light(color, ambient, diffuse, specular),m_Direction(direction)	
+DirectionaLight::DirectionaLight(glm::vec3 direction, glm::vec3 color, float ambient, float diffuse, float specular, bool enabled):
+	Light(color, ambient, diffuse, specular, enabled),m_Direction(direction)	
 {
 }
 
