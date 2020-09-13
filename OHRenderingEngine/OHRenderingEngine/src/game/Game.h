@@ -5,6 +5,8 @@
 #include "renderer/Renderer.h"
 #include "game/Skybox.h"
 #include "game/LightManager.h"
+#include "game/Collider.h"
+#include "game/BoxCollider.h"
 
 #include <GLFW/glfw3.h>
 
@@ -13,8 +15,8 @@
 const unsigned int MAJOR = 3; 
 const unsigned int MINOR = 3;
 //Window size
-const unsigned int WIDTH = 1920;
-const unsigned int HEIGHT = 1080;
+const unsigned int WIDTH = 1280;
+const unsigned int HEIGHT = 720;
 
 class Game
 {
@@ -33,9 +35,11 @@ private:
 	bool m_GameEnded;
 	std::unique_ptr<Skybox> m_Skybox;
 	std::unique_ptr<LightManager> m_LightManager;
+	std::vector<Collider*> m_Colliders;
 	//Player related
 	bool m_Moving;
 	float m_MovingSpeed;
+	bool m_Bordered;
 	//Window related
 	GLFWwindow *m_CurrentWindow;
 	unsigned int m_WindowWidth;
@@ -49,18 +53,25 @@ private:
 	void CreateWindow();
 	//Runs the game level.
 	int RunLevel();
-	//Processes user input from keyboard.
-	void ProcessInput();
-	//Assigns all the callbacks written to GLFW.
-	void AssignGLFWCallbacks() const;
 	//Setups IMGUI that is used for GUI.
 	void SetupIMGUI() const;
 	//Updates window size
 	void UpdateWindowSize(int width, int height);
+	//Assigns all the callbacks written to GLFW.
+	friend void AssignGLFWCallbacks();
+	//Friend GLFW callback functions
+	friend void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+	friend void window_size_callback(GLFWwindow *window, int width, int height);
+	friend void mouse_click_callback(GLFWwindow* window, int button, int action, int mods);
+	//Processes user input from keyboard.
+	void ProcessInput();
+	//Collision detecion functions
+	void CheckColliderClickedOn(glm::vec3 ray);
 };
 
-//GLFW callback functions
-void window_size_callback(GLFWwindow *window, int width, int height);
+//GLFW Friend functions
+void AssignGLFWCallbacks();
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
-
+void window_size_callback(GLFWwindow *window, int width, int height);
+void mouse_click_callback(GLFWwindow* window, int button, int action, int mods);
 #endif // !GAME_H

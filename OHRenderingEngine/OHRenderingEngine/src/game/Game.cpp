@@ -14,16 +14,14 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui.h"
 
-//Global variables needed in GLFW callbacks.
+//Global variable needed in GLFW callbacks.
 //TODO: Better design, maybe a callback class
-Camera *g_CurrentCamera;
-Renderer *g_CurrentRenderer;
+Game* g_Game;
 
 Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT), m_Moving(false)
 {
 	InitializeGLFW(MAJOR, MINOR);
-	g_CurrentCamera = &m_Camera;
-	g_CurrentRenderer = &m_Renderer;
+	g_Game = this;
 }
 
 
@@ -91,6 +89,17 @@ int Game::RunLevel()
 	
 	//Models
 	Model VendingMachine("res/objects/vending_machine/untitled.obj");
+	BoxCollider VendingMachineCollider;
+	glm::mat4 collider_mat(1.0f);
+	collider_mat = glm::translate(collider_mat, glm::vec3(8, -4.5f, -5.0f));
+	collider_mat = glm::rotate(collider_mat, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	collider_mat = glm::scale(collider_mat, glm::vec3(5.0f));
+	glm::vec3 mincoll = glm::vec3(collider_mat*glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	glm::vec3 maxcoll = mincoll + glm::vec3(2.0f, 10.0f, 10.0f);
+
+	VendingMachineCollider.SetMinBound(mincoll);
+	VendingMachineCollider.SetMaxBound(maxcoll);
+	m_Colliders.push_back(&VendingMachineCollider);
 	Model Ground("res/objects/try/ground.obj");
 
 	//Textures
@@ -149,10 +158,16 @@ int Game::RunLevel()
 	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
 	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
 	SpotLight l3(glm::vec3(75, 5, 0), glm::vec3(1, -1, -1), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::radians(55.0f), glm::radians(75.0f), true);
+	SpotLight l4(mincoll, glm::vec3(1, -1, -1), glm::vec3(0.0f, 0.0f, 1.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::radians(55.0f), glm::radians(75.0f), true);
+	SpotLight l5(maxcoll, glm::vec3(1, -1, -1), glm::vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::radians(55.0f), glm::radians(75.0f), true);
+	
+
 	m_LightManager->AddLight(l0);
 	m_LightManager->AddLight(l1);
 	m_LightManager->AddLight(l2);
 	m_LightManager->AddLight(l3);
+	m_LightManager->AddLight(l4);
+	m_LightManager->AddLight(l5);
 
 	//Start of rendering loop
 	while (!glfwWindowShouldClose(m_CurrentWindow))
@@ -223,9 +238,9 @@ int Game::RunLevel()
 
 		//Render using openGL
 		//Render the vending machine
-		model = glm::scale(model, glm::vec3(5.0f));
 		model = glm::translate(model, glm::vec3(9, 0.3f, 0.0f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(5.0f));
 		MainShader.SetMat4("model", model);
 		VendingMachine.Draw(MainShader);
 
@@ -256,9 +271,9 @@ int Game::RunLevel()
 
 		//Drawing the borders for the vending machine
 		model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(5.0f));
 		model = glm::translate(model, glm::vec3(9, 0.3f, 0.0f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(5.0f));
 		model = glm::scale(model, glm::vec3(1.03f));	//Border is larger
 		BorderShader.Use();
 		BorderShader.SetMat4("model", model);
@@ -267,7 +282,8 @@ int Game::RunLevel()
 		BorderShader.SetVec3("BorderColor", glm::vec3(0.9, 0.2, 0.2));
 		m_Renderer.SetStencilFunc(kNotEqual, 1, 0xff);
 		m_Renderer.SetStencilMask(0x00);
-		VendingMachine.Draw(BorderShader);
+		if(m_Bordered)
+			VendingMachine.Draw(BorderShader);
 		m_Renderer.EnableDepthTesting();
 		m_Renderer.SetStencilMask(0xff);
 		m_Renderer.DisableStencilTesting();
@@ -337,7 +353,7 @@ void Game::CreateWindow()
 	if (m_CurrentWindow == nullptr) 
 		return;
 	glfwMakeContextCurrent(m_CurrentWindow);
-	glfwSetInputMode(m_CurrentWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(m_CurrentWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void Game::ProcessInput()
@@ -375,13 +391,28 @@ void Game::ProcessInput()
 	m_MovingSpeed -= 0.05;
 }
 
-
-
-void Game::AssignGLFWCallbacks() const
+void Game::CheckColliderClickedOn(glm::vec3 ray)
 {
-	glfwSetWindowSizeCallback(m_CurrentWindow, window_size_callback);
-	glfwSetCursorPosCallback(m_CurrentWindow, cursor_position_callback);
+	for (int i = 0; i < m_Colliders.size(); i++)
+	{
+		BoxCollider *collider = dynamic_cast<BoxCollider*>(m_Colliders[i]);
+		if (collider != nullptr)
+		{
+			bool intersect;
+			std::vector<float> ts;
+			ts = collider->GetRayIntersection(m_Camera.GetPosition(),ray, intersect);
+			m_Bordered = intersect;
+			//For debugging
+			//if (intersect)
+			//{
+			//	std::cout << "INTERSECT AT t = " << ts[0] << " and at t = " << ts[1] << std::endl;
+			//}
+		}
+	}
 }
+
+
+
 
 void Game::SetupIMGUI() const
 {
@@ -404,12 +435,61 @@ void Game::UpdateWindowSize(int width, int height)
 }
 
 //GLFW Callback functions
+
+void AssignGLFWCallbacks()
+{
+	glfwSetWindowSizeCallback(g_Game->m_CurrentWindow, window_size_callback);
+	glfwSetCursorPosCallback(g_Game->m_CurrentWindow, cursor_position_callback);
+	glfwSetMouseButtonCallback(g_Game->m_CurrentWindow, mouse_click_callback);
+}
+
+
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
-	g_CurrentRenderer->ResizeWindow(width, height);
+	g_Game->m_Renderer.ResizeWindow(width, height);
 }
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	g_CurrentCamera->UpdateRotation(xpos, ypos);
+	g_Game->m_Camera.UpdateRotation(xpos, ypos);
+	float xPos = xpos, yPos = ypos;
+
+	glm::vec4 ray;
+	ray.x = (xPos * 2.0f) / (float)g_Game->m_WindowWidth - 1.0f;
+	ray.y = 1.0f - (yPos * 2.0f) / (float)g_Game->m_WindowHeight;
+	ray.z = -1.0f;
+	ray.w = 1.0f;
+	glm::mat4 projection = glm::perspective(glm::radians(g_Game->m_Camera.GetFOV()), (float)g_Game->m_WindowWidth / (float)g_Game->m_WindowHeight, 0.1f, 200.0f);
+	ray = glm::inverse(projection) * ray;
+	ray.z = -1.0f;
+	ray.w = 0.0f;
+	ray = glm::inverse(g_Game->m_Camera.GetViewMatrix()) * ray;
+	glm::vec3 ray_normalized = glm::vec3(ray.x, ray.y, ray.z);
+	ray_normalized = glm::normalize(ray_normalized);
+	g_Game->CheckColliderClickedOn(ray_normalized);
+}
+
+void mouse_click_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		double xPos, yPos;
+		//xPos = g_Game->m_WindowWidth / 2;
+		//yPos = g_Game->m_WindowHeight / 2;
+		glfwGetCursorPos(window, &xPos, &yPos);
+
+		glm::vec4 ray;
+		ray.x = (xPos * 2.0f) / (float)g_Game->m_WindowWidth - 1.0f;
+		ray.y = 1.0f - (yPos * 2.0f) / (float)g_Game->m_WindowHeight;
+		ray.z = -1.0f;
+		ray.w = 1.0f;
+		glm::mat4 projection = glm::perspective(glm::radians(g_Game->m_Camera.GetFOV()), (float)g_Game->m_WindowWidth / (float)g_Game->m_WindowHeight, 0.1f, 200.0f);
+		ray = glm::inverse(projection) * ray;
+		ray.z = -1.0f;
+		ray.w = 0.0f;
+		ray = glm::inverse(g_Game->m_Camera.GetViewMatrix()) * ray;
+		glm::vec3 ray_normalized = glm::vec3(ray.x, ray.y, ray.z);
+		ray_normalized = glm::normalize(ray_normalized);
+		g_Game->CheckColliderClickedOn(ray_normalized);
+	}
 }

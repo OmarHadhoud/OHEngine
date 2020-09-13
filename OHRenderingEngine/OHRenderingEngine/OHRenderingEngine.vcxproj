@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="src\game\BoxCollider.cpp" />
+    <ClCompile Include="src\game\Collider.cpp" />
     <ClCompile Include="src\game\LightManager.cpp" />
     <ClCompile Include="src\game\SpotLight.cpp" />
     <ClCompile Include="src\game\PointLight.cpp" />
@@ -48,6 +50,8 @@
     <ClCompile Include="src\renderer\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\BoxCollider.h" />
+    <ClInclude Include="src\game\Collider.h" />
     <ClInclude Include="src\game\LightManager.h" />
     <ClInclude Include="src\game\SpotLight.h" />
     <ClInclude Include="src\game\PointLight.h" />
