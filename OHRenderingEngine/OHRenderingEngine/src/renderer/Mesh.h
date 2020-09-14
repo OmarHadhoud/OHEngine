@@ -129,26 +129,28 @@ void Mesh::Draw(Shader & shader, std::vector<TextureMaterial> &textures)
 {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+	unsigned int normalNr = 1;
+	shader.Use();
 	for (unsigned int j = 0; j < m_TexturesIndices.size(); j++)
 	{
 		unsigned int i = m_TexturesIndices[j];
-		Texture::Activate(i);
+		Texture::Activate(j);
 		std::string number;
 		std::string name = textures[i].type;
 		if (name == "texture_diffuse")
 			number = std::to_string(diffuseNr++);
 		else if (name == "texture_specular")
 			number = std::to_string(specularNr++);
-		else 
+		else if (name == "texture_normal")
+			number = std::to_string(normalNr++);
+		else
 			continue;
-		shader.SetInt(("material." + name + number.c_str()), i);
+		shader.SetInt(("material." + name + number.c_str()), j);
 		textures[i].tex.Bind();
 	}
-	if (m_TexturesIndices.size() > 0)
-		textures[0].tex.Activate(0);
 	Renderer::Draw(m_VAO, shader, m_Indices.size(), 0);
-
 	m_VAO.Unbind();
+	Texture::Activate(0);
 }
 
 

@@ -16,6 +16,7 @@ class Shader
 public:
 	//Shader constructor that reads the shader files and compile it
 	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader(const char* vertexPath, const char* fragmentPath, const char* geomtryPath);
 	~Shader();
 	//To use the shader program
 	void Use() const;

@@ -86,7 +86,7 @@ int Game::RunLevel()
 	PostProcVAO.AddBuffer(PostProcVBO);
 
 	//Shaders used
-	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag");
+	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag"/*, "res/shaders/simple_lighting.geom"*/);
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
 	
@@ -115,6 +115,9 @@ int Game::RunLevel()
 
 	//Textures
 	stbi_set_flip_vertically_on_load_thread(1);
+	
+	//Backpack
+	Model BackPack("res/objects/backpack/backpack.obj");
 	
 	//Timing of last frame initialized
 	m_LastFrame = glfwGetTime();
@@ -220,7 +223,7 @@ int Game::RunLevel()
 		fbo.Bind();
 		m_Renderer.EnableDepthTesting();
 		m_Renderer.Clear(kColorBufferBit | kDepthBufferBit | kStencilBufferBit, glm::vec4(0.4f, 0.2f, 0.4f, 1.0f));
-		m_Renderer.EnableCulling();
+		//m_Renderer.EnableCulling();
 
 		//Transformations for the vending machine
 		if (m_Bordered && !MovingVM)
@@ -278,6 +281,14 @@ int Game::RunLevel()
 		MainShader.SetMat4("model", model);
 		Ground.Draw(MainShader);
 
+		//Draw backpack
+		model = glm::translate(model, glm::vec3(0, 5.0f, 0.0f));
+		MainShader.SetFloat("time", cos(glm::radians(glfwGetTime())));
+		MainShader.SetMat4("model", model);
+		BackPack.Draw(MainShader);
+		MainShader.SetFloat("time", 0);
+		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
+
 		//Disable culling for transparent objects
 		m_Renderer.DisableCulling();
 
@@ -295,7 +306,7 @@ int Game::RunLevel()
 		}
 			
 		//Enable culling for lights drawn
-		m_Renderer.EnableCulling();
+		//m_Renderer.EnableCulling();
 		//Draw lights (for debug purposes only)
 		m_LightManager->DrawLights(view, projection);
 
@@ -306,6 +317,7 @@ int Game::RunLevel()
 		//Draw transparent stuff [MUST BE ORDERED FROM FARTHEST TO CLOSEST]
 		//Disable culling for semi transparent objects
 		m_Renderer.DisableCulling();
+		MainShader.Use();
 		MainShader.SetMat4("model", model);
 		Window.Draw(MainShader);
 		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
@@ -338,6 +350,8 @@ int Game::RunLevel()
 		////Post processing
 		fbo.Unbind();
 		PostProcessShader.Use();
+		colorTexInttermediate.Activate(2);
+		colorTexInttermediate.Bind();
 		//If player is moving, apply blur
 		PostProcessShader.SetBool("moving", m_Moving);
 		PostProcessShader.SetFloat("blurStrength", std::max(m_MovingSpeed, 0.0f));
