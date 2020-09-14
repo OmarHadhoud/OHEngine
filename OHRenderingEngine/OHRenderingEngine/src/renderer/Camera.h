@@ -41,6 +41,7 @@ public:
 	float GetFOV() const;
 	float GetSensetivity() const;
 	glm::vec3 GetPosition() const;
+	glm::vec3 GetFront() const;
 	glm::mat4 GetViewMatrix() const;
 	
 	//Setters

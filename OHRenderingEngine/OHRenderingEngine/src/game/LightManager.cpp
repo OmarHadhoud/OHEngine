@@ -184,8 +184,8 @@ void LightManager::DrawLights(glm::mat4 view, glm::mat4 projection) const
 		glm::vec3 dir = m_SpotLights[i]->GetDirection();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, m_SpotLights[i]->GetPosition());
-		model = glm::scale(model, glm::vec3(0.2f));
-	//	model = glm::inverse(glm::lookAt(pos, pos + dir, glm::vec3(0,1,0)));
+		model = glm::scale(model, glm::vec3(0.5f));
+		model = glm::inverse(glm::lookAt(pos, pos + dir, glm::vec3(0,1,0)));
 		m_Shader.SetMat4("model", model);
 		m_Shader.SetMat4("view", view);
 		m_Shader.SetMat4("projection", projection);
