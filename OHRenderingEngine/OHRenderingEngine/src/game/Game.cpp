@@ -101,6 +101,10 @@ int Game::RunLevel()
 	VendingMachineCollider.SetMaxBound(maxcoll);
 	m_Colliders.push_back(&VendingMachineCollider);
 	Model Ground("res/objects/ground/ground.obj");
+	Model Grass("res/objects/grass/grass.obj");
+	Grass.UpdateTexturesWrap(kS, kClampToEdge);
+	Grass.UpdateTexturesWrap(kR, kClampToEdge);
+	Grass.UpdateTexturesWrap(kT, kClampToEdge);
 
 	//Textures
 	stbi_set_flip_vertically_on_load_thread(1);
@@ -265,6 +269,16 @@ int Game::RunLevel()
 		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
 		MainShader.SetMat4("model", model);
 		Ground.Draw(MainShader);
+		//Draw grass
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		for (int i = 0; i < 50; i++)
+		{
+			model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+			MainShader.SetMat4("model", model);
+			Grass.Draw(MainShader);
+		}
 			
 		
 		//Draw lights (for debug purposes only)

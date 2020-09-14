@@ -83,7 +83,7 @@ vec3 ComputeSpotLights();
 
 void main()
 {	
-	FragColor = vec4(ComputeLight(), 1.0f);
+	FragColor = vec4(ComputeLight(), texture(material.texture_diffuse1, v_TexCoords).a);
 }
 
 vec3 ComputeLight()

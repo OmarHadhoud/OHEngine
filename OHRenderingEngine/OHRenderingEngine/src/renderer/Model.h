@@ -16,6 +16,7 @@ class Model
 public:
 	Model(const char* path);
 	void Draw(Shader &shader);
+	void UpdateTexturesWrap(WrapDir dir, WrapType type);
 	~Model();
 private:
 	//Model data
@@ -38,6 +39,17 @@ void Model::Draw(Shader & shader)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader, texturesLoaded);
+}
+
+void Model::UpdateTexturesWrap(WrapDir dir, WrapType type)
+{
+	for (int i = 0; i < texturesLoaded.size(); i++)
+	{
+		texturesLoaded[i].tex.Bind();
+		texturesLoaded[i].tex.SetWrap(dir, type);
+		texturesLoaded[i].tex.Unbind();
+	}
+	
 }
 
 
