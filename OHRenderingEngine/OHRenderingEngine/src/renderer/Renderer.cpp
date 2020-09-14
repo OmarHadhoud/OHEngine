@@ -98,6 +98,21 @@ void Renderer::DisableBlending()
 	GlCall(glDisable(GL_BLEND));
 }
 
+void Renderer::SetBlendFactors(kBlendFactor source_factor, kBlendFactor dest_factor)
+{
+	GlCall(glBlendFunc(source_factor, dest_factor));
+}
+
+void Renderer::SetBlendFactorsSeparate(kBlendFactor source_factor_rgb, kBlendFactor dest_factor_rgb, kBlendFactor source_factor_a, kBlendFactor dest_factor_a)
+{
+	GlCall(glBlendFuncSeparate(source_factor_rgb, dest_factor_rgb, source_factor_a, dest_factor_a));
+}
+
+void Renderer::SetBlendEquation(kBlendFunc func)
+{
+	GlCall(glBlendEquation(func));
+}
+
 void Renderer::EnableCulling()
 {
 	GlCall(glEnable(GL_CULL_FACE));
@@ -106,6 +121,16 @@ void Renderer::EnableCulling()
 void Renderer::DisableCulling()
 {
 	GlCall(glDisable(GL_CULL_FACE));
+}
+
+void Renderer::CullFace(kFace face)
+{
+	GlCall(glCullFace(face));
+}
+
+void Renderer::SetFrontFace(kWinding dir)
+{
+	GlCall(glFrontFace(dir));
 }
 
 void Renderer::SetDepthMask(bool mask)

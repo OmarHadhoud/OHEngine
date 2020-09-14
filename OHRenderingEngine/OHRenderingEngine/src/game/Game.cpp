@@ -42,7 +42,7 @@ int Game::RunLevel()
 	//Initialize the level details
 	m_Renderer.SetActiveWindow(m_CurrentWindow);
 	m_Renderer.EnableBlending();
-	GlCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	m_Renderer.SetBlendFactors(kSrcAlpha, kOneMinusSrcAlpha);
 	std::vector<std::string> cubeMapPaths = {
 		"res/textures/px.png",
 		"res/textures/nx.png",

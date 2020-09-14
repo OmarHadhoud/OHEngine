@@ -135,5 +135,44 @@ enum kBitMask
 	kStencilBufferBit = GL_STENCIL_BUFFER_BIT
 };
 
+enum kBlendFactor
+{
+	//kZero is already defined, thus we don't define it here.
+	KOne = GL_ONE,
+	kSrcColor = GL_SRC_COLOR,
+	kOneMinusSrcColor = GL_ONE_MINUS_SRC_COLOR,
+	kDestColor = GL_DST_COLOR,
+	kOneMinusDestColor = GL_ONE_MINUS_DST_COLOR,
+	kSrcAlpha = GL_SRC_ALPHA,
+	kOneMinusSrcAlpha = GL_ONE_MINUS_SRC_ALPHA,
+	kDestAlpha = GL_DST_ALPHA,
+	kOneMinusDestAlpha = GL_ONE_MINUS_DST_ALPHA,
+	kConstColor = GL_CONSTANT_COLOR,
+	kOneMinusConstColor = GL_ONE_MINUS_CONSTANT_COLOR,
+	kConstAlpha = GL_CONSTANT_ALPHA,
+	kOneMinusConstAlpha = GL_ONE_MINUS_CONSTANT_ALPHA
+};
+
+enum kBlendFunc
+{
+	kAdd = GL_FUNC_ADD,
+	kSubtract = GL_FUNC_SUBTRACT,
+	kRevSubtract = GL_FUNC_REVERSE_SUBTRACT,
+	kMin = GL_MIN,
+	kMax = GL_MAX
+};
+
+enum kFace
+{
+	kBack = GL_BACK,
+	kFront = GL_FRONT,
+	kFrontAndBack = GL_FRONT_AND_BACK
+};
+
+enum kWinding
+{
+	kCW = GL_CW,
+	kCCW = GL_CCW
+};
 #endif // !ENUMS_H
 

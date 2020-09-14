@@ -40,20 +40,27 @@ public:
 	void SetAntiAliasingSamples(unsigned int n);
 	void EnableAntiAliasing();
 	void DisableAntiAliasing();
-	//Tests, Masks, Features related functions
+	//Tests related functions
 	static void EnableDepthTesting() ;
 	static void DisableDepthTesting() ;
 	static void EnableStencilTesting() ;
 	static void DisableStencilTesting() ;
-	static void EnableBlending();
-	static void DisableBlending();
-	static void EnableCulling();
-	static void DisableCulling();
 	static void SetDepthMask(bool mask) ;
 	static void SetDepthFunc(ComparisonFunc fn) ;
 	static void SetStencilMask(unsigned int mask) ;
 	static void SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask) ;
 	static void SetStencilOp(TestOption stencilFail, TestOption depthFail, TestOption stencilDepthPass) ;
+	//Blending related functions
+	static void EnableBlending();
+	static void DisableBlending();
+	static void SetBlendFactors(kBlendFactor source_factor, kBlendFactor dest_factor);
+	static void SetBlendFactorsSeparate(kBlendFactor source_factor_rgb, kBlendFactor dest_factor_rgb, kBlendFactor source_factor_a, kBlendFactor dest_factor_a);
+	static void SetBlendEquation(kBlendFunc func);
+	//Culling related functions
+	static void EnableCulling();
+	static void DisableCulling();
+	static void CullFace(kFace face);
+	static void SetFrontFace(kWinding dir);
 	//Framebuffers related functions
 	static void BlitNamedFrameBuffer(const FrameBuffer &fboRead, const FrameBuffer &fboDraw,
 		unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1,
