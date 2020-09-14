@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -40,6 +41,8 @@ int Game::RunLevel()
 {
 	//Initialize the level details
 	m_Renderer.SetActiveWindow(m_CurrentWindow);
+	m_Renderer.EnableBlending();
+	GlCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	std::vector<std::string> cubeMapPaths = {
 		"res/textures/px.png",
 		"res/textures/nx.png",
@@ -105,6 +108,10 @@ int Game::RunLevel()
 	Grass.UpdateTexturesWrap(kS, kClampToEdge);
 	Grass.UpdateTexturesWrap(kR, kClampToEdge);
 	Grass.UpdateTexturesWrap(kT, kClampToEdge);
+	Model Window("res/objects/window/window.obj");
+	Window.UpdateTexturesWrap(kS, kClampToEdge);
+	Window.UpdateTexturesWrap(kR, kClampToEdge);
+	Window.UpdateTexturesWrap(kT, kClampToEdge);
 
 	//Textures
 	stbi_set_flip_vertically_on_load_thread(1);
@@ -213,6 +220,7 @@ int Game::RunLevel()
 		fbo.Bind();
 		m_Renderer.EnableDepthTesting();
 		m_Renderer.Clear(kColorBufferBit | kDepthBufferBit | kStencilBufferBit, glm::vec4(0.4f, 0.2f, 0.4f, 1.0f));
+		m_Renderer.EnableCulling();
 
 		//Transformations for the vending machine
 		if (m_Bordered && !MovingVM)
@@ -269,23 +277,41 @@ int Game::RunLevel()
 		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
 		MainShader.SetMat4("model", model);
 		Ground.Draw(MainShader);
+
+		//Disable culling for transparent objects
+		m_Renderer.DisableCulling();
+
 		//Draw grass
+		model = glm::scale(model, glm::vec3(3));
 		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		MainShader.SetMat4("model", model);
 		for (int i = 0; i < 50; i++)
 		{
-			model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+			model = glm::translate(model, glm::vec3(0.1, 0.5, 0.0f));
 			MainShader.SetMat4("model", model);
 			Grass.Draw(MainShader);
 		}
 			
-		
+		//Enable culling for lights drawn
+		m_Renderer.EnableCulling();
 		//Draw lights (for debug purposes only)
 		m_LightManager->DrawLights(view, projection);
 
 		//Skybox
 		m_Skybox->Draw(view, projection);
+
+		//After drawing opaque models
+		//Draw transparent stuff [MUST BE ORDERED FROM FARTHEST TO CLOSEST]
+		//Disable culling for semi transparent objects
+		m_Renderer.DisableCulling();
+		MainShader.SetMat4("model", model);
+		Window.Draw(MainShader);
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+		MainShader.SetMat4("model", model);
+		Window.Draw(MainShader);
+
 
 		//Drawing the borders for the vending machine
 		model = glm::mat4(1.0f);

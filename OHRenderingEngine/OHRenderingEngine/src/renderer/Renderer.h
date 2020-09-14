@@ -40,11 +40,15 @@ public:
 	void SetAntiAliasingSamples(unsigned int n);
 	void EnableAntiAliasing();
 	void DisableAntiAliasing();
-	//Tests related functions
+	//Tests, Masks, Features related functions
 	static void EnableDepthTesting() ;
 	static void DisableDepthTesting() ;
 	static void EnableStencilTesting() ;
 	static void DisableStencilTesting() ;
+	static void EnableBlending();
+	static void DisableBlending();
+	static void EnableCulling();
+	static void DisableCulling();
 	static void SetDepthMask(bool mask) ;
 	static void SetDepthFunc(ComparisonFunc fn) ;
 	static void SetStencilMask(unsigned int mask) ;

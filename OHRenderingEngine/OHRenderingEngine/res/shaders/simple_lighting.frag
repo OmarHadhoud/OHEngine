@@ -84,6 +84,8 @@ vec3 ComputeSpotLights();
 void main()
 {	
 	FragColor = vec4(ComputeLight(), texture(material.texture_diffuse1, v_TexCoords).a);
+	if(FragColor.a < 0.1)
+		discard;
 }
 
 vec3 ComputeLight()

@@ -61,6 +61,11 @@ void Renderer::DisableStencilTesting()
 	GlCall(glDisable(GL_STENCIL_TEST));
 }
 
+void Renderer::EnableBlending()
+{
+	GlCall(glEnable(GL_BLEND));
+}
+
 void Renderer::SetDepthFunc(ComparisonFunc fn)
 {
 	GlCall(glDepthFunc(fn));
@@ -86,6 +91,21 @@ void Renderer::SetStencilMask(unsigned int mask)
 void Renderer::SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask)
 {
 	GlCall(glStencilFunc(fn, ref, mask));
+}
+
+void Renderer::DisableBlending()
+{
+	GlCall(glDisable(GL_BLEND));
+}
+
+void Renderer::EnableCulling()
+{
+	GlCall(glEnable(GL_CULL_FACE));
+}
+
+void Renderer::DisableCulling()
+{
+	GlCall(glDisable(GL_CULL_FACE));
 }
 
 void Renderer::SetDepthMask(bool mask)
