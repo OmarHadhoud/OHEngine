@@ -87,6 +87,7 @@ int Game::RunLevel()
 
 	//Shaders used
 	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
+	Shader DebugShader("res/shaders/debug.vert", "res/shaders/debug.frag", "res/shaders/debug.geom");
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
 	
@@ -255,7 +256,6 @@ int Game::RunLevel()
 		MainShader.SetMat4("model", model);
 		MainShader.SetMat4("view", view);
 		MainShader.SetMat4("projection", projection);
-		MainShader.SetVec3("viewPos", glm::vec3(0.0f));
 		MainShader.SetFloat("material.shineness", 32);
 
 		//Update lights data
@@ -300,12 +300,21 @@ int Game::RunLevel()
 		MainShader.SetMat4("model", model);
 		BackPack.Draw(MainShader);
 		MainShader.SetFloat("time", 0);
+
+		//Draw backpack normals
+		DebugShader.Use();
+		DebugShader.SetMat4("model", model);
+		DebugShader.SetMat4("view", view);
+		DebugShader.SetMat4("projection", projection);
+		BackPack.Draw(DebugShader);
 		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
+
 
 		//Disable culling for transparent objects
 		m_Renderer.DisableCulling();
 
 		//Draw grass
+		MainShader.Use();
 		model = glm::scale(model, glm::vec3(3));
 		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));

@@ -67,7 +67,6 @@ struct Material
 
 //Materials
 uniform Material material;
-uniform vec3 viewPos;
 
 //The lightings
 #define MAX_DIRECTIONAL_LIGHTS  5
@@ -124,7 +123,7 @@ vec3 ComputeDirectionalLight()
 
 		//Specular
 		vec3 reflectDir = normalize(reflect(-lightDir, normalDir));
-		vec3 viewDir = normalize(viewPos - fs_in.fragPos);
+		vec3 viewDir = normalize( - fs_in.fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
 		specular = vec3(pow(specular_dot,material.shineness)* directionalLights[i].specular) * vec3(texture(material.texture_specular1, fs_in.v_TexCoords));
@@ -157,7 +156,7 @@ vec3 ComputePointLights()
 
 		//Specular
 		vec3 reflectDir = normalize(reflect(-lightDir, normalDir));
-		vec3 viewDir = normalize(viewPos - fs_in.fragPos);
+		vec3 viewDir = normalize( - fs_in.fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
 		specular = vec3(pow(specular_dot,material.shineness)* pointLights[i].specular) * vec3(texture(material.texture_specular1, fs_in.v_TexCoords));
@@ -194,7 +193,7 @@ vec3 ComputeSpotLights()
 
 		//Specular
 		vec3 reflectDir = normalize(reflect(-lightDir, normalDir));
-		vec3 viewDir = normalize(viewPos - fs_in.fragPos);
+		vec3 viewDir = normalize( - fs_in.fragPos);
 		float specular_dot = max(dot(reflectDir, viewDir), 0.0f);
 
 		specular = vec3(pow(specular_dot,material.shineness)* spotLights[i].specular) * vec3(texture(material.texture_specular1, fs_in.v_TexCoords));

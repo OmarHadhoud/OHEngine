@@ -33,7 +33,7 @@ void main()
 		gs_out.v_NormalDir = gs_in[index].v_NormalDir;
 		gs_out.v_TexCoords = gs_in[index].v_TexCoords;
 		gs_out.fragPos = gs_in[index].fragPos;
-		gl_Position = projection * ( gl_in[index].gl_Position + vec4(GetNormal()*time,0.0f));
+		gl_Position = projection * ( gl_in[index].gl_Position + vec4(GetNormal()*time,0.0f) );
 		EmitVertex();
 	}
 	EndPrimitive();
