@@ -183,11 +183,11 @@ void LightManager::DrawLights(glm::mat4 view, glm::mat4 projection) const
 		glm::vec3 pos = m_SpotLights[i]->GetPosition();
 		glm::vec3 dir = m_SpotLights[i]->GetDirection();
 		model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(0.5f));
 		model = glm::translate(model, m_SpotLights[i]->GetPosition());
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-		if(glm::normalize(pos+dir) != up) //Simple check as lookAt doesn't work if up is same as direction vector
+		if(glm::normalize(dir) != up && glm::normalize(dir) != -up) //Simple check as lookAt doesn't work if up is same as direction vector
 			model = glm::inverse(glm::lookAt(pos, pos + dir, up));
+		model = glm::scale(model, glm::vec3(0.5f));
 		m_Shader.SetMat4("model", model);
 		m_Shader.SetMat4("view", view);
 		m_Shader.SetMat4("projection", projection);
