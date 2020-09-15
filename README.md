@@ -55,6 +55,6 @@ Transparent grass, semi transparent windows.
 ![gif](/Screenshots/gif1.gif)  
 Point lights are actually changing their colors here! Also might notice some of the blur.
 ![gif](/Screenshots/gif2.gif)  
-Explosion of the backpack.  
-![gif](/Screenshots/gif3.gif)  
 Ray picking the vending machine, and moving it around.  
+![gif](/Screenshots/gif3.gif)  
+Explosion of the backpack.  
