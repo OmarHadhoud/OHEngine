@@ -87,7 +87,7 @@ int Game::RunLevel()
 
 	//Shaders used
 	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
-	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
+	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
 	
 	//Models
@@ -183,6 +183,9 @@ int Game::RunLevel()
 	glm::vec3 VendingMachinePos = glm::vec3(9, 0.3f, 0.0f);
 	glm::vec3 VendingMachinePosOrig = glm::vec3(9, 0.3f, 0.0f);
 	bool MovingVM = false;
+	bool Explode = false;
+	float explodeDis = 0.0f;
+	float ExplosionStarted = 0.0f;
 
 	//Start of rendering loop
 	while (!glfwWindowShouldClose(m_CurrentWindow))
@@ -230,6 +233,8 @@ int Game::RunLevel()
 		{
 			MovingVM = true;
 			offset = glm::dot(VendingMachinePos - m_Camera.GetPosition(), m_Camera.GetFront());
+			Explode = true;
+			ExplosionStarted = glfwGetTime();
 		}
 		else if(!m_Bordered)
 			MovingVM = 0;
@@ -284,7 +289,14 @@ int Game::RunLevel()
 
 		//Draw backpack
 		model = glm::translate(model, glm::vec3(0, 5.0f, 0.0f));
-		MainShader.SetFloat("time", cos(glm::radians(glfwGetTime())));
+		explodeDis = 0;
+		if (Explode)
+		{
+			explodeDis = 5 * abs(sin(glm::radians((ExplosionStarted - glfwGetTime()) * 300)));
+			if (explodeDis >= 4.8f)
+				Explode = false;
+		}
+		MainShader.SetFloat("time", explodeDis);
 		MainShader.SetMat4("model", model);
 		BackPack.Draw(MainShader);
 		MainShader.SetFloat("time", 0);
