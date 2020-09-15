@@ -2,7 +2,7 @@
 # OHRenderingEngine
 Inspired by Cherno's abstraction of openGL in his openGL series, I decided to implement a simple "rendering engine" using openGL, to be able to abstract it later at Runtime/Compile time to choose which graphics API to use.  
 This engine is simply a wrapper for openGL API. I implemented what I studied from learnopengl.com in it.  
-Currently it doesn't support a lot of features, as I'm still developing it while learning computer graphics concept.  
+Currently it doesn't support a lot of features, as I'm still developing it while learning computer graphics concepts.  
 I also implemented a simple game manager to have a simple game scene as a test environment.  
 **Note:** It is just a test scene, it isn't well designed as I haven't put much thought into it.  
 **Note:** Ignore the name. Didn't know what to name it, so called it **O**mar **H**adhoud **rendering engine**. Just Ignore. It is also a very simple engine. I don't even know what's the difference between a "Real" rendering engine and this. This is mainly done for openGL at the moment.
