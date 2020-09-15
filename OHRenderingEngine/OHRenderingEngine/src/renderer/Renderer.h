@@ -2,16 +2,9 @@
 #define RENDERER_H
 
 
-#include "renderer/VertexBuffer.h"
-#include "renderer/IndexBuffer.h"
-#include "renderer/RenderBuffer.h"
 #include "renderer/FrameBuffer.h"
 #include "renderer/VertexArray.h"
-#include "renderer/VertexBufferLayout.h"
 #include "renderer/Shader.h"
-#include "renderer/Texture.h"
-#include "renderer/CubeMapTexture.h"
-#include "renderer/MultiSampledTexture.h"
 #include "renderer/Camera.h"
 #include "renderer/Debugger.h"
 

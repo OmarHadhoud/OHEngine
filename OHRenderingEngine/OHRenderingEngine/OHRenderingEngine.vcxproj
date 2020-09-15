@@ -31,6 +31,8 @@
     <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
     <ClCompile Include="src\renderer\Camera.cpp" />
     <ClCompile Include="src\renderer\FrameBuffer.cpp" />
+    <ClCompile Include="src\renderer\Mesh.cpp" />
+    <ClCompile Include="src\renderer\Model.cpp" />
     <ClCompile Include="src\renderer\MultiSampledTexture.cpp" />
     <ClCompile Include="src\renderer\RenderBuffer.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
@@ -58,12 +60,12 @@
     <ClInclude Include="src\game\DirectionaLight.h" />
     <ClInclude Include="src\game\Light.h" />
     <ClInclude Include="src\game\Skybox.h" />
-    <ClInclude Include="src\renderer\Mesh.h" />
-    <ClInclude Include="src\renderer\Model.h" />
     <ClInclude Include="src\renderer\CubeMapTexture.h" />
     <ClInclude Include="src\renderer\Camera.h" />
     <ClInclude Include="src\renderer\enums.h" />
     <ClInclude Include="src\renderer\FrameBuffer.h" />
+    <ClInclude Include="src\renderer\Mesh.h" />
+    <ClInclude Include="src\renderer\Model.h" />
     <ClInclude Include="src\renderer\MultiSampledTexture.h" />
     <ClInclude Include="src\renderer\RenderBuffer.h" />
     <ClInclude Include="src\renderer\Renderer.h" />

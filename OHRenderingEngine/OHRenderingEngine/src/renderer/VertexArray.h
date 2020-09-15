@@ -26,6 +26,7 @@ public:
 	void AddBuffer(const VertexBuffer &vb);
 private:
 	unsigned int m_ID;
+	unsigned int m_BoundedAttributes;
 };
 
 #endif	//VERTEX_ARRAY_H

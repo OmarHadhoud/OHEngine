@@ -3,6 +3,11 @@
 
 #include <vector>
 
+#include "renderer/VertexBuffer.h"
+#include "renderer/VertexBufferLayout.h"
+#include "renderer/IndexBuffer.h"
+#include "renderer/VertexArray.h"
+#include "renderer/Shader.h"
 #include "renderer/Renderer.h"
 
 #include "game/DirectionaLight.h"

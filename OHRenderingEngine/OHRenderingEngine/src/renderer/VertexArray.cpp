@@ -2,7 +2,8 @@
 #include "Debugger.h"
 
 
-VertexArray::VertexArray()
+VertexArray::VertexArray():
+	m_BoundedAttributes(0)
 {
 	GlCall(glGenVertexArrays(1, &m_ID));
 }
@@ -80,8 +81,9 @@ void VertexArray::AddBuffer(const VertexBuffer & vb)
 	unsigned int offset = 0;
 	for (int i = 0; i < elements.size(); i++)
 	{
-		GlCall(glVertexAttribPointer(i, elements[i].count, elements[i].type, elements[i].normalized, stride, (void*)offset));
-		GlCall(glEnableVertexAttribArray(i));
+		GlCall(glVertexAttribPointer(m_BoundedAttributes, elements[i].count, elements[i].type, elements[i].normalized, stride, (void*)offset));
+		GlCall(glEnableVertexAttribArray(m_BoundedAttributes));
 		offset += elements[i].count*GLSizeOf(elements[i].type);
+		m_BoundedAttributes++;
 	}
 }

@@ -36,6 +36,7 @@ void Renderer::Draw(const VertexArray & vao, const Shader & shader, unsigned int
 	GlCall(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)offset));
 }
 
+
 void Renderer::ResizeWindow(int width, int height)
 {
 	GlCall(glViewport(0, 0, width, height));

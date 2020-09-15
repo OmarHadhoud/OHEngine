@@ -9,6 +9,13 @@
 #include "Game.h"
 #include "dependencies/utils/glm_util.h"
 #include "renderer/Renderer.h"
+#include "renderer/VertexBuffer.h"
+#include "renderer/VertexBufferLayout.h"
+#include "renderer/IndexBuffer.h"
+#include "renderer/Texture.h"
+#include "renderer/MultiSampledTexture.h"
+#include "renderer/CubeMapTexture.h"
+#include "renderer/RenderBuffer.h"
 #include "renderer/Model.h"
 
 #include "imgui/imgui_impl_glfw.h"
@@ -87,6 +94,7 @@ int Game::RunLevel()
 
 	//Shaders used
 	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
+	Shader MainShaderInstanced("res/shaders/simple_lighting_instanced.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
 	Shader DebugShader("res/shaders/debug.vert", "res/shaders/debug.frag", "res/shaders/debug.geom");
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
@@ -302,11 +310,11 @@ int Game::RunLevel()
 		MainShader.SetFloat("time", 0);
 
 		//Draw backpack normals
-		DebugShader.Use();
+		/*DebugShader.Use();
 		DebugShader.SetMat4("model", model);
 		DebugShader.SetMat4("view", view);
 		DebugShader.SetMat4("projection", projection);
-		BackPack.Draw(DebugShader);
+		BackPack.Draw(DebugShader);*/
 		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
 
 
