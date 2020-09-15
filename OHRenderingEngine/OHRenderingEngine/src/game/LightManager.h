@@ -19,7 +19,7 @@ public:
 	LightManager();
 	~LightManager();
 	void AddLight(Light &light);
-	void SetLight(Shader &shader) const;
+	void SetLight(Shader &shader, glm::mat4 view_matrix) const;
 	void DrawLights(glm::mat4 view, glm::mat4 projection) const;
 private:
 	std::vector<DirectionaLight*> m_DirectionalLights;

@@ -114,7 +114,7 @@ void LightManager::AddLight(Light &light)
 
 }
 
-void LightManager::SetLight(Shader & shader) const
+void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 {
 	unsigned int n_Active = 0;
 	for (int i = 0; i < m_DirectionalLights.size() && m_DirectionalLights[i]->IsEnabled() && n_Active < MAX_DIRECTIONAL_LIGHTS; i++)
@@ -122,7 +122,7 @@ void LightManager::SetLight(Shader & shader) const
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].ambient", m_DirectionalLights[i]->GetAmbient());
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].diffuse", m_DirectionalLights[i]->GetDiffuse());
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].specular", m_DirectionalLights[i]->GetSpecular());
-		shader.SetVec3("directionalLights[" + std::to_string(n_Active) + "].direction", m_DirectionalLights[i]->GetDirection());
+		shader.SetVec3("directionalLights[" + std::to_string(n_Active) + "].direction", glm::vec3(view_matrix*glm::vec4(m_DirectionalLights[i]->GetDirection(), 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("directionalLights["+std::to_string(n_Active)+"].color", m_DirectionalLights[i]->GetColor());
 		n_Active++;
 	}
@@ -134,7 +134,7 @@ void LightManager::SetLight(Shader & shader) const
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].ambient", m_PointLights[i]->GetAmbient());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].diffuse", m_PointLights[i]->GetDiffuse());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].specular", m_PointLights[i]->GetSpecular());
-		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].position", m_PointLights[i]->GetPosition());
+		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].position", glm::vec3(view_matrix*glm::vec4(m_PointLights[i]->GetPosition(),1.0f)));
 		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].color", m_PointLights[i]->GetColor());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].kC", m_PointLights[i]->GetConstant());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].kL", m_PointLights[i]->GetLinearConstant());
@@ -149,8 +149,8 @@ void LightManager::SetLight(Shader & shader) const
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].ambient", m_SpotLights[i]->GetAmbient());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].diffuse", m_SpotLights[i]->GetDiffuse());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].specular", m_SpotLights[i]->GetSpecular());
-		shader.SetVec3("spotLights[" + std::to_string(n_Active) + "].position", m_SpotLights[i]->GetPosition());
-		shader.SetVec3("spotLights[" + std::to_string(n_Active) + "].direction", m_SpotLights[i]->GetDirection());
+		shader.SetVec3("spotLights[" + std::to_string(n_Active) + "].position", glm::vec3(view_matrix*glm::vec4(m_SpotLights[i]->GetPosition(), 1.0f))); //W = 1 as we want to translate the position
+		shader.SetVec3("spotLights[" + std::to_string(n_Active) + "].direction", glm::vec3(view_matrix*glm::vec4(m_SpotLights[i]->GetDirection(), 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("spotLights[" + std::to_string(n_Active) + "].color", m_SpotLights[i]->GetColor());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].kC", m_SpotLights[i]->GetConstant());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].kL", m_SpotLights[i]->GetLinearConstant());
@@ -183,9 +183,11 @@ void LightManager::DrawLights(glm::mat4 view, glm::mat4 projection) const
 		glm::vec3 pos = m_SpotLights[i]->GetPosition();
 		glm::vec3 dir = m_SpotLights[i]->GetDirection();
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, m_SpotLights[i]->GetPosition());
 		model = glm::scale(model, glm::vec3(0.5f));
-		model = glm::inverse(glm::lookAt(pos, pos + dir, glm::vec3(0,1,0)));
+		model = glm::translate(model, m_SpotLights[i]->GetPosition());
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+		if(glm::normalize(pos+dir) != up) //Simple check as lookAt doesn't work if up is same as direction vector
+			model = glm::inverse(glm::lookAt(pos, pos + dir, up));
 		m_Shader.SetMat4("model", model);
 		m_Shader.SetMat4("view", view);
 		m_Shader.SetMat4("projection", projection);

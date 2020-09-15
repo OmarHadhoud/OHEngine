@@ -86,7 +86,7 @@ int Game::RunLevel()
 	PostProcVAO.AddBuffer(PostProcVBO);
 
 	//Shaders used
-	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag"/*, "res/shaders/simple_lighting.geom"*/);
+	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
 	
@@ -171,7 +171,7 @@ int Game::RunLevel()
 	DirectionaLight l0(glm::vec3(0, 0, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 1.0f, true);
 	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
 	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
-	SpotLight l3(glm::vec3(75, 5, 0), glm::vec3(1, -1, -1), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::radians(55.0f), glm::radians(75.0f), true);
+	SpotLight l3(glm::vec3(75, 5, 0), glm::vec3(1, -1, 0), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::cos(glm::radians(15.0f)), glm::cos(glm::radians(25.0f)), true);
 	
 
 	m_LightManager->AddLight(l0);
@@ -250,13 +250,14 @@ int Game::RunLevel()
 		MainShader.SetMat4("model", model);
 		MainShader.SetMat4("view", view);
 		MainShader.SetMat4("projection", projection);
-		MainShader.SetVec3("viewPos", m_Camera.GetPosition());
+		MainShader.SetVec3("viewPos", glm::vec3(0.0f));
 		MainShader.SetFloat("material.shineness", 32);
 
 		//Update lights data
 		l1.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
 		l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
-		m_LightManager->SetLight(MainShader);
+		l3.SetDirection(glm::vec3((sin(glfwGetTime()*2)), -1, cos(glfwGetTime() * 5)));
+		m_LightManager->SetLight(MainShader, m_Camera.GetViewMatrix());
 
 		//Setup for border (part 1)
 		m_Renderer.EnableStencilTesting();

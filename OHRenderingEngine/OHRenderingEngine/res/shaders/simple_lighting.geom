@@ -17,7 +17,7 @@ out GS_OUT
 } gs_out;
 
 uniform float time;
-uniform mat4 projection;
+//uniform mat4 projection;
 
 void main()
 {
@@ -26,7 +26,7 @@ void main()
 		gs_out.v_NormalDir = gs_in[index].v_NormalDir;
 		gs_out.v_TexCoords = gs_in[index].v_TexCoords;
 		gs_out.fragPos = gs_in[index].fragPos;
-		gl_Position = projection * ( gl_in[index].gl_Position + vec4(gs_in[index].v_NormalDir*time*0.0f,0.0f));
+		gl_Position =  ( gl_in[index].gl_Position + vec4(gs_in[index].v_NormalDir*time*0.0f,0.0f));
 		EmitVertex();
 	}
 	EndPrimitive();

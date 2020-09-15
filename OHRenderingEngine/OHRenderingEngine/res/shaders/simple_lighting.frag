@@ -2,7 +2,7 @@
 
 out vec4 FragColor;
 
-in VS_OUT
+in GS_OUT
 {
 	vec3 v_NormalDir;
 	vec2 v_TexCoords;
