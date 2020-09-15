@@ -2,10 +2,10 @@
 #include "renderer/Mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<unsigned int> &textures_indices)
+	: m_Vertices(vertices),
+	m_Indices(indices),
+	m_TexturesIndices(textures_indices)
 {
-	this->m_Vertices = vertices;
-	this->m_Indices = indices;
-	this->m_TexturesIndices = textures_indices;
 	SetupMesh();
 }
 

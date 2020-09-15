@@ -83,10 +83,6 @@ private:
 	VertexBuffer m_VBO;
 	VertexBufferLayout m_VBL;
 
-	IndexBuffer m_IBOInstanced;
-	VertexBuffer m_VBOInstanced;
-	VertexBufferLayout m_VBLInstanced;
-
 	void SetupMesh();
 };
 
