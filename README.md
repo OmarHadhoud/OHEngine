@@ -9,18 +9,23 @@ I also implemented a simple game manager to have a simple game scene as a test e
 # Features
 - A high level of abstraction for the API and its enums. Custom enums are used instead.
 - Supporting different texture types, like CubeMaps and Multisampled textures. This allows us to have Skyboxes and AntiAliasing in the project.
-- Supporting drawing to custom textures and/or render buffers. This allows the use of custom frame buffers which opens the possibility of post processing.
+- Supporting drawing to custom textures and/or render buffers. This allows the use of custom frame buffers which opens the possibility of post processing.  
+- Implemented simple blending & culling functionalities. **Note:** Semi transparent objects should be drawn in the end, starting from the furthest object.  
+- Implemented simple ray picking functionality to pick the vending machine and move it.  
+- Implemented simple geomtry shader to make an explosion effect using normal maps. Added also another debug shader to draw the normal vectors loaded for the model.  
 - The game manager has a simple light manager to manage setting and drawing the lights with the shaders implemented.
 # Features to be implemented
 - Implement shadows support.
-- Implement blending support.
-- Implement simple form of collision detection.
+- Implement a sorting system for semi transparent objects to draw them automatically with the furthest first.  
+- ~~Implement a class to manage instanced drawing of same object.~~ [Delayed, not that important for now, also needs the current code to be refactored.]  
 # Scene Controls
 **W**: Move forward  
 **A**: Move Left  
 **S**: Move backward  
 **D**: Move right  
 **Escape**: Exit game  
+**Left click**: Pick the vending machine model [In test scene only]  
+**Right click**: Drop the vending machine model [In test scene only]  
 # Project structure
 The project consists of 2 main folders: The source code folder, and the resources folder.  
 The resources folder has the models, textures, and shaders in it.  
@@ -43,6 +48,13 @@ Simple motion blur in effect.
 Same scene without the motion blur.    
 ![image](/Screenshots/6.png?raw=true)
 Yokohama. Beautiful.    
-![gif](/Screenshots/gif.gif)  
+![image](/Screenshots/7.png?raw=true)
+Explosion effect in action. Simply moving every fragment in the direction of the normal.    
+![image](/Screenshots/8.png?raw=true)
+Transparent grass, semi transparent windows.  
+![gif](/Screenshots/gif1.gif)  
 Point lights are actually changing their colors here! Also might notice some of the blur.
-
+![gif](/Screenshots/gif2.gif)  
+Explosion of the backpack.  
+![gif](/Screenshots/gif3.gif)  
+Ray picking the vending machine, and moving it around.  
