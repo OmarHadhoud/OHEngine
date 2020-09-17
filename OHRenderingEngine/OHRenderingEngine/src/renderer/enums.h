@@ -128,6 +128,15 @@ enum TextureType
 	kCubeMap = GL_TEXTURE_CUBE_MAP
 };
 
+
+enum TextureFormat
+{
+	kRGB = GL_RGB,
+	kRGBA = GL_RGBA,
+	kSRGB = GL_SRGB,
+	kSRGBA = GL_SRGB_ALPHA
+};
+
 enum kBitMask
 {
 	kColorBufferBit = GL_COLOR_BUFFER_BIT,

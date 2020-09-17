@@ -12,7 +12,7 @@ class Texture
 {
 public:
 	Texture();
-	Texture(const char * path);
+	Texture(const char * path, bool gamma_corrected = false);
 	virtual ~Texture();
 	//Copy constructor
 	Texture(const Texture& other);					
@@ -41,14 +41,20 @@ public:
 	//num: The number of texture to be active (ex: 0 = GL_TEXTURE0)
 	static void Activate(unsigned int num);
 	bool IsMultiSampled() const;
+	//Gamma correction functions
+	void SetGammaCorrection(bool val);
 private:
 	unsigned int m_ID;
-	GLenum m_Format;
+	bool m_IsGammaCorrected;
+	TextureFormat m_Format;
+	TextureFormat m_InternalFormat;
 	TextureType m_Type;
 	std::string m_Path;
 protected:
-	GLenum GetFormat() const;
-	void SetFormat(GLenum format);
+	TextureFormat GetFormat() const;
+	TextureFormat GetInternalFormat() const;
+	void SetFormat(TextureFormat format);
+	void SetInternalFormat(TextureFormat format);
 };
 
 #endif // !TEXTURE_H

@@ -162,8 +162,8 @@ std::vector<unsigned int> Model::loadMaterialTextures(aiMaterial * mat, aiTextur
 		if (!skip)
 		{
 			//if we didn't load texture yet, load it
-
-			Texture tex(filename.c_str());
+			bool isSRGB = typeName == "texture_diffuse";
+			Texture tex(filename.c_str(), isSRGB);
 			TextureMaterial texture(std::move(tex));
 			texture.type = typeName;
 			texture_indices.push_back(texturesLoaded.size());

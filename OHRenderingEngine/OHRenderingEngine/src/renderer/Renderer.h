@@ -54,6 +54,9 @@ public:
 	static void DisableCulling();
 	static void CullFace(kFace face);
 	static void SetFrontFace(kWinding dir);
+	//Gamma correction functions
+	static void EnableGammaCorrection();
+	static void DisableGammaCorrection();
 	//Framebuffers related functions
 	static void BlitNamedFrameBuffer(const FrameBuffer &fboRead, const FrameBuffer &fboDraw,
 		unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1,

@@ -94,7 +94,6 @@ int Game::RunLevel()
 
 	//Shaders used
 	Shader MainShader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
-	Shader MainShaderInstanced("res/shaders/simple_lighting_instanced.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom");
 	Shader DebugShader("res/shaders/debug.vert", "res/shaders/debug.frag", "res/shaders/debug.geom");
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
@@ -177,18 +176,15 @@ int Game::RunLevel()
 		return -1;
 
 	//Setup scene lights	
-	DirectionaLight l0(glm::vec3(0, 0, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 1.0f, true);
-	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
-	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, true);
-	SpotLight l3(glm::vec3(75, 5, 0), glm::vec3(1, -1, 0), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00045f, 0.00075f, glm::cos(glm::radians(15.0f)), glm::cos(glm::radians(25.0f)), true);
-	PointLight l4(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.00095f, 0.00175f, true);
-	
+	DirectionaLight l0(glm::vec3(-1, 0, -1.0f), glm::vec3(0.99215, 0.9843, 0.8274), 0.4f, 0.9f, 0.9f, true);
+	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, true);
+	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, true);
+	SpotLight l3(glm::vec3(75, 5, 0), glm::vec3(1, -1, 0), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, glm::cos(glm::radians(15.0f)), glm::cos(glm::radians(25.0f)), true);
 
-	/*m_LightManager->AddLight(l0);
+	m_LightManager->AddLight(l0);
 	m_LightManager->AddLight(l1);
 	m_LightManager->AddLight(l2);
-	m_LightManager->AddLight(l3);*/
-	m_LightManager->AddLight(l4);
+	m_LightManager->AddLight(l3);
 
 	
 	
@@ -199,7 +195,7 @@ int Game::RunLevel()
 	bool Explode = false;
 	float explodeDis = 0.0f;
 	float ExplosionStarted = 0.0f;
-
+	m_IsDay = true;
 	//Start of rendering loop
 	while (!glfwWindowShouldClose(m_CurrentWindow))
 	{
@@ -268,13 +264,27 @@ int Game::RunLevel()
 		MainShader.SetMat4("model", model);
 		MainShader.SetMat4("view", view);
 		MainShader.SetMat4("projection", projection);
-		MainShader.SetFloat("material.shineness", 32);
-		MainShader.SetBool("material.blinn", false);
+		MainShader.SetFloat("material.shineness", 64);
+		MainShader.SetBool("material.blinn", true);
 
 		//Update lights data
-		//l1.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
-		//l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
-		//l3.SetDirection(glm::vec3((sin(glfwGetTime()*2)), -1, cos(glfwGetTime() * 5)));
+		if (m_IsDay)
+		{
+			l0.Enable();
+			l1.Disable();
+			l2.Disable();
+			l3.Disable();
+		}
+		else
+		{
+			l0.Disable();
+			l1.Enable();
+			l2.Enable();
+			l3.Enable();
+		}
+		l1.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
+		l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
+		l3.SetDirection(glm::vec3((sin(glfwGetTime()*2)), -1, cos(glfwGetTime() * 5)));
 		m_LightManager->SetLight(MainShader, m_Camera.GetViewMatrix());
 
 		//Setup for border (part 1)
@@ -390,10 +400,11 @@ int Game::RunLevel()
 		//If player is moving, apply blur
 		PostProcessShader.SetBool("moving", m_Moving);
 		PostProcessShader.SetFloat("blurStrength", std::max(m_MovingSpeed, 0.0f));
+		PostProcessShader.SetFloat("gammaCorrection",2.2f);
 		PostProcVAO.Bind();
 		m_Renderer.DisableDepthTesting();
 		m_Renderer.Draw(PostProcVAO, PostProcessShader, 6 * 1, 0);
-		
+
 		//Render GUI onto screen
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -479,6 +490,16 @@ void Game::ProcessInput()
 		m_Camera.UpdatePosition(kLeft, m_DeltaTime);
 		m_Moving = true;
 		m_MovingSpeed += 0.005;
+		return;
+	}
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_N))
+	{
+		m_IsDay = false;
+		return;
+	}
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_P))
+	{
+		m_IsDay = true;
 		return;
 	}
 	m_MovingSpeed -= 0.05;

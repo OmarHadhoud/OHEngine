@@ -40,6 +40,7 @@ private:
 	bool m_Moving;
 	float m_MovingSpeed;
 	bool m_Bordered;
+	bool m_IsDay;
 	//Window related
 	GLFWwindow *m_CurrentWindow;
 	unsigned int m_WindowWidth;

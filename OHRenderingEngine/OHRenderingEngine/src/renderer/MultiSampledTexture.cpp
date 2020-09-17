@@ -17,7 +17,7 @@ void MultiSampledTexture::CreateTexImage(float width, float height, BufferType b
 {
 	if (bType == kColor)
 	{
-		GlCall(glTexImage2DMultisample(GetType() , m_NumSamples, GL_RGB, width, height, GL_TRUE));
+		GlCall(glTexImage2DMultisample(GetType() , m_NumSamples, GL_RGB16, width, height, GL_TRUE));
 	}
 	else if (bType == kDepth)
 	{

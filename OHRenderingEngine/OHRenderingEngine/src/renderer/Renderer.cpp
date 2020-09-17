@@ -77,6 +77,16 @@ void Renderer::SetStencilOp(TestOption sfail, TestOption dpthfail, TestOption dp
 	GlCall(glStencilOp(sfail, dpthfail, dpthpass));
 }
 
+void Renderer::EnableGammaCorrection()
+{
+	GlCall(glEnable(GL_FRAMEBUFFER_SRGB));
+}
+
+void Renderer::DisableGammaCorrection()
+{
+	GlCall(glDisable(GL_FRAMEBUFFER_SRGB));
+}
+
 void Renderer::BlitNamedFrameBuffer(const FrameBuffer & fboRead, const FrameBuffer & fboDraw, unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1, unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1)
 {
 	fboRead.Bind(kRead);

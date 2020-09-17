@@ -5,13 +5,13 @@
 #include "Texture.h"
 
 
-Texture::Texture():m_Type(k2D), m_Path(""), m_ID(0)
+Texture::Texture():m_Type(k2D), m_Path(""), m_ID(0), m_IsGammaCorrected(false)
 {
 	//Generate the texture
 	GlCall(glGenTextures(1, &m_ID));
 }
 
-Texture::Texture(const char *path):m_Type(k2D), m_Path(path), m_ID(0)
+Texture::Texture(const char *path, bool gamma_corrected):m_Type(k2D), m_Path(path), m_ID(0), m_IsGammaCorrected(gamma_corrected)
 {
 	//Generate the texture
 	GlCall(glGenTextures(1, &m_ID));
@@ -32,6 +32,7 @@ Texture::Texture(const Texture & other)
 	m_Path = other.m_Path;
 	//Copy the type
 	m_Type = other.m_Type;
+	m_IsGammaCorrected = other.m_IsGammaCorrected;
 	CreateTextureFromPath();
 }
 
@@ -42,11 +43,13 @@ Texture::Texture(Texture && other) noexcept
 	m_Path = other.m_Path;
 	m_Type = other.m_Type;
 	m_Format = other.m_Format;
+	m_InternalFormat = other.m_InternalFormat;
+	m_IsGammaCorrected = other.m_IsGammaCorrected;
 
 	//Clean the moved texture
 	other.m_ID = 0;
 	other.m_Path = "";
-	other.m_Format = 0;	
+	other.m_Format = kRGB;	
 }
 
 Texture & Texture::operator=(const Texture & other)
@@ -57,6 +60,7 @@ Texture & Texture::operator=(const Texture & other)
 		m_Path = other.m_Path;
 		//Copy the type
 		m_Type = other.m_Type;
+		m_IsGammaCorrected = other.m_IsGammaCorrected;
 		CreateTextureFromPath();
 	}
 
@@ -72,11 +76,13 @@ Texture & Texture::operator=(Texture && other) noexcept
 	m_Path = other.m_Path;
 	m_Type = other.m_Type;
 	m_Format = other.m_Format;
+	m_InternalFormat = other.m_InternalFormat;
+	m_IsGammaCorrected = other.m_IsGammaCorrected;
 
 	//Clean the moved texture
 	other.m_ID = 0;
 	other.m_Path = "";
-	other.m_Format = 0;
+	other.m_Format = kRGB;
 
 	return *this;
 }
@@ -91,9 +97,19 @@ std::string Texture::GetPath() const
 	return m_Path;
 }
 
-GLenum Texture::GetFormat() const
+TextureFormat Texture::GetFormat() const
 {
 	return m_Format;
+}
+
+TextureFormat Texture::GetInternalFormat() const
+{
+	return m_InternalFormat;
+}
+
+void Texture::SetInternalFormat(TextureFormat format)
+{
+	m_InternalFormat = format;
 }
 
 TextureType Texture::GetType() const
@@ -119,14 +135,17 @@ void Texture::CreateTextureFromPath()
 	unsigned char *data = stbi_load(m_Path.c_str(), &width, &height, &nrChannels, 0);
 	if (data)
 	{
-		if (nrChannels == 1)
-			SetFormat(GL_RED);
-		else if (nrChannels == 3)
-			SetFormat(GL_RGB);
+		if (nrChannels == 3)
+		{
+			SetInternalFormat(m_IsGammaCorrected == true ? kSRGB : kRGB);
+			SetFormat(kRGB);
+		}
 		else if (nrChannels == 4)
-			SetFormat(GL_RGBA);
-		GLenum format = GetFormat();
-		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data));
+		{
+			SetInternalFormat(m_IsGammaCorrected == true ? kSRGBA :  kRGBA);
+			SetFormat(kRGBA);
+		}
+		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, width, height, 0, m_Format, GL_UNSIGNED_BYTE, data));
 		GlCall(glGenerateMipmap(GL_TEXTURE_2D));
 	}
 	else
@@ -140,7 +159,7 @@ void Texture::CreateTexImage(float width, float height, BufferType bType) const
 {
 	if (bType == kColor)
 	{
-		GlCall(glTexImage2D(m_Type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+		GlCall(glTexImage2D(m_Type, 0, GL_RGB16, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
 	}
 	else if (bType == kDepth)
 	{
@@ -183,7 +202,7 @@ void Texture::SetType(TextureType type)
 {
 	m_Type = type;
 }
-void Texture::SetFormat(GLenum format)
+void Texture::SetFormat(TextureFormat format)
 {
 	m_Format = format;
 }
@@ -203,4 +222,9 @@ void Texture::Activate(unsigned int num)
 bool Texture::IsMultiSampled() const
 {
 	return m_Type==k2DMS;
+}
+
+void Texture::SetGammaCorrection(bool val)
+{
+	m_IsGammaCorrected = val;
 }

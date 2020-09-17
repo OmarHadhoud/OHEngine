@@ -173,7 +173,6 @@ vec3 ComputePointLights()
 		//Attenuate
 		float dist = distance(fs_in.fragPos, pointLights[i].position);
 		float f_attn = 1.0f / (pointLights[i].kC + pointLights[i].kL * dist + pointLights[i].kQ * dist * dist); 
-
 		ret += f_attn * pointLights[i].color * (ambient+diffuse+specular);
 	}
 	

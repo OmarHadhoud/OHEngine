@@ -6,6 +6,7 @@ in vec2 v_TexCoords;
 uniform sampler2D quadTex;
 uniform bool moving;
 uniform float blurStrength;
+uniform float gammaCorrection;
 
 const float offset = 1.0f / 300.0f;
 
@@ -45,4 +46,5 @@ void main()
 	}
 	FragColor *= vec4(vec3(kernelConstant),1.0f);
 	FragColor = (1-blurStrength)*vec4(pixels[4],1.0f) + blurStrength*FragColor;
+	FragColor = vec4(pow(vec3(FragColor),vec3(1.0f/gammaCorrection)),1.0f);
 }
