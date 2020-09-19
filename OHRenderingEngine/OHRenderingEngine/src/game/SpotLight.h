@@ -15,10 +15,13 @@ public:
 	void SetDirection(glm::vec3 dir);
 	void SetInnerCutoff(float val);
 	void SetOuterCutoff(float val);
+	void UpdateTransformationMatrix();
 private:
 	glm::vec3 m_Direction;
 	float m_InnerCutoff;
+	float m_InnerCutoffAngle;
 	float m_OuterCutoff;
+	float m_OuterCutoffAngle;
 };
 
 #endif // !SPOT_LIGHT_H

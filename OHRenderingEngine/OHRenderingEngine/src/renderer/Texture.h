@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include "renderer/enums.h"
 
@@ -32,6 +33,7 @@ public:
 	//Binds the 2D texture to this texture
 	void Bind() const;
 	void SetWrap(WrapDir dir, WrapType type) const;
+	void SetBorderColor(float* color) const;
 	void SetMinFilter(TextureFilter filter) const;
 	void SetMagFilter(TextureFilter filter) const;
 	void SetType(TextureType type);

@@ -163,7 +163,7 @@ void Texture::CreateTexImage(float width, float height, BufferType bType) const
 	}
 	else if (bType == kDepth)
 	{
-		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
+		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
 	}
 	else if (bType == kStencil)
 	{
@@ -184,6 +184,11 @@ void Texture::SetWrap(WrapDir dir, WrapType type) const
 {
 	//Set the texture wrapping Settings
 	GlCall(glTexParameteri(m_Type, dir, type));
+}
+
+void Texture::SetBorderColor(float* color) const
+{
+	GlCall(glTexParameterfv(m_Type,GL_TEXTURE_BORDER_COLOR, color));
 }
 
 void Texture::SetMinFilter(TextureFilter filter) const

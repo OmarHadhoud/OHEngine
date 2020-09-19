@@ -53,7 +53,7 @@ enum WrapType
 	kRepeat = GL_REPEAT,
 	kMirroredRepeat = GL_MIRRORED_REPEAT,
 	kClampToEdge = GL_CLAMP_TO_EDGE,
-	kClampToBorer = GL_CLAMP_TO_BORDER
+	kClampToBorder = GL_CLAMP_TO_BORDER
 };
 
 enum TextureFilter
@@ -68,7 +68,7 @@ enum TextureFilter
 
 enum BufferType
 {
-	kNone,
+	kNone = GL_NONE,
 	kColor,
 	kDepth,
 	kStencil,

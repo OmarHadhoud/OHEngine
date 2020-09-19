@@ -10,6 +10,7 @@ out VS_OUT
 	vec3 v_NormalDir;
 	vec2 v_TexCoords;
 	vec3 fragPos;
+	vec3 fragPosWorld;
 } vs_out;
 
 uniform mat4 model;
@@ -21,4 +22,5 @@ void main()
 	vs_out.v_TexCoords = vec2(aTexCoords.x, aTexCoords.y);
 	vs_out.v_NormalDir = mat3(transpose(inverse(view * model))) * aNormal;
 	vs_out.fragPos = vec3(view * model * vec4(aPos, 1.0f));
+	vs_out.fragPosWorld = vec3(model * vec4(aPos, 1.0f));
 }

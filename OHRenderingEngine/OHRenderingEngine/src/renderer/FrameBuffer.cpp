@@ -58,4 +58,14 @@ bool FrameBuffer::IsComplete() const
 	return ret;
 }
 
+void FrameBuffer::DrawBuffer(BufferType buffer)
+{
+	GlCall(glDrawBuffer(buffer));
+}
+
+void FrameBuffer::ReadBuffer(BufferType buffer)
+{
+	GlCall(glReadBuffer(buffer));
+}
+
 

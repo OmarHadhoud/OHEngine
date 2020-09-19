@@ -58,3 +58,7 @@ void PointLight::SetQuadraticConstant(float val)
 	assert(val >= 0);
 	m_kQ = val;
 }
+
+void PointLight::UpdateTransformationMatrix()
+{
+}

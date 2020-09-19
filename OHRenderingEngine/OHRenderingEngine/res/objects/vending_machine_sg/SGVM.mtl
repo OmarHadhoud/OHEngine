@@ -1,0 +1,42 @@
+# Blender MTL File: 'SGVM.blend'
+# Material Count: 3
+
+newmtl Material
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd FrontDiffuse.png
+map_Bump FrontNormal.png
+map_Ks FrontSpecular.png
+
+newmtl Material.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd SideDiffuse.png
+map_Bump SideNormal.png
+map_Ks SideSpecular.png
+
+newmtl Material.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd BackDiffuse.png
+map_Bump BackNormal.png
+map_Ks BackSpecular.png
+

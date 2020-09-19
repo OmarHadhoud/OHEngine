@@ -7,6 +7,7 @@ in GS_OUT
 	vec3 v_NormalDir;
 	vec2 v_TexCoords;
 	vec3 fragPos;
+	vec3 fragPosWorld;
 } fs_in;
 
 //Lighting structs
@@ -19,6 +20,9 @@ struct DirectionaLighting
 	float ambient;
 	float diffuse;
 	float specular;
+
+	mat4 TransformationMatrix;
+	sampler2D DepthMap;
 };
 
 struct PointLight
@@ -53,6 +57,9 @@ struct SpotLight
 
 	float outer_cutoff;
 	float inner_cutoff;
+
+	mat4 TransformationMatrix;
+	sampler2D DepthMap;
 };
 
 //Material structs
@@ -80,11 +87,14 @@ uniform DirectionaLighting directionalLights[MAX_DIRECTIONAL_LIGHTS];
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOTLIGHTS];
 
+
 //Light computation functions
 vec3 ComputeLight();
 vec3 ComputeDirectionalLight();
 vec3 ComputePointLights();
 vec3 ComputeSpotLights();
+float CalcShadow(mat4 TransformationMatrix ,sampler2D DepthMap, vec3 normalDir, vec3 lightDir);
+
 
 void main()
 {	
@@ -92,6 +102,7 @@ void main()
 	if(FragColor.a < 0.1)
 		discard;
 }
+
 
 vec3 ComputeLight()
 {
@@ -132,6 +143,10 @@ vec3 ComputeDirectionalLight()
 		else
 			specular_dot = max(dot(halfWayDir, normalDir), 0.0f);
 		specular = vec3(pow(specular_dot,material.shineness)* directionalLights[i].specular) * vec3(texture(material.texture_specular1, fs_in.v_TexCoords));
+		//Shadow calculation
+		float shadow = CalcShadow(directionalLights[i].TransformationMatrix, directionalLights[i].DepthMap, normalDir, lightDir);
+		specular*=(1-shadow);
+		diffuse*=(1-shadow);
 		ret += directionalLights[i].color * (ambient+diffuse+specular);
 	}
 	
@@ -221,8 +236,38 @@ vec3 ComputeSpotLights()
 		diffuse *= intensity;
 		specular *= intensity;
 		
+		//Shadow calculation
+		float shadow = CalcShadow(spotLights[i].TransformationMatrix, spotLights[i].DepthMap, normalDir, lightDir);
+		specular*=(1-shadow);
+		diffuse*=(1-shadow);
+
 		ret += f_attn *spotLights[i].color * (ambient+diffuse+specular);
 	}
 	
 	return ret;
+}
+
+float CalcShadow(mat4 TransformationMatrix ,sampler2D DepthMap, vec3 normalDir, vec3 lightDir)
+{
+	vec2 texelSize = 1.0/textureSize(DepthMap,0);
+	vec4 FragLightPos = TransformationMatrix * vec4(fs_in.fragPosWorld, 1.0f);
+	vec3 lightCoords = FragLightPos.xyz / FragLightPos.w;
+	lightCoords = 0.5f * lightCoords + 0.5f;
+	float shadow = 0.0f;
+	float bias = max(0.005f, 0.05*(1-dot(normalDir, lightDir)));
+	bias = 0.0f; //Using culling, no need for bias here.
+	float currentPoint = lightCoords.z;
+	for(int x = -1; x < 2; x++)
+	{
+		for(int y = -1; y < 2; y++)
+		{
+			vec2 offset = texelSize * vec2(x,y);
+			float closestPoint  = texture(DepthMap, lightCoords.xy+offset).r;
+			shadow += currentPoint - bias > closestPoint ? 1.0f : 0.0f;
+		}
+	}
+	shadow /= 9.0f;
+	if(currentPoint > 1)
+		shadow = 0;	
+	return shadow;
 }

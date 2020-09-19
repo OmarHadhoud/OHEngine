@@ -18,6 +18,7 @@ public:
 	void SetConstant(float val);
 	void SetLinearConstant(float val);
 	void SetQuadraticConstant(float val);
+	void UpdateTransformationMatrix();
 private:
 	glm::vec3 m_Position;
 	float m_kC;

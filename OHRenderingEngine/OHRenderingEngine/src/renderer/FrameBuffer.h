@@ -22,6 +22,9 @@ public:
 	void AttachRenderObject(RenderBuffer &rbo, FrameBufferAttachement attach) const;
 	//Checks if the frame buffer is complete
 	bool IsComplete() const;
+	//Sets the read and draw buffer
+	void DrawBuffer(BufferType buffer);
+	void ReadBuffer(BufferType buffer);
 private:
 	unsigned int m_ID;
 	FrameBufferTarget m_Target;

@@ -117,20 +117,26 @@ void LightManager::AddLight(Light &light)
 void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 {
 	unsigned int n_Active = 0;
-	for (int i = 0; i < m_DirectionalLights.size() && m_DirectionalLights[i]->IsEnabled() && n_Active < MAX_DIRECTIONAL_LIGHTS; i++)
+	for (int i = 0; i < m_DirectionalLights.size()  && n_Active < MAX_DIRECTIONAL_LIGHTS; i++)
 	{
+		if (!m_DirectionalLights[i]->IsEnabled())
+			continue;
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].ambient", m_DirectionalLights[i]->GetAmbient());
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].diffuse", m_DirectionalLights[i]->GetDiffuse());
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].specular", m_DirectionalLights[i]->GetSpecular());
 		shader.SetVec3("directionalLights[" + std::to_string(n_Active) + "].direction", glm::vec3(view_matrix*glm::vec4(m_DirectionalLights[i]->GetDirection(), 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("directionalLights["+std::to_string(n_Active)+"].color", m_DirectionalLights[i]->GetColor());
+		shader.SetMat4("directionalLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_DirectionalLights[i]->GetTransformationMatrix());
+		shader.SetInt("directionalLights[" + std::to_string(n_Active) + "].DepthMap", m_DirectionalLights[i]->GetDepthMap());
 		n_Active++;
 	}
 	shader.SetInt("n_DirectionalLights", n_Active);
 	
 	n_Active = 0;
-	for (int i = 0; i < m_PointLights.size() && m_PointLights[i]->IsEnabled() && n_Active < MAX_POINT_LIGHTS; i++)
+	for (int i = 0; i < m_PointLights.size() && n_Active < MAX_POINT_LIGHTS; i++)
 	{
+		if (!m_PointLights[i]->IsEnabled())
+			continue;
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].ambient", m_PointLights[i]->GetAmbient());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].diffuse", m_PointLights[i]->GetDiffuse());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].specular", m_PointLights[i]->GetSpecular());
@@ -144,8 +150,10 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 	shader.SetInt("n_PointLights", n_Active);
 
 	n_Active = 0;
-	for (int i = 0; i < m_SpotLights.size() && m_SpotLights[i]->IsEnabled() && n_Active < MAX_SPOTLIGHTS; i++)
+	for (int i = 0; i < m_SpotLights.size() && n_Active < MAX_SPOTLIGHTS; i++)
 	{
+		if (!m_SpotLights[i]->IsEnabled())
+			continue;
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].ambient", m_SpotLights[i]->GetAmbient());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].diffuse", m_SpotLights[i]->GetDiffuse());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].specular", m_SpotLights[i]->GetSpecular());
@@ -157,6 +165,8 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].kQ", m_SpotLights[i]->GetQuadraticConstant());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].inner_cutoff", m_SpotLights[i]->GetInnerCutoff());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].outer_cutoff", m_SpotLights[i]->GetOuterCutoff());
+		shader.SetMat4("spotLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_SpotLights[i]->GetTransformationMatrix());
+		shader.SetInt("spotLights[" + std::to_string(n_Active) + "].DepthMap", m_SpotLights[i]->GetDepthMap());
 		n_Active++;
 	}
 	shader.SetInt("n_SpotLights", n_Active);
@@ -167,8 +177,10 @@ void LightManager::DrawLights(glm::mat4 view, glm::mat4 projection) const
 	m_Shader.Use();
 	m_VAO.Bind();
 	glm::mat4 model;
-	for (int i = 0; i < m_PointLights.size() && m_PointLights[i]->IsEnabled(); i++)
+	for (int i = 0; i < m_PointLights.size(); i++)
 	{
+		if (!m_PointLights[i]->IsEnabled())
+			continue;
 		model = glm::mat4(0.3f);
 		model = glm::translate(model, m_PointLights[i]->GetPosition());
 		m_Shader.SetMat4("model", model);
@@ -178,8 +190,10 @@ void LightManager::DrawLights(glm::mat4 view, glm::mat4 projection) const
 		Renderer::Draw(m_VAO, m_Shader, 6 * 6, 0);
 	}
 
-	for (int i = 0; i < m_SpotLights.size() && m_SpotLights[i]->IsEnabled(); i++)
+	for (int i = 0; i < m_SpotLights.size(); i++)
 	{
+		if (!m_SpotLights[i]->IsEnabled())
+			continue;
 		glm::vec3 pos = m_SpotLights[i]->GetPosition();
 		glm::vec3 dir = m_SpotLights[i]->GetDirection();
 		model = glm::mat4(1.0f);

@@ -12,8 +12,10 @@ public:
 	~DirectionaLight();
 	glm::vec3 GetDirection() const;
 	void SetDirection(glm::vec3 dir);
+	void UpdateTransformationMatrix();
 private:
 	glm::vec3 m_Direction;
+
 };
 
 #endif // !DIRECTIONAL_LIGHT_H
