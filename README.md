@@ -13,9 +13,11 @@ I also implemented a simple game manager to have a simple game scene as a test e
 - Implemented simple blending & culling functionalities. **Note:** Semi transparent objects should be drawn in the end, starting from the furthest object.  
 - Implemented simple ray picking functionality to pick the vending machine and move it.  
 - Implemented simple geomtry shader to make an explosion effect using normal maps. Added also another debug shader to draw the normal vectors loaded for the model.  
-- The game manager has a simple light manager to manage setting and drawing the lights with the shaders implemented.
+- The game manager has a simple light manager to manage setting and drawing the lights with the shaders implemented.  
+- Supports Gamma Correction.  
+- Supports Directional and Spot Lights shadows. **Note:** For now, only 1 light can cast shadows. Will support having more than 1 when refactoring the light manager.  
 # Features to be implemented
-- Implement shadows support.
+- Implement shadows support for Point Lights using cubemaps.  
 - Implement a sorting system for semi transparent objects to draw them automatically with the furthest first.  
 - ~~Implement a class to manage instanced drawing of same object.~~ [Delayed, not that important for now, also needs the current code to be refactored.]  
 # Scene Controls
