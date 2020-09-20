@@ -97,7 +97,8 @@ int Game::RunLevel()
 	Shader DebugShader("res/shaders/debug.vert", "res/shaders/debug.frag", "res/shaders/debug.geom");
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
-	Shader ShadowShader("res/shaders/shadow_shader.vert", "res/shaders/shadow_shader.frag");
+	//Shader ShadowShader("res/shaders/shadow_shader.vert", "res/shaders/shadow_shader.frag");
+	Shader ShadowShader("res/shaders/shadow_shader_cubemap.vert", "res/shaders/shadow_shader_cubemap.frag", "res/shaders/shadow_shader_cubemap.geom");
 	
 	//Models
 	Model VendingMachine("res/objects/vending_machine_sg/SGVM.obj");
@@ -178,7 +179,7 @@ int Game::RunLevel()
 
 	//Setup scene lights	
 	DirectionaLight l0(glm::vec3(15, -20, 15), glm::vec3(0.99215, 0.9843, 0.8274), 0.4f, 0.9f, 0.9f, true);
-	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, true);
+	PointLight l1(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.000045f, 0.000075f, true);
 	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, true);
 	SpotLight l3(glm::vec3(75, 5, 0), glm::vec3(1, -1, 0), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, glm::radians(35.0f), glm::radians(35.0f), true);
 
@@ -192,11 +193,17 @@ int Game::RunLevel()
 	l0.SetNearPlane(1.0f);
 	l0.SetFarPlane(50.0f);
 	l0.UpdateTransformationMatrix();
+	
+	l1.SetDepthMap(31);
+	l1.SetNearPlane(0.1f);
+	l1.SetFarPlane(200.0f);
+	l1.UpdateTransformationMatrix();
 
-	l3.SetDepthMap(32);
+	l3.SetDepthMap(30);
 	l3.SetNearPlane(0.1f);
 	l3.SetFarPlane(50.0f);
 	l3.UpdateTransformationMatrix();
+
 
 
 
@@ -213,16 +220,27 @@ int Game::RunLevel()
 	DepthMap.SetMagFilter(kNearest);
 	DepthMap.CreateTexImage(2048, 2048, kDepth);
 
+	CubeMapTexture DepthCubeMap;
+	DepthCubeMap.SetType(kCubeMap);
+	DepthCubeMap.Activate(31);
+	DepthCubeMap.Bind();
+	DepthCubeMap.SetWrap(kS, kClampToBorder);
+	DepthCubeMap.SetWrap(kT, kClampToBorder);
+	DepthCubeMap.SetWrap(kR, kClampToBorder);
+	DepthCubeMap.SetMagFilter(kNearest);
+	DepthCubeMap.SetMinFilter(kNearest);
+	DepthCubeMap.CreateTexImage(2048, 2048, kDepth);
+
 	FrameBuffer ShadowMapFBO;
 	ShadowMapFBO.Bind();
-	ShadowMapFBO.AttachTexture(DepthMap, kDepthAttach);
+	ShadowMapFBO.AttachTexture(DepthCubeMap, kDepthAttach, true);
 	ShadowMapFBO.DrawBuffer(kNone);
 	ShadowMapFBO.ReadBuffer(kNone);
-	ShadowMapFBO.Unbind();
 	if (!ShadowMapFBO.IsComplete())
 		return -1;
+	ShadowMapFBO.Unbind();
 	glm::mat4 ShadowTranformationMatrix;
-
+	std::vector<glm::mat4> PtLightTransMatrix;
 
 	float offset;
 	glm::vec3 VendingMachinePos = glm::vec3(9, -0.3f, 0.0f);
@@ -290,7 +308,7 @@ int Game::RunLevel()
 		{
 			float yPos = VendingMachinePos.y;
 			VendingMachinePos = offset*m_Camera.GetFront() + m_Camera.GetPosition();
-			VendingMachinePos.y = yPos;
+			//VendingMachinePos.y = yPos;
 			VendingMachineCollider.SetMinBound(mincoll+VendingMachinePos-VendingMachinePosOrig);
 			VendingMachineCollider.SetMaxBound(maxcoll + VendingMachinePos - VendingMachinePosOrig);
 		}
@@ -310,22 +328,25 @@ int Game::RunLevel()
 		
 		//Update lights data
 		l0.UpdateTransformationMatrix();
+		l1.UpdateTransformationMatrix();
 		l3.UpdateTransformationMatrix();
 		if (m_IsDay)
 		{
 			l0.Enable();
-			l1.Disable();
+			l1.Enable();
 			l2.Disable();
 			l3.Disable();
-			ShadowTranformationMatrix = l0.GetTransformationMatrix();
+			ShadowTranformationMatrix = l0.GetTransformationMatrix()[0];
+			PtLightTransMatrix = l1.GetTransformationMatrix();
 		}
 		else
 		{
 			l0.Disable();
 			l1.Enable();
-			l2.Enable();
-			l3.Enable();
-			ShadowTranformationMatrix = l3.GetTransformationMatrix();
+			//l2.Enable();
+			//l3.Enable();
+			ShadowTranformationMatrix = l3.GetTransformationMatrix()[0];
+			PtLightTransMatrix = l1.GetTransformationMatrix();
 		}
 		l0.SetDirection(glm::vec3(15*cos(glfwGetTime()/2)-5, -10, 15*sin(glfwGetTime()/2)-3));
 		l1.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
@@ -334,8 +355,8 @@ int Game::RunLevel()
 		MainShader.Use();
 		m_LightManager->SetLight(MainShader, m_Camera.GetViewMatrix());
 
-		//Drawing shadows
-		ShadowMapFBO.Bind();
+		//Drawing shadows for directional and spot lights
+		/*ShadowMapFBO.Bind();
 		m_Renderer.EnableCulling();
 		m_Renderer.CullFace(kFront);
 		//Render the vending machine
@@ -363,14 +384,51 @@ int Game::RunLevel()
 		//Setup shadow first
 		ShadowShader.SetMat4("TransformationMatrix", ShadowTranformationMatrix);
 		ShadowShader.SetMat4("ModelMatrix", model);
+		BackPack.Draw(ShadowShader);*/
+
+		//Drawing shadows for point lights
+		ShadowMapFBO.Bind();
+		m_Renderer.EnableCulling();
+		m_Renderer.CullFace(kFront);
+		//Render the vending machine
+		model = glm::translate(model, VendingMachinePos);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f));
+		//Setup shadow first
+		glad_glViewport(0, 0, 2048, 2048);
+		m_Renderer.Clear(kDepthBufferBit, glm::vec4(0.0f));
+		ShadowShader.Use();
+		ShadowShader.SetMat4("TransformationMatrix[0]", PtLightTransMatrix[0]);
+		ShadowShader.SetMat4("TransformationMatrix[1]", PtLightTransMatrix[1]);
+		ShadowShader.SetMat4("TransformationMatrix[2]", PtLightTransMatrix[2]);
+		ShadowShader.SetMat4("TransformationMatrix[3]", PtLightTransMatrix[3]);
+		ShadowShader.SetMat4("TransformationMatrix[4]", PtLightTransMatrix[4]);
+		ShadowShader.SetMat4("TransformationMatrix[5]", PtLightTransMatrix[5]);
+		ShadowShader.SetMat4("ModelMatrix", model);
+		ShadowShader.SetFloat("FarPlane", l1.GetFarPlane());
+		ShadowShader.SetVec3("LightPosition", l1.GetPosition());
+		VendingMachine.Draw(ShadowShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
+
+		//Setup shadow first
+		ShadowShader.SetMat4("ModelMatrix", model);
+		Ground.Draw(ShadowShader);
+
+
+		//Draw backpack
+		model = glm::translate(model, glm::vec3(0, 5.0f, 0.0f));
+		//Setup shadow first
+		ShadowShader.SetMat4("ModelMatrix", model);
 		BackPack.Draw(ShadowShader);
 
 		//Disable shadows
 		m_Renderer.DisableCulling();
 		glad_glViewport(0, 0, m_WindowWidth, m_WindowHeight);
 		fbo.Bind();
-		DepthMap.Activate(32);
-		DepthMap.Bind();
+		DepthCubeMap.Activate(31);
+		DepthCubeMap.Bind();
 		m_Renderer.DisableBlending();
 
 
@@ -391,6 +449,7 @@ int Game::RunLevel()
 		model = glm::scale(model, glm::vec3(5.0f));*/
 		MainShader.Use();
 		MainShader.SetMat4("model", model);
+		MainShader.SetInt("ssss",31);
 		VendingMachine.Draw(MainShader);
 
 		//Start rendering the Ground but disable border
@@ -399,10 +458,24 @@ int Game::RunLevel()
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, -5.0f, 0.0f));
 		MainShader.SetMat4("model", model);
-
-
-
 		Ground.Draw(MainShader);
+		//TODO: REMOVE, ONLY TESTING POINT LIGHT
+		glm::mat4 model2 = model;
+		model2 = glm::translate(model2, glm::vec3(0, 5.0f*8, 0.0f));
+		model2 = glm::rotate(model2, glm::radians(180.0f), glm::vec3(1, 0, 0));
+		MainShader.SetMat4("model", model2);
+		Ground.Draw(MainShader);
+		model2 = glm::translate(model2, glm::vec3(10, -5.0f * 8, 0.0f));
+		model2 = glm::rotate(model2,glm::radians(90.0f),glm::vec3(0,0,1));
+		model2 = glm::translate(model2, glm::vec3(0, -50.0f, 0.0f));
+		MainShader.SetMat4("model", model2);
+		Ground.Draw(MainShader);
+		model2 = glm::translate(model2, glm::vec3(0, 100, 0.0f));
+		model2 = glm::rotate(model2, glm::radians(180.0f), glm::vec3(1, 0, 0));
+		MainShader.SetMat4("model", model2);
+		Ground.Draw(MainShader);
+		//END OF TODO
+
 
 		//Draw backpack
 		model = glm::translate(model, glm::vec3(0, 5.0f, 0.0f));

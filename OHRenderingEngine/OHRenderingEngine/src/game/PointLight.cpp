@@ -1,5 +1,25 @@
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "PointLight.h"
 
+
+glm::vec3 directions[6] = {
+	glm::vec3(1,0,0),
+	glm::vec3(-1,0,0),
+	glm::vec3(0,1,0),
+	glm::vec3(0,-1,0),
+	glm::vec3(0,0,1),
+	glm::vec3(0,0,-1)
+};
+
+glm::vec3 Up[6] = {
+	glm::vec3(0,-1,0),
+	glm::vec3(0,-1,0),
+	glm::vec3(0,0,1),
+	glm::vec3(0,0,-1),
+	glm::vec3(0,-1,0),
+	glm::vec3(0,-1,0)
+};
 
 
 PointLight::PointLight()
@@ -61,4 +81,15 @@ void PointLight::SetQuadraticConstant(float val)
 
 void PointLight::UpdateTransformationMatrix()
 {
+	float NearPlane = GetNearPlane();
+	float FarPlane = GetFarPlane();
+	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)1.0f, NearPlane, FarPlane);
+	std::vector<glm::mat4> matrices;
+	for (int i = 0; i < 6; i++)
+	{
+		glm::mat4 ViewMatrix = glm::lookAt(GetPosition(), GetPosition()+directions[i], Up[i]);
+		glm::mat4 TransformationMatrix = ProjectionMatrix * ViewMatrix;
+		matrices.push_back(TransformationMatrix);
+	}
+	SetTransformationMatrix(matrices);
 }

@@ -34,6 +34,7 @@ float kernelConstant = 1.0f/16.0f;
 
 vec3 pixels[9];
 
+
 void main()
 {
 	for(int i = 0; i < 9; i++)

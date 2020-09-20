@@ -36,9 +36,16 @@ void FrameBuffer::Unbind() const
 	GlCall(glBindFramebuffer(m_Target, 0));
 }
 
-void FrameBuffer::AttachTexture(Texture & tex, FrameBufferAttachement attach) const
+void FrameBuffer::AttachTexture(Texture & tex, FrameBufferAttachement attach, bool is_cubemap) const
 {
-	GlCall(glFramebufferTexture2D(m_Target, attach, tex.GetType(), tex.GetId(), 0));
+	if (!is_cubemap)
+	{
+		GlCall(glFramebufferTexture2D(m_Target, attach, tex.GetType(), tex.GetId(), 0));
+	}
+	else
+	{
+		GlCall(glFramebufferTexture(m_Target, attach, tex.GetId(), 0) );
+	}
 }
 
 void FrameBuffer::AttachRenderObject(RenderBuffer & rbo, FrameBufferAttachement attach) const

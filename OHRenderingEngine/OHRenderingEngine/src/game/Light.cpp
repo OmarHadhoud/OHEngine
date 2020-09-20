@@ -7,7 +7,7 @@ Light::Light():
 	m_Ambient((0.0f)),
 	m_Diffuse((0.0f)),
 	m_Specular((0.0f)),
-	m_TransformationMatrix(glm::mat4(1.0f)),
+	m_TransformationMatrix(std::vector<glm::mat4> (1,glm::mat4(1.0f))),
 	m_FarPlane(10.0f),
 	m_NearPlane(1.0f),
 	m_FrustumSize(10.0f)
@@ -15,7 +15,7 @@ Light::Light():
 }
 
 Light::Light(glm::vec3 color, float ambient, float diffuse, float specular, bool enabled)
-	: m_Color(color), m_Ambient(ambient), m_Diffuse(diffuse), m_Specular(specular), m_Enabled(enabled), m_TransformationMatrix(glm::mat4(1.0f)),
+	: m_Color(color), m_Ambient(ambient), m_Diffuse(diffuse), m_Specular(specular), m_Enabled(enabled), m_TransformationMatrix(std::vector<glm::mat4>(1, glm::mat4(1.0f))),
 	m_FarPlane(10.0f),
 	m_NearPlane(1.0f),
 	m_FrustumSize(10.0f)
@@ -62,7 +62,7 @@ float Light::GetFarPlane() const
 	return m_FarPlane;
 }
 
-glm::mat4 Light::GetTransformationMatrix() const
+std::vector<glm::mat4> Light::GetTransformationMatrix() const
 {
 	return m_TransformationMatrix;
 }
@@ -102,7 +102,7 @@ void Light::SetDepthMap(int map)
 	m_DepthMap = map;
 }
 
-void Light::SetTransformationMatrix(glm::mat4 transformation_matrix)
+void Light::SetTransformationMatrix(std::vector<glm::mat4> transformation_matrix)
 {
 	m_TransformationMatrix = transformation_matrix;
 }

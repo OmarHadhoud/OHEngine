@@ -60,5 +60,5 @@ void SpotLight::UpdateTransformationMatrix()
 	glm::mat4 ViewMatrix = glm::lookAt(GetPosition(), GetPosition() + GetDirection(), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)1.0f, NearPlane, FarPlane);
 	glm::mat4 TransformationMatrix = ProjectionMatrix * ViewMatrix;
-	SetTransformationMatrix(TransformationMatrix);
+	SetTransformationMatrix(std::vector<glm::mat4>(1, TransformationMatrix));
 }

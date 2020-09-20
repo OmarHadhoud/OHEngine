@@ -9,7 +9,7 @@ Camera::Camera(float sensetivity, float speed):
 	m_FirstMouseMotion(true),
 	m_FOV(45.0f),
 	m_Sensetivity(sensetivity),
-	m_YLocked(true),
+	m_YLocked(!true),
 	m_Pos(glm::vec3(0.0f,1.0f,20.0f)),
 	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
 	m_Camerafront(glm::vec3(0.0f, 0.0f, -1.0f)),

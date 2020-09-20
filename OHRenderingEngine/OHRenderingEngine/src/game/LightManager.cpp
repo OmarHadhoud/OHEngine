@@ -126,7 +126,7 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetFloat("directionalLights[" + std::to_string(n_Active) + "].specular", m_DirectionalLights[i]->GetSpecular());
 		shader.SetVec3("directionalLights[" + std::to_string(n_Active) + "].direction", glm::vec3(view_matrix*glm::vec4(m_DirectionalLights[i]->GetDirection(), 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("directionalLights["+std::to_string(n_Active)+"].color", m_DirectionalLights[i]->GetColor());
-		shader.SetMat4("directionalLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_DirectionalLights[i]->GetTransformationMatrix());
+		shader.SetMat4("directionalLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_DirectionalLights[i]->GetTransformationMatrix()[0]);
 		shader.SetInt("directionalLights[" + std::to_string(n_Active) + "].DepthMap", m_DirectionalLights[i]->GetDepthMap());
 		n_Active++;
 	}
@@ -140,11 +140,14 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].ambient", m_PointLights[i]->GetAmbient());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].diffuse", m_PointLights[i]->GetDiffuse());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].specular", m_PointLights[i]->GetSpecular());
-		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].position", glm::vec3(view_matrix*glm::vec4(m_PointLights[i]->GetPosition(),1.0f)));
+		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].position", glm::vec3(view_matrix*glm::vec4(m_PointLights[i]->GetPosition(), 1.0f)));
+		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].world_position", glm::vec3(m_PointLights[i]->GetPosition()));
 		shader.SetVec3("pointLights[" + std::to_string(n_Active) + "].color", m_PointLights[i]->GetColor());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].kC", m_PointLights[i]->GetConstant());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].kL", m_PointLights[i]->GetLinearConstant());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].kQ", m_PointLights[i]->GetQuadraticConstant());
+		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].far_plane", m_PointLights[i]->GetFarPlane());
+		shader.SetInt("pointLights[" + std::to_string(n_Active) + "].DepthMap", m_PointLights[i]->GetDepthMap());
 		n_Active++;
 	}
 	shader.SetInt("n_PointLights", n_Active);
@@ -165,7 +168,7 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].kQ", m_SpotLights[i]->GetQuadraticConstant());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].inner_cutoff", m_SpotLights[i]->GetInnerCutoff());
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].outer_cutoff", m_SpotLights[i]->GetOuterCutoff());
-		shader.SetMat4("spotLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_SpotLights[i]->GetTransformationMatrix());
+		shader.SetMat4("spotLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_SpotLights[i]->GetTransformationMatrix()[0]);
 		shader.SetInt("spotLights[" + std::to_string(n_Active) + "].DepthMap", m_SpotLights[i]->GetDepthMap());
 		n_Active++;
 	}

@@ -17,7 +17,7 @@ public:
 	//Unbinds the frame buffer
 	void Unbind() const;
 	//Attaches texture object to frame buffer
-	void AttachTexture(Texture &tex, FrameBufferAttachement attach) const;
+	void AttachTexture(Texture &tex, FrameBufferAttachement attach, bool is_cubemap = false) const;
 	//Attaches render object to frame buffer
 	void AttachRenderObject(RenderBuffer &rbo, FrameBufferAttachement attach) const;
 	//Checks if the frame buffer is complete

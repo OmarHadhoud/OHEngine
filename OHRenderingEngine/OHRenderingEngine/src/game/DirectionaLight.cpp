@@ -37,5 +37,5 @@ void DirectionaLight::UpdateTransformationMatrix()
 	glm::mat4 ViewMatrix = glm::lookAt(-m_Direction,glm::vec3(0.0f),glm::vec3(0.0f,1.0f,0.0f));
 	glm::mat4 ProjectionMatrix = glm::ortho(-FrustumSize, FrustumSize, -FrustumSize, FrustumSize, NearPlane, FarPlane);
 	glm::mat4 TransformationMatrix = ProjectionMatrix * ViewMatrix;
-	SetTransformationMatrix(TransformationMatrix);
+	SetTransformationMatrix(std::vector<glm::mat4> (1,TransformationMatrix));
 }

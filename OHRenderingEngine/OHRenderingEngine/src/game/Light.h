@@ -3,6 +3,7 @@
 
 #include "renderer/Texture.h"
 
+#include <vector>
 #include <glm/glm.hpp>
 
 class Light
@@ -18,7 +19,7 @@ public:
 	float GetFrustumSize() const;
 	float GetNearPlane() const;
 	float GetFarPlane() const;
-	glm::mat4 GetTransformationMatrix() const;
+	virtual std::vector<glm::mat4> GetTransformationMatrix() const;
 	int GetDepthMap() const;
 	bool IsEnabled() const;
 	void SetColor(glm::vec3 color);
@@ -39,13 +40,13 @@ private:
 	float m_Specular;
 	bool m_Enabled;
 	//Shadow mapping related
-	glm::mat4 m_TransformationMatrix;
+	std::vector<glm::mat4> m_TransformationMatrix;
 	int m_DepthMap;
 	float m_FrustumSize;
 	float m_NearPlane;
 	float m_FarPlane;
 protected:
-	void SetTransformationMatrix(glm::mat4 transformation_matrix);
+	void SetTransformationMatrix(std::vector<glm::mat4> transformation_matrix);
 };
 #endif //! LIGHT_H
 

@@ -28,6 +28,7 @@ struct DirectionaLighting
 struct PointLight
 {
 	vec3 position;
+	vec3 world_position;
 
 	vec3 color;
 
@@ -38,6 +39,9 @@ struct PointLight
 	float kC;
 	float kL;
 	float kQ;
+
+	samplerCube DepthMap;
+	float far_plane;
 };
 
 struct SpotLight
@@ -75,6 +79,7 @@ struct Material
 
 //Materials
 uniform Material material;
+uniform samplerCube ssss;
 
 //The lightings
 #define MAX_DIRECTIONAL_LIGHTS  5
@@ -94,6 +99,7 @@ vec3 ComputeDirectionalLight();
 vec3 ComputePointLights();
 vec3 ComputeSpotLights();
 float CalcShadow(mat4 TransformationMatrix ,sampler2D DepthMap, vec3 normalDir, vec3 lightDir);
+float CalcShadow(samplerCube DepthMap, float far_plane, vec3 normalDir, vec3 lightDir, float viewDistance );
 
 
 void main()
@@ -188,6 +194,13 @@ vec3 ComputePointLights()
 		//Attenuate
 		float dist = distance(fs_in.fragPos, pointLights[i].position);
 		float f_attn = 1.0f / (pointLights[i].kC + pointLights[i].kL * dist + pointLights[i].kQ * dist * dist); 
+
+		//Shadow calculation
+		vec3 lightDirNonNorm = fs_in.fragPosWorld- pointLights[i].world_position;
+		float shadow = CalcShadow(pointLights[i].DepthMap, pointLights[i].far_plane, normalDir, lightDirNonNorm, length(fs_in.fragPos));
+		specular*=(1-shadow);
+		diffuse*=(1-shadow);
+
 		ret += f_attn * pointLights[i].color * (ambient+diffuse+specular);
 	}
 	
@@ -269,5 +282,33 @@ float CalcShadow(mat4 TransformationMatrix ,sampler2D DepthMap, vec3 normalDir, 
 	shadow /= 9.0f;
 	if(currentPoint > 1)
 		shadow = 0;	
+	return shadow;
+}
+
+vec3 sampleDirectionsPtLight[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
+
+float CalcShadow(samplerCube DepthMap, float far_plane, vec3 normalDir, vec3 lightDir, float viewDistance)
+{
+	DepthMap = ssss;//for now
+	vec3 lightToFragment = lightDir;
+	float currentPoint = length(lightToFragment);
+	float shadow = 0.0f;
+	float bias = max(0.005f, 0.05*(1-dot(normalDir, lightToFragment)));
+	bias = 0.0f; //Using culling, no need for bias here.
+	float diskRadius = (1 + (viewDistance/far_plane) ) / 25.0f;
+	for(int i = 0; i < 20; i++)
+	{
+		float closestPoint = texture(DepthMap, lightToFragment + diskRadius * sampleDirectionsPtLight[i]).r;
+		closestPoint *= far_plane;
+		shadow += currentPoint - bias > closestPoint ? 1.0f : 0.0f;
+	}
+	shadow /= 20.0f;
 	return shadow;
 }
