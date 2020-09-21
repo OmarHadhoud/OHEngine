@@ -150,6 +150,11 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetInt("pointLights[" + std::to_string(n_Active) + "].DepthMap", m_PointLights[i]->GetDepthMap());
 		n_Active++;
 	}
+	//Setting all samplerCubes that are not used as GLSL requires to.
+	for (int i = n_Active; i < MAX_POINT_LIGHTS; i++)
+	{
+		shader.SetInt("pointLights[" + std::to_string(i) + "].DepthMap", 32);
+	}
 	shader.SetInt("n_PointLights", n_Active);
 
 	n_Active = 0;

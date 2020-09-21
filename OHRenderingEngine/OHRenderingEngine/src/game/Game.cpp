@@ -450,6 +450,7 @@ int Game::RunLevel()
 		MainShader.Use();
 		MainShader.SetMat4("model", model);
 		MainShader.SetInt("ssss",31);
+		MainShader.SetInt("pointLights[0].DepthMap",31);
 		VendingMachine.Draw(MainShader);
 
 		//Start rendering the Ground but disable border

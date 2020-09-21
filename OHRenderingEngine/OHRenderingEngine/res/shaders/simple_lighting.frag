@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 out vec4 FragColor;
 
@@ -296,7 +296,8 @@ vec3 sampleDirectionsPtLight[20] = vec3[]
 
 float CalcShadow(samplerCube DepthMap, float far_plane, vec3 normalDir, vec3 lightDir, float viewDistance)
 {
-	DepthMap = ssss;//for now
+	//DepthMap = ssss;//for now
+
 	vec3 lightToFragment = lightDir;
 	float currentPoint = length(lightToFragment);
 	float shadow = 0.0f;
