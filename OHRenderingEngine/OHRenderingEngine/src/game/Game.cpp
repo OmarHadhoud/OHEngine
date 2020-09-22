@@ -142,6 +142,11 @@ int Game::RunLevel()
 	colorTex.Bind();
 	colorTex.SetMultiSamples(16);
 	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	MultiSampledTexture brightTexMS;
+	brightTexMS.SetType(k2DMS);
+	brightTexMS.Bind();
+	brightTexMS.SetMultiSamples(16);
+	brightTexMS.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 
 	RenderBuffer rbo;
 	rbo.Bind();
@@ -153,6 +158,7 @@ int Game::RunLevel()
 	fbo.Bind();
 	fbo.AttachRenderObject(rbo, kDepthStencilAttach);
 	fbo.AttachTexture(colorTex, kColorAttach0);
+	fbo.AttachTexture(brightTexMS, kColorAttach1);
 	if (!fbo.IsComplete())
 		return -1;
 	
@@ -167,6 +173,16 @@ int Game::RunLevel()
 	colorTexInttermediate.SetMinFilter(kLinear);
 	colorTexInttermediate.SetMagFilter(kLinear);
 	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	Texture brightTexInttermediate;
+	brightTexInttermediate.SetType(k2D);
+	brightTexInttermediate.Activate(2);
+	brightTexInttermediate.Bind();
+	brightTexInttermediate.SetWrap(kS, kRepeat);
+	brightTexInttermediate.SetWrap(kT, kRepeat);
+	brightTexInttermediate.SetMinFilter(kLinear);
+	brightTexInttermediate.SetMagFilter(kLinear);
+	brightTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+
 	PostProcessShader.Use();
 	PostProcessShader.SetInt("quadTex", 2);
 
@@ -178,6 +194,7 @@ int Game::RunLevel()
 	fboInttermediate.Bind();
 	fboInttermediate.AttachRenderObject(rboInttermediate, kDepthStencilAttach);
 	fboInttermediate.AttachTexture(colorTexInttermediate, kColorAttach0);
+	fboInttermediate.AttachTexture(brightTexInttermediate, kColorAttach1);
 	if (!fboInttermediate.IsComplete())
 		return -1;
 

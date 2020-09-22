@@ -208,7 +208,7 @@ vec3 ComputePointLights()
 
 		//Shadow calculation
 		vec3 lightDirNonNorm = fs_in.fragPosWorld- pointLights[i].world_position;
-		float shadow = !directionalLights[i].HasShadow ? 0.0f : CalcShadow(pointLights[i].DepthMap, pointLights[i].far_plane, normalDir, lightDirNonNorm, length(fs_in.fragPos));
+		float shadow = !pointLights[i].HasShadow ? 0.0f : CalcShadow(pointLights[i].DepthMap, pointLights[i].far_plane, normalDir, lightDirNonNorm, length(fs_in.fragPos));
 		specular*=(1-shadow);
 		diffuse*=(1-shadow);
 
@@ -263,7 +263,7 @@ vec3 ComputeSpotLights()
 		specular *= intensity;
 		
 		//Shadow calculation
-		float shadow = !directionalLights[i].HasShadow ? 0.0f : CalcShadow(spotLights[i].TransformationMatrix, spotLights[i].DepthMap, normalDir, lightDir);
+		float shadow = !spotLights[i].HasShadow ? 0.0f : CalcShadow(spotLights[i].TransformationMatrix, spotLights[i].DepthMap, normalDir, lightDir);
 		specular*=(1-shadow);
 		diffuse*=(1-shadow);
 
