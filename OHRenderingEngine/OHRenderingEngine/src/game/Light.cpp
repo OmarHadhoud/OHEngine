@@ -10,7 +10,8 @@ Light::Light():
 	m_TransformationMatrix(std::vector<glm::mat4> (1,glm::mat4(1.0f))),
 	m_FarPlane(10.0f),
 	m_NearPlane(1.0f),
-	m_FrustumSize(10.0f)
+	m_FrustumSize(10.0f),
+	m_HasShadows(false)
 {
 }
 
@@ -18,7 +19,8 @@ Light::Light(glm::vec3 color, float ambient, float diffuse, float specular, bool
 	: m_Color(color), m_Ambient(ambient), m_Diffuse(diffuse), m_Specular(specular), m_Enabled(enabled), m_TransformationMatrix(std::vector<glm::mat4>(1, glm::mat4(1.0f))),
 	m_FarPlane(10.0f),
 	m_NearPlane(1.0f),
-	m_FrustumSize(10.0f)
+	m_FrustumSize(10.0f),
+	m_HasShadows(false)
 {
 }
 
@@ -115,6 +117,21 @@ void Light::Enable()
 void Light::Disable()
 {
 	m_Enabled = false;
+}
+
+void Light::EnableShadows()
+{
+	m_HasShadows = true;
+}
+
+void Light::DisableShadows()
+{
+	m_HasShadows = false;
+}
+
+bool Light::HasShadows() const
+{
+	return m_HasShadows;
 }
 
 

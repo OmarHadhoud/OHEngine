@@ -161,6 +161,10 @@ void Texture::CreateTexImage(float width, float height, BufferType bType) const
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_RGB16, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
 	}
+	else if (bType == kColorF)
+	{
+		GlCall(glTexImage2D(m_Type, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL));
+	}
 	else if (bType == kDepth)
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));

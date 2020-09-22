@@ -1,6 +1,7 @@
 #version 400 core
 
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
 
 in GS_OUT
 {
@@ -24,6 +25,8 @@ struct DirectionaLighting
 
 	mat4 TransformationMatrix;
 	sampler2D DepthMap;
+
+	bool HasShadow;
 };
 
 struct PointLight
@@ -43,6 +46,8 @@ struct PointLight
 
 	samplerCube DepthMap;
 	float far_plane;
+
+	bool HasShadow;
 };
 
 struct SpotLight
@@ -65,6 +70,8 @@ struct SpotLight
 
 	mat4 TransformationMatrix;
 	sampler2D DepthMap;
+
+	bool HasShadow;
 };
 
 //Material structs
@@ -152,7 +159,7 @@ vec3 ComputeDirectionalLight()
 			specular_dot = max(dot(halfWayDir, normalDir), 0.0f);
 		specular = vec3(pow(specular_dot,material.shineness)* directionalLights[i].specular) * vec3(texture(material.texture_specular1, fs_in.v_TexCoords));
 		//Shadow calculation
-		float shadow = CalcShadow(directionalLights[i].TransformationMatrix, directionalLights[i].DepthMap, normalDir, lightDir);
+		float shadow = !directionalLights[i].HasShadow ? 0.0f : CalcShadow(directionalLights[i].TransformationMatrix, directionalLights[i].DepthMap, normalDir, lightDir);
 		specular*=(1-shadow);
 		diffuse*=(1-shadow);
 		ret += directionalLights[i].color * (ambient+diffuse+specular);
@@ -201,7 +208,7 @@ vec3 ComputePointLights()
 
 		//Shadow calculation
 		vec3 lightDirNonNorm = fs_in.fragPosWorld- pointLights[i].world_position;
-		float shadow = CalcShadow(pointLights[i].DepthMap, pointLights[i].far_plane, normalDir, lightDirNonNorm, length(fs_in.fragPos));
+		float shadow = !directionalLights[i].HasShadow ? 0.0f : CalcShadow(pointLights[i].DepthMap, pointLights[i].far_plane, normalDir, lightDirNonNorm, length(fs_in.fragPos));
 		specular*=(1-shadow);
 		diffuse*=(1-shadow);
 
@@ -256,7 +263,7 @@ vec3 ComputeSpotLights()
 		specular *= intensity;
 		
 		//Shadow calculation
-		float shadow = CalcShadow(spotLights[i].TransformationMatrix, spotLights[i].DepthMap, normalDir, lightDir);
+		float shadow = !directionalLights[i].HasShadow ? 0.0f : CalcShadow(spotLights[i].TransformationMatrix, spotLights[i].DepthMap, normalDir, lightDir);
 		specular*=(1-shadow);
 		diffuse*=(1-shadow);
 

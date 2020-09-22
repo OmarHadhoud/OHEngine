@@ -128,6 +128,9 @@ int Game::RunLevel()
 	
 	//Backpack
 	Model BackPack("res/objects/backpack/backpack.obj");
+
+	//Box
+	Model Box("res/objects/box/box.obj");
 	
 	//Timing of last frame initialized
 	m_LastFrame = glfwGetTime();
@@ -138,7 +141,7 @@ int Game::RunLevel()
 	colorTex.SetType(k2DMS);
 	colorTex.Bind();
 	colorTex.SetMultiSamples(16);
-	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 
 	RenderBuffer rbo;
 	rbo.Bind();
@@ -152,6 +155,7 @@ int Game::RunLevel()
 	fbo.AttachTexture(colorTex, kColorAttach0);
 	if (!fbo.IsComplete())
 		return -1;
+	
 
 	//Intermediate buffer to be able to make post processing with multisampling
 	Texture colorTexInttermediate;
@@ -162,7 +166,7 @@ int Game::RunLevel()
 	colorTexInttermediate.SetWrap(kT, kRepeat);
 	colorTexInttermediate.SetMinFilter(kLinear);
 	colorTexInttermediate.SetMagFilter(kLinear);
-	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 	PostProcessShader.Use();
 	PostProcessShader.SetInt("quadTex", 2);
 
@@ -178,10 +182,10 @@ int Game::RunLevel()
 		return -1;
 
 	//Setup scene lights	
-	DirectionaLight l0(glm::vec3(15, -20, 15), glm::vec3(0.99215, 0.9843, 0.8274), 0.4f, 0.9f, 0.9f, true);
-	SpotLight l1(glm::vec3(75, 5, 0), glm::vec3(-1, -1, 1), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, glm::radians(35.0f), glm::radians(35.0f), true);
-	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 0.0f, 0.0f), 0.2, 0.8f, 1.0f, 1.0f, 0.0045f, 0.0075f, true);
-	PointLight l3(glm::vec3(25, 5, 0), glm::vec3(0.0f, 0.0f, 1.0f), 0.2f, 0.8f, 1.0f, 1.0f, 0.000045f, 0.000075f, true);
+	DirectionaLight l0(glm::vec3(15, -20, 15), glm::vec3(0.99215, 0.9843, 0.8274), 0.4f, 1.0f, 1.0f, true);
+	SpotLight l1(glm::vec3(75, 5, 0), glm::vec3(1, -1, 0), glm::vec3(0.0f, 1.0f, 0.0f), 0.2f, 1.0f, 1.0f, 1.0f, 0.0045f, 0.0075f, glm::radians(35.0f), glm::radians(35.0f), true);
+	PointLight l2(glm::vec3(50, 5, 30), glm::vec3(1.0f, 1.0f, 1.0f), 0.2, 1.0f, 1.0f, 1.0f, 0.0045f, 0.0075f, true);
+	PointLight l3(glm::vec3(25, 5, 0), glm::vec3(1.0f, 1.0f, 1.0f), 0.2f, 1.0f, 1.0f, 1.0f, 0.000045f, 0.000075f, true);
 
 	m_LightManager->AddLight(l0);
 	m_LightManager->AddLight(l1);
@@ -192,21 +196,25 @@ int Game::RunLevel()
 	l0.SetFrustumSize(20.0f);
 	l0.SetNearPlane(1.0f);
 	l0.SetFarPlane(50.0f);
+	l0.EnableShadows();
 	l0.UpdateTransformationMatrix();
 	
 	l1.SetDepthMap(31);
 	l1.SetNearPlane(0.1f);
 	l1.SetFarPlane(50.0f);
+	l1.EnableShadows();
 	l1.UpdateTransformationMatrix();
 	
 	l2.SetDepthMap(30);
 	l2.SetNearPlane(0.1f);
 	l2.SetFarPlane(200.0f);
+	l2.EnableShadows();
 	l2.UpdateTransformationMatrix();
 
 	l3.SetDepthMap(29);
 	l3.SetNearPlane(0.1f);
 	l3.SetFarPlane(200.0f);
+	l3.EnableShadows();
 	l3.UpdateTransformationMatrix();
 
 
@@ -271,6 +279,7 @@ int Game::RunLevel()
 	bool Explode = false;
 	float explodeDis = 0.0f;
 	float ExplosionStarted = 0.0f;
+	float exposure = 1.0f;
 	m_IsDay = true;
 
 
@@ -288,9 +297,9 @@ int Game::RunLevel()
 			rboInttermediate.Bind();
 			rboInttermediate.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 			colorTex.Bind();
-			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 			colorTexInttermediate.Bind();
-			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColor);
+			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 		}
 
 		//Update timings
@@ -305,6 +314,7 @@ int Game::RunLevel()
 		//Render IMGUI GUI
 		ImGui::Begin("Editor");
 		{
+			ImGui::SliderFloat("Exposure", &exposure, 0, 5);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 		ImGui::End();
@@ -330,7 +340,7 @@ int Game::RunLevel()
 		{
 			float yPos = VendingMachinePos.y;
 			VendingMachinePos = offset*m_Camera.GetFront() + m_Camera.GetPosition();
-			VendingMachinePos.y = yPos;
+			//VendingMachinePos.y = yPos;
 			VendingMachineCollider.SetMinBound(mincoll+VendingMachinePos-VendingMachinePosOrig);
 			VendingMachineCollider.SetMaxBound(maxcoll + VendingMachinePos - VendingMachinePosOrig);
 		}
@@ -374,9 +384,9 @@ int Game::RunLevel()
 			l3.Enable();
 		}
 		l0.SetDirection(glm::vec3(15*cos(glfwGetTime()/2)-5, -10, 15*sin(glfwGetTime()/2)-3));
-		//l1.SetDirection(glm::vec3((sin(glfwGetTime() * 2)), -1, cos(glfwGetTime() * 5)));
-		//l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
-		//l3.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
+		l1.SetDirection(glm::vec3((sin(glfwGetTime() * 2)), -1, cos(glfwGetTime() * 5)));
+		l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
+		l3.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
 		MainShader.Use();
 		m_LightManager->SetLight(MainShader, m_Camera.GetViewMatrix());
 
@@ -533,6 +543,11 @@ int Game::RunLevel()
 		BackPack.Draw(MainShader);
 		MainShader.SetFloat("time", 0);
 
+		model = glm::translate(model, glm::vec3(20, -2.0f, 0.0f));
+		MainShader.SetMat4("model", model);
+		Box.Draw(MainShader);
+		model = glm::translate(model, glm::vec3(-20.0f, 2.0f, 0.0f));
+
 		//Draw backpack normals
 		/*DebugShader.Use();
 		DebugShader.SetMat4("model", model);
@@ -610,7 +625,8 @@ int Game::RunLevel()
 		//If player is moving, apply blur
 		PostProcessShader.SetBool("moving", m_Moving);
 		PostProcessShader.SetFloat("blurStrength", std::max(m_MovingSpeed, 0.0f));
-		PostProcessShader.SetFloat("gammaCorrection",2.2f);
+		PostProcessShader.SetFloat("gammaCorrection", 2.2f);
+		PostProcessShader.SetFloat("exposure",exposure);
 		PostProcVAO.Bind();
 		m_Renderer.DisableDepthTesting();
 		m_Renderer.Draw(PostProcVAO, PostProcessShader, 6 * 1, 0);

@@ -33,12 +33,16 @@ public:
 	virtual void UpdateTransformationMatrix() = 0;
 	void Enable();
 	void Disable();
+	void EnableShadows();
+	void DisableShadows();
+	bool HasShadows() const;
 private:
 	glm::vec3 m_Color;
 	float m_Ambient;
 	float m_Diffuse;
 	float m_Specular;
 	bool m_Enabled;
+	bool m_HasShadows;
 	//Shadow mapping related
 	std::vector<glm::mat4> m_TransformationMatrix;
 	int m_DepthMap;

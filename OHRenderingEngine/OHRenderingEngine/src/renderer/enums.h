@@ -72,7 +72,8 @@ enum BufferType
 	kColor,
 	kDepth,
 	kStencil,
-	kDepthStencil
+	kDepthStencil,
+	kColorF
 };
 
 enum FrameBufferTarget

@@ -7,6 +7,7 @@ uniform sampler2D quadTex;
 uniform bool moving;
 uniform float blurStrength;
 uniform float gammaCorrection;
+uniform float exposure;
 
 const float offset = 1.0f / 300.0f;
 
@@ -47,5 +48,7 @@ void main()
 	}
 	FragColor *= vec4(vec3(kernelConstant),1.0f);
 	FragColor = (1-blurStrength)*vec4(pixels[4],1.0f) + blurStrength*FragColor;
+	//Do tone mapping and gamma correction
+	FragColor = vec4(vec3(1.0f) - exp(-FragColor.xyz*exposure),1.0f);
 	FragColor = vec4(pow(vec3(FragColor),vec3(1.0f/gammaCorrection)),1.0f);
 }

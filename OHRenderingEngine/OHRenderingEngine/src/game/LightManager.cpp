@@ -128,6 +128,7 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetVec3("directionalLights["+std::to_string(n_Active)+"].color", m_DirectionalLights[i]->GetColor());
 		shader.SetMat4("directionalLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_DirectionalLights[i]->GetTransformationMatrix()[0]);
 		shader.SetInt("directionalLights[" + std::to_string(n_Active) + "].DepthMap", m_DirectionalLights[i]->GetDepthMap());
+		shader.SetInt("directionalLights[" + std::to_string(n_Active) + "].HasShadow", m_DirectionalLights[i]->HasShadows());
 		n_Active++;
 	}
 	shader.SetInt("n_DirectionalLights", n_Active);
@@ -148,6 +149,7 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].kQ", m_PointLights[i]->GetQuadraticConstant());
 		shader.SetFloat("pointLights[" + std::to_string(n_Active) + "].far_plane", m_PointLights[i]->GetFarPlane());
 		shader.SetInt("pointLights[" + std::to_string(n_Active) + "].DepthMap", m_PointLights[i]->GetDepthMap());
+		shader.SetInt("pointLights[" + std::to_string(n_Active) + "].HasShadow", m_PointLights[i]->HasShadows());
 		n_Active++;
 	}
 	//Setting all samplerCubes that are not used as GLSL requires to.
@@ -175,6 +177,7 @@ void LightManager::SetLight(Shader & shader, glm::mat4 view_matrix) const
 		shader.SetFloat("spotLights[" + std::to_string(n_Active) + "].outer_cutoff", m_SpotLights[i]->GetOuterCutoff());
 		shader.SetMat4("spotLights[" + std::to_string(n_Active) + "].TransformationMatrix", m_SpotLights[i]->GetTransformationMatrix()[0]);
 		shader.SetInt("spotLights[" + std::to_string(n_Active) + "].DepthMap", m_SpotLights[i]->GetDepthMap());
+		shader.SetInt("spotLights[" + std::to_string(n_Active) + "].HasShadow", m_SpotLights[i]->HasShadows());
 		n_Active++;
 	}
 	shader.SetInt("n_SpotLights", n_Active);
