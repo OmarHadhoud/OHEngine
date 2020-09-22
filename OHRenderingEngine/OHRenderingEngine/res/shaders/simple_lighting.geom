@@ -8,6 +8,7 @@ in VS_OUT
 	vec2 v_TexCoords;
 	vec3 fragPos;
 	vec3 fragPosWorld;
+	mat3 TBN;
 } gs_in[];
 
 out GS_OUT
@@ -16,6 +17,7 @@ out GS_OUT
 	vec2 v_TexCoords;
 	vec3 fragPos;
 	vec3 fragPosWorld;
+	mat3 TBN;
 } gs_out;
 
 uniform float time;
@@ -36,6 +38,7 @@ void main()
 		gs_out.v_TexCoords = gs_in[index].v_TexCoords;
 		gs_out.fragPos = gs_in[index].fragPos;
 		gs_out.fragPosWorld = gs_in[index].fragPosWorld;
+		gs_out.TBN = gs_in[index].TBN;
 		gl_Position = projection * ( gl_in[index].gl_Position + vec4(GetNormal()*time,0.0f) );
 		EmitVertex();
 	}

@@ -11,6 +11,7 @@ out VS_OUT
 	vec2 v_TexCoords;
 	vec3 fragPos;
 	vec3 fragPosWorld;
+	mat3 TBN;
 } vs_out;
 
 uniform mat4 model;
@@ -23,4 +24,12 @@ void main()
 	vs_out.v_NormalDir = mat3(transpose(inverse(view * model))) * aNormal;
 	vs_out.fragPos = vec3(view * model * vec4(aPos, 1.0f));
 	vs_out.fragPosWorld = vec3(model * vec4(aPos, 1.0f));
+
+	vec3 normal = normalize(vec3(view*model*vec4(aNormal,0.0f)));
+	vec3 tangent = normalize(vec3(view*model*vec4(aTangent,0.0f)));
+	vec3 bitangent = normalize(vec3(view*model*vec4(aBitangent,0.0f)));
+	//Gram shmidt orthogonalization
+	normal = normalize(normal - tangent * dot(tangent, normal));
+	bitangent = normalize(cross(normal, tangent));
+	vs_out.TBN = mat3(tangent, bitangent, normal);
 }

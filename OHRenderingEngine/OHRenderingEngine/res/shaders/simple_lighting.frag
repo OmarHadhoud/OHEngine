@@ -8,6 +8,7 @@ in GS_OUT
 	vec2 v_TexCoords;
 	vec3 fragPos;
 	vec3 fragPosWorld;
+	mat3 TBN;
 } fs_in;
 
 //Lighting structs
@@ -79,7 +80,6 @@ struct Material
 
 //Materials
 uniform Material material;
-uniform samplerCube ssss;
 
 //The lightings
 #define MAX_DIRECTIONAL_LIGHTS  5
@@ -134,7 +134,9 @@ vec3 ComputeDirectionalLight()
 		ambient = vec3(directionalLights[i].ambient) * vec3(texture(material.texture_diffuse1, fs_in.v_TexCoords));
 
 		//Diffuse
-		vec3 normalDir = vec3(normalize(fs_in.v_NormalDir));
+		vec3 normalDir = texture(material.texture_normal1, fs_in.v_TexCoords).rgb;
+		normalDir = normalDir * 2 - 1;
+		normalDir = normalize(fs_in.TBN * normalDir);
 		float diffuse_dot = max(dot(normalDir, lightDir), 0.0f);
 
 		diffuse = vec3(diffuse_dot*directionalLights[i].diffuse) *vec3(texture(material.texture_diffuse1, fs_in.v_TexCoords));
@@ -175,7 +177,9 @@ vec3 ComputePointLights()
 		ambient = vec3(pointLights[i].ambient) * vec3(texture(material.texture_diffuse1, fs_in.v_TexCoords));
 
 		//Diffuse
-		vec3 normalDir = vec3(normalize(fs_in.v_NormalDir));
+		vec3 normalDir = texture(material.texture_normal1, fs_in.v_TexCoords).rgb;
+		normalDir = normalDir * 2 - 1;
+		normalDir = normalize(fs_in.TBN * normalDir);
 		float diffuse_dot = max(dot(normalDir, lightDir), 0.0f);
 
 		diffuse = vec3(diffuse_dot*pointLights[i].diffuse) * vec3(texture(material.texture_diffuse1, fs_in.v_TexCoords));
@@ -223,7 +227,9 @@ vec3 ComputeSpotLights()
 		ambient = vec3(spotLights[i].ambient) * vec3(texture(material.texture_diffuse1, fs_in.v_TexCoords));
 
 		//Diffuse
-		vec3 normalDir = vec3(normalize(fs_in.v_NormalDir));
+		vec3 normalDir = texture(material.texture_normal1, fs_in.v_TexCoords).rgb;
+		normalDir = normalDir * 2 - 1;
+		normalDir = normalize(fs_in.TBN * normalDir);
 		float diffuse_dot = max(dot(normalDir, lightDir), 0.0f);
 
 		diffuse = vec3(diffuse_dot*spotLights[i].diffuse) * vec3(texture(material.texture_diffuse1, fs_in.v_TexCoords));
@@ -296,8 +302,6 @@ vec3 sampleDirectionsPtLight[20] = vec3[]
 
 float CalcShadow(samplerCube DepthMap, float far_plane, vec3 normalDir, vec3 lightDir, float viewDistance)
 {
-	//DepthMap = ssss;//for now
-
 	vec3 lightToFragment = lightDir;
 	float currentPoint = length(lightToFragment);
 	float shadow = 0.0f;
