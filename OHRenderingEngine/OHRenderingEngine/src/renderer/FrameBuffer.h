@@ -23,8 +23,8 @@ public:
 	//Checks if the frame buffer is complete
 	bool IsComplete() const;
 	//Sets the read and draw buffer
-	void DrawBuffer(BufferType buffer);
-	void ReadBuffer(BufferType buffer);
+	void DrawBuffer(FrameBufferAttachement buffer);
+	void ReadBuffer(FrameBufferAttachement buffer);
 private:
 	unsigned int m_ID;
 	FrameBufferTarget m_Target;

@@ -114,6 +114,8 @@ void main()
 	FragColor = vec4(ComputeLight(), texture(material.texture_diffuse1, fs_in.v_TexCoords).a);
 	if(FragColor.a < 0.1)
 		discard;
+	float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	BrightColor = brightness > 1 ? FragColor : vec4(0.0f);
 }
 
 

@@ -97,6 +97,7 @@ int Game::RunLevel()
 	Shader DebugShader("res/shaders/debug.vert", "res/shaders/debug.frag", "res/shaders/debug.geom");
 	Shader BorderShader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom");
 	Shader PostProcessShader("res/shaders/post_process.vert", "res/shaders/post_process.frag");
+	Shader BloomShader("res/shaders/post_process.vert", "res/shaders/bloom.frag");
 	Shader ShadowShader("res/shaders/shadow_shader.vert", "res/shaders/shadow_shader.frag");
 	Shader ShadowShaderPoint("res/shaders/shadow_shader_cubemap.vert", "res/shaders/shadow_shader_cubemap.frag", "res/shaders/shadow_shader_cubemap.geom");
 	
@@ -136,22 +137,22 @@ int Game::RunLevel()
 	m_LastFrame = glfwGetTime();
 	
 	//Post processing getting ready by creating custom frame buffer
-	
+	GLenum attach[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	MultiSampledTexture colorTex;
 	colorTex.SetType(k2DMS);
 	colorTex.Bind();
-	colorTex.SetMultiSamples(16);
+	colorTex.SetMultiSamples(8);
 	colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 	MultiSampledTexture brightTexMS;
 	brightTexMS.SetType(k2DMS);
 	brightTexMS.Bind();
-	brightTexMS.SetMultiSamples(16);
+	brightTexMS.SetMultiSamples(8);
 	brightTexMS.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 
 	RenderBuffer rbo;
 	rbo.Bind();
 	rbo.EnableMultiSampled();
-	rbo.SetMultiSamples(16);
+	rbo.SetMultiSamples(8);
 	rbo.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
 
 	FrameBuffer fbo;
@@ -159,6 +160,7 @@ int Game::RunLevel()
 	fbo.AttachRenderObject(rbo, kDepthStencilAttach);
 	fbo.AttachTexture(colorTex, kColorAttach0);
 	fbo.AttachTexture(brightTexMS, kColorAttach1);
+	glDrawBuffers(2, attach);
 	if (!fbo.IsComplete())
 		return -1;
 	
@@ -175,16 +177,20 @@ int Game::RunLevel()
 	colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 	Texture brightTexInttermediate;
 	brightTexInttermediate.SetType(k2D);
-	brightTexInttermediate.Activate(2);
+	brightTexInttermediate.Activate(3);
 	brightTexInttermediate.Bind();
 	brightTexInttermediate.SetWrap(kS, kRepeat);
 	brightTexInttermediate.SetWrap(kT, kRepeat);
 	brightTexInttermediate.SetMinFilter(kLinear);
 	brightTexInttermediate.SetMagFilter(kLinear);
 	brightTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	
+	
+
 
 	PostProcessShader.Use();
 	PostProcessShader.SetInt("quadTex", 2);
+	PostProcessShader.SetInt("brightTex", 4);
 
 	RenderBuffer rboInttermediate;
 	rboInttermediate.Bind();
@@ -195,8 +201,29 @@ int Game::RunLevel()
 	fboInttermediate.AttachRenderObject(rboInttermediate, kDepthStencilAttach);
 	fboInttermediate.AttachTexture(colorTexInttermediate, kColorAttach0);
 	fboInttermediate.AttachTexture(brightTexInttermediate, kColorAttach1);
+	glDrawBuffers(2, attach);
 	if (!fboInttermediate.IsComplete())
 		return -1;
+
+	//Ping pong buffers
+	FrameBuffer bloomFBOS[2];
+	Texture blurTex[2];
+	for (int i = 0; i < 2; i++)
+	{
+		blurTex[i].SetType(k2D);
+		blurTex[i].Activate(4);
+		blurTex[i].Bind();
+		blurTex[i].SetWrap(kS, kRepeat);
+		blurTex[i].SetWrap(kT, kRepeat);
+		blurTex[i].SetMinFilter(kLinear);
+		blurTex[i].SetMagFilter(kLinear);
+		blurTex[i].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+
+		bloomFBOS[i].Bind();
+		bloomFBOS[i].AttachTexture(blurTex[i], kColorAttach0);
+		if (!bloomFBOS[i].IsComplete())
+			return -1;
+	}
 
 	//Setup scene lights	
 	DirectionaLight l0(glm::vec3(15, -20, 15), glm::vec3(0.99215, 0.9843, 0.8274), 0.4f, 1.0f, 1.0f, true);
@@ -317,6 +344,14 @@ int Game::RunLevel()
 			colorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 			colorTexInttermediate.Bind();
 			colorTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+			brightTexMS.Bind();
+			brightTexMS.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+			brightTexInttermediate.Bind();
+			brightTexInttermediate.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+			blurTex[0].Bind();
+			blurTex[0].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+			blurTex[1].Bind();
+			blurTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 		}
 
 		//Update timings
@@ -400,7 +435,7 @@ int Game::RunLevel()
 			l2.Enable();
 			l3.Enable();
 		}
-		l0.SetDirection(glm::vec3(15*cos(glfwGetTime()/2)-5, -10, 15*sin(glfwGetTime()/2)-3));
+		//l0.SetDirection(glm::vec3(15*cos(glfwGetTime()/2)-5, -10, 15*sin(glfwGetTime()/2)-3));
 		l1.SetDirection(glm::vec3((sin(glfwGetTime() * 2)), -1, cos(glfwGetTime() * 5)));
 		l2.SetColor(glm::vec3(std::max<float>(-sin(glfwGetTime() * 2), sin(glfwGetTime()*2)), 0.0f, std::max<float>(-sin(glfwGetTime() * 3), sin(glfwGetTime()*3))));
 		l3.SetColor(glm::vec3(std::max<float>(-cos(glfwGetTime() * 2), cos(glfwGetTime() * 2)), 0.0f, std::max<float>(-cos(glfwGetTime() * 3), cos(glfwGetTime() * 3))));
@@ -632,13 +667,46 @@ int Game::RunLevel()
 		m_Renderer.DisableStencilTesting();
 
 		//Copying from MS buffer to normal one
+		fbo.Bind(kRead);
+		fboInttermediate.Bind(kDraw);
+		fbo.ReadBuffer(kColorAttach0);
+		fboInttermediate.DrawBuffer(kColorAttach0);
 		m_Renderer.BlitNamedFrameBuffer(fbo, fboInttermediate, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
+		fbo.ReadBuffer(kColorAttach1);
+		fboInttermediate.DrawBuffer(kColorAttach1);
+		m_Renderer.BlitNamedFrameBuffer(fbo, fboInttermediate, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
+
+		//Make bloom effect
+		bloomFBOS[0].Bind();
+		PostProcVAO.Bind();
+		m_Renderer.DisableDepthTesting();
+		BloomShader.Use();
+		BloomShader.SetInt("tex", 3);
+		BloomShader.SetBool("horizontal", 1);
+
+		brightTexInttermediate.Activate(3);
+		brightTexInttermediate.Bind();
+		m_Renderer.Draw(PostProcVAO, BloomShader, 6 * 1, 0);
+		bool vertical = 1;
+		for (int i = 0; i < 5; i++)
+		{
+			BloomShader.SetBool("horizontal", !vertical);
+			bloomFBOS[vertical].Bind();
+			blurTex[!vertical].Activate(3);
+			blurTex[!vertical].Bind();
+			m_Renderer.Draw(PostProcVAO, BloomShader, 6 * 1, 0);
+			vertical = !vertical;
+		}
+		blurTex[1].Activate(3);
+		blurTex[1].Bind();
 
 		////Post processing
 		fbo.Unbind();
 		PostProcessShader.Use();
 		colorTexInttermediate.Activate(2);
 		colorTexInttermediate.Bind();
+		blurTex[0].Activate(4);
+		blurTex[0].Bind();
 		//If player is moving, apply blur
 		PostProcessShader.SetBool("moving", m_Moving);
 		PostProcessShader.SetFloat("blurStrength", std::max(m_MovingSpeed, 0.0f));

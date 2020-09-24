@@ -68,7 +68,6 @@ enum TextureFilter
 
 enum BufferType
 {
-	kNone = GL_NONE,
 	kColor,
 	kDepth,
 	kStencil,
@@ -119,7 +118,8 @@ enum FrameBufferAttachement
 	kColorAttach31 = GL_COLOR_ATTACHMENT31,
 	kDepthAttach = GL_DEPTH_ATTACHMENT,
 	kStencilAttach = GL_STENCIL_ATTACHMENT,
-	kDepthStencilAttach = GL_DEPTH_STENCIL_ATTACHMENT
+	kDepthStencilAttach = GL_DEPTH_STENCIL_ATTACHMENT,
+	kNone = GL_NONE
 };
 
 enum TextureType

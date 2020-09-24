@@ -65,12 +65,12 @@ bool FrameBuffer::IsComplete() const
 	return ret;
 }
 
-void FrameBuffer::DrawBuffer(BufferType buffer)
+void FrameBuffer::DrawBuffer(FrameBufferAttachement buffer)
 {
 	GlCall(glDrawBuffer(buffer));
 }
 
-void FrameBuffer::ReadBuffer(BufferType buffer)
+void FrameBuffer::ReadBuffer(FrameBufferAttachement buffer)
 {
 	GlCall(glReadBuffer(buffer));
 }
