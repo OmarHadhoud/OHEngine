@@ -10,7 +10,7 @@
 #include "src/game/Game.h"
 
 int main()
-{
+{	
 	Game *g = new Game();
 	while (!g->GameEnded())
 	{

@@ -10,13 +10,20 @@
 
 #include <GLFW/glfw3.h>
 
+//Include systems
+#include "game/ecs/Systems/InputSystem.h"
+#include "game/ecs/Systems/GameLogicSystem.h"
+#include "game/ecs/Systems/GUISystem.h"
+#include "game/ecs/Systems/RenderSystem.h"
+#include "game/ecs/Events/EventsController.h"
+
 //Game global variables, game settings
 //openGL version
 const unsigned int MAJOR = 4; 
 const unsigned int MINOR = 0;
 //Window size
-const unsigned int WIDTH = 1920;
-const unsigned int HEIGHT = 1080;
+const unsigned int WIDTH = 720;
+const unsigned int HEIGHT = 480;
 
 class Game
 {
@@ -28,6 +35,13 @@ public:
 	//Runs the game and returns -1 if failed.
 	int Run();
 private:
+	//Systems
+	InputSystem m_InputSystem;
+	GameLogicSystem m_GameLogicSystem;
+	GUISystem m_GUISystem;
+	RenderSystem m_RenderSystem;
+	//Events
+	EventsController m_EventsController;
 	//Rendering related
 	Renderer m_Renderer;
 	Camera m_Camera;
@@ -52,6 +66,8 @@ private:
 	//Initializes GLFW with the passed openGL core version.
 	void InitializeGLFW(int major, int minor) const;
 	void CreateWindow();
+	void AssignEventController();
+	void AssignWindow();
 	//Runs the game level.
 	int RunLevel();
 	//Setups IMGUI that is used for GUI.

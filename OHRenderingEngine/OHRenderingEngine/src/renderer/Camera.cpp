@@ -54,7 +54,7 @@ void Camera::UpdateRotation(double xpos, double ypos)
 	UpdateCameraVectors();
 }
 
-void Camera::UpdatePosition(MovementDirection dir, float delta_time)
+void Camera::UpdatePosition(MovementDirections dir, float delta_time)
 {
 	glm::vec3 movement_direction = m_Camerafront;
 	if (m_YLocked) movement_direction.y = 0;

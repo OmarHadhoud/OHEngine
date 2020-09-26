@@ -3,13 +3,23 @@
 
 #include <glad/glad.h>
 
+#include "CONFIG.h"
+
+#ifdef OPENGL_API
+
+enum GL_ENUM
+{
+
+};
+
+
 enum BUFFER_USAGE {
 	kStaticDraw = GL_STATIC_DRAW,
 	kStreamDraw = GL_STREAM_DRAW,
 	kDynamicDraw = GL_DYNAMIC_DRAW
 };
 
-enum MovementDirection
+enum MovementDirections
 {
 	kForward = 0,
 	kBackward = 1,
@@ -184,5 +194,7 @@ enum kWinding
 	kCW = GL_CW,
 	kCCW = GL_CCW
 };
+#endif
+
 #endif // !ENUMS_H
 
