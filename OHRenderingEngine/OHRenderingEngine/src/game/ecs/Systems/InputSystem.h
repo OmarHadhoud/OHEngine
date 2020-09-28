@@ -3,10 +3,11 @@
 
 #include <memory>
 #include <vector>
-#include <GLFW/glfw3.h>
 
 #include "game/ecs/Systems/System.h"
 #include "game/ecs/Events/Event.h"
+
+#include <GLFW/glfw3.h>
 
 class InputSystem : public System
 {

@@ -4,11 +4,10 @@
 #include <GLFW/glfw3.h>
 
 
+bool Renderer::s_AntiAliasingEnabled = true;
 
 Renderer::Renderer():
-	m_ActiveWindow(nullptr),
-	s_AntiAliasingEnabled(true),
-	s_MultiSamples(1)
+	m_ActiveWindow(nullptr)
 {
 }
 
@@ -159,9 +158,4 @@ void Renderer::DisableAntiAliasing()
 {
 	GlCall(glDisable(GL_MULTISAMPLE));
 	s_AntiAliasingEnabled = false;
-}
-
-void Renderer::SetAntiAliasingSamples(unsigned int n)
-{
-	s_MultiSamples = n;
 }

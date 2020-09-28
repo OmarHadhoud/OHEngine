@@ -54,22 +54,22 @@ void Camera::UpdateRotation(double xpos, double ypos)
 	UpdateCameraVectors();
 }
 
-void Camera::UpdatePosition(MovementDirections dir, float delta_time)
+void Camera::UpdatePosition(MovementDirection dir, float delta_time)
 {
 	glm::vec3 movement_direction = m_Camerafront;
 	if (m_YLocked) movement_direction.y = 0;
 	switch (dir)
 	{
-	case kForward: 
+	case MovementDirection::kForward: 
 		m_Pos += movement_direction * m_CameraSpeed * delta_time;
 		break;
-	case kBackward: 
+	case MovementDirection::kBackward:
 		m_Pos -= movement_direction * m_CameraSpeed * delta_time;
 		break;
-	case kRight: 
+	case MovementDirection::kRight:
 		m_Pos += m_Right * delta_time * m_CameraSpeed;
 		break;
-	case kLeft: 
+	case MovementDirection::kLeft:
 		m_Pos -= m_Right * delta_time * m_CameraSpeed;
 		break;
 	}

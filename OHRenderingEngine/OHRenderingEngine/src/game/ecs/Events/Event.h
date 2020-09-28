@@ -11,7 +11,7 @@ enum class EventType
 	kMovePlayer,
 	kRotatePlayer,
 	kPlayerShoots,
-	kPlayerSelects
+	kPlayerSelects,
 	//Game logic events
 
 
@@ -22,7 +22,7 @@ enum class EventType
 
 
 	//GUI events
-
+	kUpdatePostProcessingParams
 
 	//Sound events
 };
@@ -51,6 +51,12 @@ struct RotatePlayerEvent : Event
 {
 	double m_MouseXPos;
 	double m_MouseYPos;
+};
+
+struct UpdatePostProcessingParams : Event
+{
+	float m_GammaCorrection;
+	float m_Exposure;
 };
 
 #endif // !EVENT_H

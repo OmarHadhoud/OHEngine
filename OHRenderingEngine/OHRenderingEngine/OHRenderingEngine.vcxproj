@@ -20,18 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="src\game\ecs\ECSManager.cpp" />
     <ClCompile Include="src\game\ecs\Events\EventsController.cpp" />
     <ClCompile Include="src\game\ecs\Systems\GameLogicSystem.cpp" />
     <ClCompile Include="src\game\ecs\Systems\GUISystem.cpp" />
     <ClCompile Include="src\game\ecs\Systems\InputSystem.cpp" />
-    <ClCompile Include="src\game\BoxCollider.cpp" />
     <ClCompile Include="src\game\Collider.cpp" />
     <ClCompile Include="src\game\ecs\Systems\RenderSystem.cpp" />
-    <ClCompile Include="src\game\LightManager.cpp" />
-    <ClCompile Include="src\game\SpotLight.cpp" />
-    <ClCompile Include="src\game\PointLight.cpp" />
-    <ClCompile Include="src\game\DirectionaLight.cpp" />
-    <ClCompile Include="src\game\Light.cpp" />
+    <ClCompile Include="src\game\Scene.cpp" />
     <ClCompile Include="src\game\Skybox.cpp" />
     <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
     <ClCompile Include="src\renderer\Camera.cpp" />
@@ -58,16 +54,7 @@
     <ClCompile Include="src\game\ecs\Systems\System.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\game\ecs\Events\EventsController.h" />
-    <ClInclude Include="src\game\ecs\Events\Event.h" />
-    <ClInclude Include="src\game\ecs\Systems\GameLogicSystem.h" />
-    <ClInclude Include="src\game\ecs\Systems\GUISystem.h" />
-    <ClInclude Include="src\game\ecs\Systems\InputSystem.h" />
-    <ClInclude Include="src\CONFIG.h" />
-    <ClInclude Include="src\game\BoxCollider.h" />
-    <ClInclude Include="src\game\Collider.h" />
     <ClInclude Include="src\game\ecs\Components\BoxCollider.h" />
-    <ClInclude Include="src\game\ecs\Components\Camera.h" />
     <ClInclude Include="src\game\ecs\Components\DirectionalLight.h" />
     <ClInclude Include="src\game\ecs\Components\LightShadow.h" />
     <ClInclude Include="src\game\ecs\Components\MeshRenderer.h" />
@@ -75,13 +62,17 @@
     <ClInclude Include="src\game\ecs\Components\RigidBody.h" />
     <ClInclude Include="src\game\ecs\Components\SpotLight.h" />
     <ClInclude Include="src\game\ecs\Components\Transform.h" />
+    <ClInclude Include="src\game\ecs\ECSManager.h" />
+    <ClInclude Include="src\game\ecs\Events\EventsController.h" />
+    <ClInclude Include="src\game\ecs\Events\Event.h" />
+    <ClInclude Include="src\game\ecs\Systems\GameLogicSystem.h" />
+    <ClInclude Include="src\game\ecs\Systems\GUISystem.h" />
+    <ClInclude Include="src\game\ecs\Systems\InputSystem.h" />
+    <ClInclude Include="src\CONFIG.h" />
+    <ClInclude Include="src\game\Collider.h" />
     <ClInclude Include="src\game\ecs\Entity.h" />
     <ClInclude Include="src\game\ecs\Systems\RenderSystem.h" />
-    <ClInclude Include="src\game\LightManager.h" />
-    <ClInclude Include="src\game\SpotLight.h" />
-    <ClInclude Include="src\game\PointLight.h" />
-    <ClInclude Include="src\game\DirectionaLight.h" />
-    <ClInclude Include="src\game\Light.h" />
+    <ClInclude Include="src\game\Scene.h" />
     <ClInclude Include="src\game\Skybox.h" />
     <ClInclude Include="src\renderer\CubeMapTexture.h" />
     <ClInclude Include="src\renderer\Camera.h" />

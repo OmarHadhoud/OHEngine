@@ -1,6 +1,7 @@
 #include "GameLogicSystem.h"
 
 #include <iostream>
+#include <glm/glm.hpp>
 
 GameLogicSystem::GameLogicSystem()
 {
@@ -15,6 +16,15 @@ GameLogicSystem::~GameLogicSystem()
 void GameLogicSystem::Update()
 {
 	ProcessEvents();
+	glm::mat4 model;
+	for (int i = 0; i <Transform::m_Count; i++)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, m_ECSManager->m_Transforms[i].m_Position);
+		model = glm::rotate(model, m_ECSManager->m_Transforms[i].m_RotationAngle, m_ECSManager->m_Transforms[i].m_RotationAxis);
+		model = glm::scale(model, m_ECSManager->m_Transforms[i].m_Scale);
+		m_ECSManager->m_Transforms[i].m_ModelMatrix = model;
+	}
 }
 
 GameState GameLogicSystem::GetGameState() const
@@ -34,7 +44,6 @@ void GameLogicSystem::ProcessEvent(Event* event)
 	case EventType::kRotatePlayer:
 	{
 		RotatePlayerEvent *e = dynamic_cast<RotatePlayerEvent*>(event);
-		std::cout << "Mouse is at pos: (" << e->m_MouseXPos << ", " << e->m_MouseYPos << ")\n";
 		break;
 	}
 	default:

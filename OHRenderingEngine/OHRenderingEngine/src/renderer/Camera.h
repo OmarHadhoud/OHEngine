@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "renderer/enums.h"
+#include "game/ecs/Events/Event.h"
 
 const float NORMAL_SENSETIVITY = 0.2f;
 const float NORMAL_CAM_SPEED = 12.0f;
@@ -25,7 +26,7 @@ public:
 	//Updates the camera after moving it
 	//dir: Enum for direction of movement, forward/backward/right/left
 	//delta_time: Time between frames
-	void UpdatePosition(MovementDirections dir, float delta_time);
+	void UpdatePosition(MovementDirection dir, float delta_time);
 	
 	//Resets the camera walking speed to the default one
 	void ResetSpeed();

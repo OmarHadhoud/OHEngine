@@ -11,6 +11,11 @@ void System::SetEventsController(EventsController * eventsController)
 	m_EventsController = eventsController;
 }
 
+void System::SetECSManager(ECSManager * manager)
+{
+	m_ECSManager = manager;
+}
+
 void System::ProcessEvents()
 {
 	int lastEventIndex = m_EventsController->GetLastEventIndex();

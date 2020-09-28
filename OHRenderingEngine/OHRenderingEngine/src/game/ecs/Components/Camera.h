@@ -1,6 +1,7 @@
 #ifndef CAMERACOMP_H
 #define v
 
+#include <unordered_map>
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -13,6 +14,8 @@ struct CameraCOMP
 	float m_NearPlane;
 	float m_FarPlane;
 	bool m_Enabled;
+	static unsigned int m_Count;
+	static std::unordered_map<unsigned int, unsigned int> m_Map;
 };
 
 #endif // !CAMERACOMP_H

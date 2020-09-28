@@ -101,6 +101,7 @@ void Skybox::Draw(glm::mat4 &view, glm::mat4 &projection) const
 	m_Tex.Activate(0);
 	m_Tex.Bind();
 	Renderer::Draw(m_VAO, m_Shader, 6 * 6, 0);
+	m_Tex.Unbind();
 	m_VAO.Unbind();
 	Renderer::SetDepthFunc(kLess);
 }

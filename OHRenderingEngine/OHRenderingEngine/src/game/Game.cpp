@@ -22,16 +22,21 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui.h"
 
+float Game::m_DeltaTime = 0;
+float Game::m_CurrentFrame = 0;
+float Game::m_LastFrame = 0;
 
 //Global variable needed in GLFW callbacks.
 //TODO: Better design, maybe a callback class
 Game* g_Game;
 
-Game::Game(): m_WindowWidth(WIDTH), m_WindowHeight(HEIGHT), m_Moving(false)
+Game::Game(): 
+	m_WindowWidth(WIDTH), 
+	m_WindowHeight(HEIGHT),
+	m_Moving(false)
 {
 	InitializeGLFW(MAJOR, MINOR);
 	g_Game = this;
-	AssignEventController();
 }
 
 
@@ -49,19 +54,26 @@ bool Game::GameEnded()
 int Game::RunLevel()
 {
 	//Load scene from scene manager
-	AssignWindow();
+	m_Scene.LoadScene(&m_ECSManager, 0);
+	m_RenderSystem->CreateSkybox("res/textures/", "png");
 	bool levelEnded = false;
-	while(m_GameLogicSystem.GetGameState()== GameState::kLevelRunning)
+	while(m_GameLogicSystem->GetGameState()== GameState::kLevelRunning)
 	{
-		m_InputSystem.Update();
-		m_GameLogicSystem.Update();
+		//Update timings
+		m_CurrentFrame = glfwGetTime();
+		m_DeltaTime = m_CurrentFrame - m_LastFrame;
+		m_LastFrame = m_CurrentFrame;
+
+		m_InputSystem->Update();
+		m_GameLogicSystem->Update();
 		//AI.Update();
-		m_RenderSystem.Update();
-		m_GUISystem.Update();
-		m_RenderSystem.Draw();
+		m_GUISystem->Update();
+		m_RenderSystem->Update();
+		m_GUISystem->Draw();
+		m_RenderSystem->Draw();
 		//Sound.Update();
 	}
-	m_GameEnded = m_GameLogicSystem.GetGameState() == GameState::kGameExited;
+	m_GameEnded = m_GameLogicSystem->GetGameState() == GameState::kGameExited;
 	return 0;
 }
 
@@ -80,7 +92,15 @@ int Game::Run()
 		std::cout << "ERROR: FAILED TO INITIALIZE GLAD!" << std::endl;
 		return -1;
 	}
-	SetupIMGUI();
+	CreateSystems();
+
+	//Assign shared classes with systems
+	AssignEventController();
+	AssignECSManager();
+	AssignWindow();
+	//Setup systems
+	m_RenderSystem->Setup();
+	m_GUISystem->Setup();
 	return RunLevel();
 }
 
@@ -103,25 +123,42 @@ void Game::CreateWindow()
 	glfwSetInputMode(m_CurrentWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
+void Game::CreateSystems()
+{
+	m_InputSystem = std::make_unique<InputSystem>();
+	m_GameLogicSystem = std::make_unique<GameLogicSystem>();
+	m_GUISystem = std::make_unique<GUISystem>();
+	m_RenderSystem = std::make_unique<RenderSystem>();
+}
+
 void Game::AssignEventController()
 {
-	m_InputSystem.SetEventsController(&m_EventsController);
-	m_GameLogicSystem.SetEventsController(&m_EventsController);
-	m_GUISystem.SetEventsController(&m_EventsController);
-	m_RenderSystem.SetEventsController(&m_EventsController);
+	m_InputSystem->SetEventsController(&m_EventsController);
+	m_GameLogicSystem->SetEventsController(&m_EventsController);
+	m_GUISystem->SetEventsController(&m_EventsController);
+	m_RenderSystem->SetEventsController(&m_EventsController);
+}
+
+void Game::AssignECSManager()
+{
+	m_InputSystem->SetECSManager(&m_ECSManager);
+	m_GameLogicSystem->SetECSManager(&m_ECSManager);
+	m_GUISystem->SetECSManager(&m_ECSManager);
+	m_RenderSystem->SetECSManager(&m_ECSManager);
 }
 
 void Game::AssignWindow()
 {
-	m_InputSystem.SetCurrentWindow(m_CurrentWindow);
-	m_RenderSystem.SetCurrentWindow(m_CurrentWindow);
+	m_InputSystem->SetCurrentWindow(m_CurrentWindow);
+	m_RenderSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
+	m_GUISystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 }
 
 void Game::ProcessInput()
 {
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(m_CurrentWindow, true);
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_W))
+	/*if (glfwGetKey(m_CurrentWindow, GLFW_KEY_W))
 	{
 		m_Camera.UpdatePosition(kForward, m_DeltaTime);
 		m_Moving = true;
@@ -148,7 +185,7 @@ void Game::ProcessInput()
 		m_Moving = true;
 		m_MovingSpeed += 0.005;
 		return;
-	}
+	}*/
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_N))
 	{
 		m_IsDay = false;
@@ -169,9 +206,9 @@ void Game::CheckColliderClickedOn(glm::vec3 ray)
 		BoxCollider *collider = dynamic_cast<BoxCollider*>(m_Colliders[i]);
 		if (collider != nullptr)
 		{
-			bool intersect;
+			bool intersect = false;
 			std::vector<float> ts;
-			ts = collider->GetRayIntersection(m_Camera.GetPosition(),ray, intersect);
+			//ts = collider->GetRayIntersection(m_Camera.GetPosition(),ray, intersect);
 			m_Bordered = intersect;
 			
 		}

@@ -31,7 +31,7 @@ public:
 	//Sets the number of anit aliasing samples
 	//n: The number of samples for anti aliasing
 	void SetAntiAliasingSamples(unsigned int n);
-	void EnableAntiAliasing();
+	static void EnableAntiAliasing();
 	void DisableAntiAliasing();
 	//Tests related functions
 	static void EnableDepthTesting() ;
@@ -63,8 +63,7 @@ public:
 		unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1) ;
 private:
 	GLFWwindow *m_ActiveWindow;
-	bool s_AntiAliasingEnabled;
-	unsigned int s_MultiSamples;
+	static bool s_AntiAliasingEnabled;
 };
 
 #endif // !RENDERER_H
