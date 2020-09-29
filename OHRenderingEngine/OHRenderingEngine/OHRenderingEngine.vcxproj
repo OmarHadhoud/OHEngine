@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\ecs\Components\BoxCollider.h" />
+    <ClInclude Include="src\game\ecs\Components\Component.h" />
     <ClInclude Include="src\game\ecs\Components\DirectionalLight.h" />
     <ClInclude Include="src\game\ecs\Components\LightShadow.h" />
     <ClInclude Include="src\game\ecs\Components\MeshRenderer.h" />

@@ -4,12 +4,13 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
-struct BoxCollider
+#include "game/ecs/Components/Component.h"
+
+struct BoxCollider : Component
 {
 	glm::vec3 m_Bounds[2];
-	bool m_Enabled;
 	static unsigned int m_Count;
-	static std::unordered_map<unsigned int, unsigned int> m_Map;
+ static std::unordered_map<int, int> m_Map;
 };
 
 #endif // !BOX_COLLIDER_H

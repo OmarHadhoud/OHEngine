@@ -1,5 +1,4 @@
-ENTITY_START
-
+========================================== ENTITY_START ==================================
 MESH_RENDERER
 MODEL_PATH = res/objects/vending_machine_sg/SGVM.obj
 BORDER_COLOR = 0 0 0
@@ -15,20 +14,157 @@ ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
 ENABLED = 1
+========================================== ENTITY_END ==================================
 
 
-ENTITY_END
+========================================== ENTITY_START ==================================
+
+MESH_RENDERER
+MODEL_PATH = res/objects/backpack/backpack.obj
+BORDER_COLOR = 0 0 0
+BORDER_ENABLED = 0
+IS_TRANSPARENT = 0
+IS_SOLID = 1
+ENABLED = 1
+
+TRANSFORM
+POSITION = 5 0 0
+SCALE = 1 1 1
+ROTATION_AXIS = 0 1 0
+ROTATION_ANGLE = 0
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
 
 
-ENTITY_START
+========================================== ENTITY_START ==================================
+MESH_RENDERER
+MODEL_PATH = res/objects/ground/ground.obj
+BORDER_COLOR = 0 0 0
+BORDER_ENABLED = 0
+IS_TRANSPARENT = 0
+IS_SOLID = 1
+ENABLED = 1
+
+TRANSFORM
+POSITION = 0 -3 0
+SCALE = 1 1 1
+ROTATION_AXIS = 0 1 0
+ROTATION_ANGLE = 0
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
+
+========================================== ENTITY_START ==================================
+MESH_RENDERER
+MODEL_PATH = res/objects/grass/grass.obj
+BORDER_COLOR = 0 0 0
+BORDER_ENABLED = 0
+IS_TRANSPARENT = 2
+IS_SOLID = 1
+ENABLED = 1
+
+TRANSFORM
+POSITION = -4 -2 0
+SCALE = 1 1 1
+ROTATION_AXIS = 1 0 0
+ROTATION_ANGLE = 90
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
 
 
+
+
+========================================== ENTITY_START ==================================
+MESH_RENDERER
+MODEL_PATH = res/objects/window/window.obj
+BORDER_COLOR = 0 0 0
+BORDER_ENABLED = 0
+IS_TRANSPARENT = 1
+IS_SOLID = 0
+ENABLED = 1
+
+TRANSFORM
+POSITION = -4 -2 1
+SCALE = 1 1 1
+ROTATION_AXIS = 1 0 0
+ROTATION_ANGLE = 90
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
+
+
+========================================== ENTITY_START ==================================
+MESH_RENDERER
+MODEL_PATH = res/objects/window/window.obj
+BORDER_COLOR = 0 0 0
+BORDER_ENABLED = 0
+IS_TRANSPARENT = 1
+IS_SOLID = 0
+ENABLED = 1
+
+TRANSFORM
+POSITION = -4 -1 0
+SCALE = 1 1 1
+ROTATION_AXIS = 1 0 0
+ROTATION_ANGLE = 90
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
+
+
+========================================== ENTITY_START ==================================
+POINT_LIGHT
+COLOR = 1 0 0
+AMBIENT = 0.3
+DIFFUSE = 1
+SPECULAR = 1
+CONSTANT = 1
+LINEAR = 0.0045
+QUADRATIC = 0.0075
+ENABLED = 1
+
+TRANSFORM
+POSITION = 15 0 0
+SCALE = 1 1 1
+ROTATION_AXIS = 0 1 0
+ROTATION_ANGLE = 0
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
+
+========================================== ENTITY_START ==================================
+SPOT_LIGHT
+COLOR = 0 1 1
+DIRECTION = 1 -1 0
+AMBIENT = 0.2
+DIFFUSE = 1
+SPECULAR = 1
+CONSTANT = 1
+LINEAR = 0.0045
+QUADRATIC = 0.0075
+INNER_CUTOFF_ANGLE = 30
+OUTER_CUTOFF_ANGLE = 45
+ENABLED = 1
+
+TRANSFORM
+POSITION = -25 5 0
+SCALE = 1 1 1
+ROTATION_AXIS = 0 1 0
+ROTATION_ANGLE = 0
+FORWARD = 0 0 1
+ENABLED = 1
+========================================== ENTITY_END ==================================
+
+
+========================================== ENTITY_START ==================================
 DIRECTIONAL_LIGHT
-COLOR = 1 1 1
-DIRECTION = 1 -1 1
-AMBIENT = 0.5
-DIFFUSE = 0.5
-SPECULAR = 0.9
+COLOR = 0.99215 0.9843 0.8274
+DIRECTION = -15 -10 15
+AMBIENT = 0.4
+DIFFUSE = 1
+SPECULAR = 1
 ENABLED = 1
 
 TRANSFORM
@@ -37,7 +173,5 @@ SCALE = 1 1 1
 ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
-ENABLED = 1
-
-
-ENTITY_END
+ENABLED = 0
+========================================== ENTITY_END ==================================

@@ -92,22 +92,22 @@ private:
 
 	//Render pipeline
 	void SetLights(const glm::mat4 &viewMatrix);
-	void SetDirectionalLights(std::vector<int> &indices, Shader &shader,const glm::mat4 &viewMatrix);
-	void SetPointLights(std::vector<int> &indices, Shader &shader, const glm::mat4 &viewMatrix);
-	void SetSpotLights(std::vector<int> &indices, Shader &shader, const glm::mat4 &viewMatrix);
-	void DrawSolidObjects(std::vector<int> &indices);
-	void DrawNonSolidOjects(std::vector<int> &indices);
-	void DrawTransparentObjects(std::map<float, int> &indices);
+	void SetDirectionalLights(const int * const indices, Shader &shader,const glm::mat4 &viewMatrix);
+	void SetPointLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix);
+	void SetSpotLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix);
+	void DrawSolidObjects(const int * const indices);
+	void DrawNonSolidOjects(const int * const indices);
+	void DrawSemiTransparentObjects(std::map<float, int> &indices);
 	void DownsampleMSBuffer();
 	void ApplyBloom();
 	void DrawInBuffer();
-	std::vector<int> GetDrawableMeshes();
-	std::vector<int> GetSolidMeshes(const std::vector<int> &drawableMeshes);
-	std::vector<int> GetNonSolidMeshes(const std::vector<int> &drawableMeshes);
-	std::map<float, int> GetTransparentMeshes(const std::vector<int> &drawableMeshes);
-	std::vector<int> GetDirectionalLights();
-	std::vector<int> GetPointLights();
-	std::vector<int> GetSpotlights();
+	void GetDrawableMeshes(int *indices);
+	void GetSolidMeshes(const int * const drawableMeshes, int *solidIndices);
+	void GetNonSolidMeshes(const int * const drawableMeshes, int *nonSolidIndices);
+	std::map<float, int> GetSemiTransparentMeshes(const int * const drawableMeshes);
+	void GetDirectionalLights(int *indices);
+	void GetPointLights(int *indices);
+	void GetSpotlights(int *indices);
 
 };
 

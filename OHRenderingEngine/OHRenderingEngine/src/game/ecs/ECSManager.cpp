@@ -14,15 +14,16 @@ unsigned int RigidBody::m_Count = 0;
 unsigned int SpotLight::m_Count = 0;
 unsigned int Transform::m_Count = 0;
 //MAPS
-std::unordered_map<unsigned int, unsigned int> BoxCollider::m_Map;
+std::unordered_map<int, int> BoxCollider::m_Map;
 //std::unordered_map<unsigned int, unsigned int> Camera::m_Map;
-std::unordered_map<unsigned int, unsigned int> DirectionalLight::m_Map;
-std::unordered_map<unsigned int, unsigned int> LightShadow::m_Map;
-std::unordered_map<unsigned int, unsigned int> MeshRenderer::m_Map;
-std::unordered_map<unsigned int, unsigned int> PointLight::m_Map;
-std::unordered_map<unsigned int, unsigned int> RigidBody::m_Map;
-std::unordered_map<unsigned int, unsigned int> SpotLight::m_Map;
-std::unordered_map<unsigned int, unsigned int> Transform::m_Map;
+std::unordered_map<int, int> DirectionalLight::m_Map;
+std::unordered_map<int, int> LightShadow::m_Map;
+std::unordered_map<int, int> MeshRenderer::m_Map;
+std::unordered_map<int, int> PointLight::m_Map;
+std::unordered_map<int, int> RigidBody::m_Map;
+std::unordered_map<int, int> SpotLight::m_Map;
+std::unordered_map<int, int> Transform::m_Map;
+
 
 
 

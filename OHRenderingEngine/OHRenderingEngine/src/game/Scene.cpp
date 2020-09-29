@@ -152,15 +152,21 @@ void Scene::ParseMeshRenderer(int entityId, ECSManager* manager)
 	manager->m_MeshRenderers[id].m_Model = std::make_unique<Model>(modelPath.c_str());
 	manager->m_MeshRenderers[id].m_BorderColor = borderColor;
 	manager->m_MeshRenderers[id].m_BorderEnabled = borderEnabled;
-	manager->m_MeshRenderers[id].m_IsTransparent = isTransparent;
+	manager->m_MeshRenderers[id].m_Transparency = isTransparent == 0 ? Transparency::kNonTransparent : isTransparent == 1 ? Transparency::kSemiTransparent : Transparency::kTransparent;
 	manager->m_MeshRenderers[id].m_IsSolid= isSolid;
 	manager->m_MeshRenderers[id].m_Enabled = enabled;
+	//Set texture settings for transparent/semi transparent objects
+	if (isTransparent == 1 || isTransparent == 2)
+	{
+		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(kS, kClampToEdge);
+		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(kT, kClampToEdge);
+		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(kR, kClampToEdge);
+	}
 }
 
 void Scene::ParsePointLight(int entityId, ECSManager* manager)
 {
 	glm::vec3 color;
-	glm::vec3 position;
 	float ambient;
 	float diffuse;
 	float specular;
@@ -171,7 +177,6 @@ void Scene::ParsePointLight(int entityId, ECSManager* manager)
 
 	std::string tmp;
 	m_sceneStream >> tmp >> tmp >> color.x >> color.y >> color.z;
-	m_sceneStream >> tmp >> tmp >> position.x >> position.y >> position.z;
 	m_sceneStream >> tmp >> tmp >> ambient;
 	m_sceneStream >> tmp >> tmp >> diffuse;
 	m_sceneStream >> tmp >> tmp >> specular;
@@ -181,7 +186,6 @@ void Scene::ParsePointLight(int entityId, ECSManager* manager)
 	m_sceneStream >> tmp >> tmp >> enabled;
 	int id = manager->AddComponent<PointLight>(entityId);
 	manager->m_PointLights[id].m_Color = color;
-	manager->m_PointLights[id].m_Position = position;
 	manager->m_PointLights[id].m_Ambient = ambient;
 	manager->m_PointLights[id].m_Diffuse = diffuse;
 	manager->m_PointLights[id].m_Specular = specular;
@@ -213,7 +217,6 @@ void Scene::ParseRigidBody(int entityId, ECSManager* manager)
 void Scene::ParseSpotLight(int entityId, ECSManager* manager)
 {
 	glm::vec3 color;
-	glm::vec3 position;
 	glm::vec3 direction;
 	float ambient;
 	float diffuse;
@@ -227,7 +230,6 @@ void Scene::ParseSpotLight(int entityId, ECSManager* manager)
 
 	std::string tmp;
 	m_sceneStream >> tmp >> tmp >> color.x >> color.y >> color.z;
-	m_sceneStream >> tmp >> tmp >> position.x >> position.y >> position.z;
 	m_sceneStream >> tmp >> tmp >> direction.x >> direction.y >> direction.z;
 	m_sceneStream >> tmp >> tmp >> ambient;
 	m_sceneStream >> tmp >> tmp >> diffuse;
@@ -240,7 +242,7 @@ void Scene::ParseSpotLight(int entityId, ECSManager* manager)
 	m_sceneStream >> tmp >> tmp >> enabled;
 	int id = manager->AddComponent<SpotLight>(entityId);
 	manager->m_SpotLights[id].m_Color = color;
-	manager->m_SpotLights[id].m_Position = position;
+	manager->m_SpotLights[id].m_Direction = direction;
 	manager->m_SpotLights[id].m_Ambient = ambient;
 	manager->m_SpotLights[id].m_Diffuse = diffuse;
 	manager->m_SpotLights[id].m_Specular = specular;

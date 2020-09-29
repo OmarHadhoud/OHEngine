@@ -64,7 +64,9 @@ void RenderSystem::Setup()
 	SetupPostProcessing();
 	SetupFrameBuffers();
 	SetupDethMaps();
-	Game::m_DeltaTime = 5;
+	Renderer::EnableBlending();
+	Renderer::SetBlendFactors(kSrcAlpha, kOneMinusSrcAlpha);
+	Renderer::DisableBlending();
 }
 
 
@@ -73,10 +75,13 @@ void RenderSystem::Update()
 	ProcessEvents();
 	CheckWindowSize();
 	//Get meshes ready to draw
-	std::vector<int> drawableMeshes = GetDrawableMeshes();
-	std::vector<int> solidMeshes = GetSolidMeshes(drawableMeshes);
-	std::map<float, int> transparentMeshes = GetTransparentMeshes(drawableMeshes);
-	std::vector<int> nonSolidMeshes = GetNonSolidMeshes(drawableMeshes);
+	int drawableMeshes[MAX_ENTITY_COUNT];
+	int solidMeshes[MAX_ENTITY_COUNT];
+	int nonSolidMeshes[MAX_ENTITY_COUNT];
+	GetDrawableMeshes(drawableMeshes);
+	GetSolidMeshes(drawableMeshes, solidMeshes);
+	std::map<float, int> semiTransparentMeshes = GetSemiTransparentMeshes(drawableMeshes);
+	GetNonSolidMeshes(drawableMeshes, nonSolidMeshes);
 
 	//Bind to the frame buffer, clear screen, set settings
 	m_MultisampledFBO.Bind();
@@ -102,7 +107,7 @@ void RenderSystem::Update()
 	
 	DrawSolidObjects(solidMeshes);
 	DrawNonSolidOjects(nonSolidMeshes);
-	DrawTransparentObjects(transparentMeshes);	
+	DrawSemiTransparentObjects(semiTransparentMeshes);	
 	m_SkyBox->Draw(view, projection);
 	
 	DownsampleMSBuffer();
@@ -313,40 +318,45 @@ void RenderSystem::UpdateTexturesSize()
 	m_BloomTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 }
 
-void RenderSystem::DrawSolidObjects(std::vector<int>& indices)
+void RenderSystem::DrawSolidObjects(const int * const indices)
 {
 	glm::mat4 model;
 	Renderer::EnableCulling();
 	Renderer::CullFace(kBack);
-	for (int i = 0; i < indices.size(); i++)
+	int i = 0;
+	while(indices[i] != -1)
 	{
 		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
 		int meshIndex = m_ECSManager->m_MeshRenderers->m_Map[indices[i]];
 		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
 		m_MainShader.SetMat4("model", model);
 		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
+		i++;
 	}
 }
 
-void RenderSystem::DrawNonSolidOjects(std::vector<int>& indices)
+void RenderSystem::DrawNonSolidOjects(const int * const indices)
 {
 	glm::mat4 model;
 	Renderer::DisableCulling();
-	for (int i = 0; i < indices.size(); i++)
+	int i = 0;
+	while(indices[i] != -1)
 	{
 		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
 		int meshIndex = m_ECSManager->m_MeshRenderers->m_Map[indices[i]];
 		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
 		m_MainShader.SetMat4("model", model);
 		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
+		i++;
 	}
 }
 
-void RenderSystem::DrawTransparentObjects(std::map<float, int>& indices)
+void RenderSystem::DrawSemiTransparentObjects(std::map<float, int>& indices)
 {
 	glm::mat4 model;
 	Renderer::EnableBlending();
-	for (std::map<float, int>::iterator it = indices.begin(); it != indices.end(); it++)
+	Renderer::DisableCulling();
+	for (auto it = indices.rbegin(); it != indices.rend(); it++)
 	{
 		int transformIndex = m_ECSManager->m_Transforms->m_Map[it->second];
 		int meshIndex = m_ECSManager->m_MeshRenderers->m_Map[it->second];
@@ -355,6 +365,7 @@ void RenderSystem::DrawTransparentObjects(std::map<float, int>& indices)
 		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
 	}
 	Renderer::DisableBlending();
+	Renderer::EnableCulling();
 }
 
 
@@ -419,50 +430,56 @@ void RenderSystem::DrawInBuffer()
 	Renderer::Draw(m_PostProcessVAO, m_PostProcessShader, 6 * 1, 0);
 }
 
-std::vector<int> RenderSystem::GetDrawableMeshes()
+void RenderSystem::GetDrawableMeshes(int *indices)
 {
-	std::vector<int> indices;
+	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
 		if (Transform::m_Map.find(i) == Transform::m_Map.end() || MeshRenderer::m_Map.find(i) == MeshRenderer::m_Map.end())
 			continue;
-		indices.push_back(i);
+		
+		int transformIndex = Transform::m_Map[i];
+		int meshIndex = MeshRenderer::m_Map[i];
+		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_MeshRenderers[meshIndex].m_Enabled)
+			continue;
+
+		indices[j++] = i;
 	}
-	return indices;
+	indices[j] = -1;
 }
 
-std::vector<int> RenderSystem::GetSolidMeshes(const std::vector<int>& drawableMeshes)
+void RenderSystem::GetSolidMeshes(const int * const drawableMeshes, int *solidIndices)
 {
-	std::vector<int> indices;
-	for (int i = 0; i < drawableMeshes.size(); i++)
+	int j = 0;
+	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Map[drawableMeshes[i]];
-		if (m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Enabled)
-			indices.push_back(drawableMeshes[i]);
+		if (m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::kSemiTransparent)
+			solidIndices[j++] = drawableMeshes[i];
 	}
-	return indices;
+	solidIndices[j] = -1;
 }
 
 
-std::vector<int> RenderSystem::GetNonSolidMeshes(const std::vector<int>& drawableMeshes)
+void RenderSystem::GetNonSolidMeshes(const int * const drawableMeshes, int * nonSolidIndices)
 {
-	std::vector<int> indices;
-	for (int i = 0; i < drawableMeshes.size(); i++)
+	int j = 0;
+	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Map[drawableMeshes[i]];
-		if (!m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Enabled)
-			indices.push_back(drawableMeshes[i]);
+		if (!m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::kSemiTransparent)
+			nonSolidIndices[j++] = drawableMeshes[i];
 	}
-	return indices;
+	nonSolidIndices[j] = -1;
 }
 
-std::map<float, int> RenderSystem::GetTransparentMeshes(const std::vector<int>& drawableMeshes)
+std::map<float, int> RenderSystem::GetSemiTransparentMeshes(const int * const drawableMeshes)
 {
 	std::map<float, int> indices;
-	for (int i = 0; i < drawableMeshes.size(); i++)
+	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Map[drawableMeshes[i]];
-		if (!m_ECSManager->m_MeshRenderers[mapIndex].m_IsTransparent || !m_ECSManager->m_MeshRenderers[mapIndex].m_Enabled)
+		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::kSemiTransparent) )
 			continue;
 		int transformIndex = Transform::m_Map[drawableMeshes[i]];
 		float distance = glm::length(m_FPSCamera.GetPosition() - m_ECSManager->m_Transforms[transformIndex].m_Position);
@@ -473,57 +490,80 @@ std::map<float, int> RenderSystem::GetTransparentMeshes(const std::vector<int>& 
 
 
 
-std::vector<int> RenderSystem::GetDirectionalLights()
+void RenderSystem::GetDirectionalLights(int *indices)
 {
-	std::vector<int> indices;
+	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
 		if (Transform::m_Map.find(i) == Transform::m_Map.end() || DirectionalLight::m_Map.find(i) == DirectionalLight::m_Map.end())
 			continue;
-		indices.push_back(i);
+
+		int transformIndex = Transform::m_Map[i];
+		int directionalLightIndex = DirectionalLight::m_Map[i];
+		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_DirectionalLights[directionalLightIndex].m_Enabled)
+			continue;
+
+		indices[j++] = i;
 	}
-	return indices;
+	indices[j] = -1;
 }
 
-std::vector<int> RenderSystem::GetPointLights()
+void RenderSystem::GetPointLights(int *indices)
 {
-	std::vector<int> indices;
+	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
 		if (Transform::m_Map.find(i) == Transform::m_Map.end() || PointLight::m_Map.find(i) == PointLight::m_Map.end())
 			continue;
-		indices.push_back(i);
+
+		int transformIndex = Transform::m_Map[i];
+		int pointLightIndex = PointLight::m_Map[i];
+		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_PointLights[pointLightIndex].m_Enabled)
+			continue;
+
+		indices[j++] = i;
 	}
-	return indices;
+	indices[j] = -1;
 }
 
-std::vector<int> RenderSystem::GetSpotlights()
+void RenderSystem::GetSpotlights(int *indices)
 {
-	std::vector<int> indices;
+	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
 		if (Transform::m_Map.find(i) == Transform::m_Map.end() || SpotLight::m_Map.find(i) == SpotLight::m_Map.end())
 			continue;
-		indices.push_back(i);
+
+		int transformIndex = Transform::m_Map[i];
+		int spotLightIndex = SpotLight::m_Map[i];
+		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_SpotLights[spotLightIndex].m_Enabled)
+			continue;
+
+		indices[j++] = i;
 	}
-	return indices;
+	indices[j] = -1;
 }
 
 void RenderSystem::SetLights(const glm::mat4 &viewMatrix)
 {
-	std::vector<int> directionalLights = GetDirectionalLights();
-	std::vector<int> pointLights = GetPointLights();
-	std::vector<int> spotLights = GetSpotlights();
+	int directionalLights[MAX_DIRECTIONAL_LIGHTS_COUNT];
+	int pointLights[MAX_POINT_LIGHT_COUNT];
+	int spotLights[MAX_SPOTLIGHT_COUNT];
+
+	GetDirectionalLights(directionalLights);
+	GetPointLights(pointLights);
+	GetSpotlights(spotLights);
 
 	SetDirectionalLights(directionalLights, m_MainShader, viewMatrix);
 	SetPointLights(pointLights, m_MainShader, viewMatrix);
 	SetSpotLights(spotLights, m_MainShader, viewMatrix);
 }
 
-void RenderSystem::SetDirectionalLights(std::vector<int>& indices, Shader &shader, const glm::mat4 &viewMatrix)
+void RenderSystem::SetDirectionalLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix)
 {
 	shader.Use();
-	for (int i = 0; i < indices.size(); i++)
+	int i = 0;
+	while(indices[i] != -1)
 	{
 		int lightIndex = m_ECSManager->m_DirectionalLights->m_Map[indices[i]];
 		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
@@ -532,16 +572,61 @@ void RenderSystem::SetDirectionalLights(std::vector<int>& indices, Shader &shade
 		shader.SetFloat("directionalLights[" + std::to_string(i) + "].specular", m_ECSManager->m_DirectionalLights[lightIndex].m_Specular);
 		shader.SetVec3("directionalLights[" + std::to_string(i) + "].direction", glm::vec3(viewMatrix*glm::vec4(m_ECSManager->m_DirectionalLights[lightIndex].m_Direction, 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("directionalLights[" + std::to_string(i) + "].color", m_ECSManager->m_DirectionalLights[lightIndex].m_Color);
+		i++;
 	}
-	shader.SetInt("n_DirectionalLights", indices.size());
+	shader.SetInt("n_DirectionalLights", i);
 
 }
 
-void RenderSystem::SetPointLights(std::vector<int>& indices, Shader &shader, const glm::mat4 &viewMatrix)
+void RenderSystem::SetPointLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix)
 {
+	shader.Use();
+	int i = 0;
+	while (indices[i] != -1)
+	{
+		int lightIndex = m_ECSManager->m_PointLights->m_Map[indices[i]];
+		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].ambient", m_ECSManager->m_PointLights[lightIndex].m_Ambient);
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].diffuse", m_ECSManager->m_PointLights[lightIndex].m_Diffuse);
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].specular", m_ECSManager->m_PointLights[lightIndex].m_Specular);
+		shader.SetVec3("pointLights[" + std::to_string(i) + "].position", glm::vec3(viewMatrix*glm::vec4(m_ECSManager->m_Transforms[transformIndex].m_Position, 1.0f)));
+		shader.SetVec3("pointLights[" + std::to_string(i) + "].world_position", glm::vec3(m_ECSManager->m_Transforms[transformIndex].m_Position));
+		shader.SetVec3("pointLights[" + std::to_string(i) + "].color", m_ECSManager->m_PointLights[lightIndex].m_Color);
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].kC", m_ECSManager->m_PointLights[lightIndex].m_kConstant);
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].kL", m_ECSManager->m_PointLights[lightIndex].m_kLinear);
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].kQ", m_ECSManager->m_PointLights[lightIndex].m_kQuadratic);
+		i++;
+	}
+	//TODO: should be removed and handled in shadows code
+	//Setting all samplerCubes that are not used as GLSL requires to.
+	for (int i = 0; i < MAX_POINT_LIGHT_COUNT; i++)
+	{
+		shader.SetInt("pointLights[" + std::to_string(i) + "].DepthMap", 32);
+	}
+	shader.SetInt("n_PointLights", i);
 }
 
-void RenderSystem::SetSpotLights(std::vector<int>& indices, Shader &shader, const glm::mat4 &viewMatrix)
+void RenderSystem::SetSpotLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix)
 {
+	shader.Use();
+	int i = 0;
+	while (indices[i] != -1)
+	{
+		int lightIndex = m_ECSManager->m_SpotLights->m_Map[indices[i]];
+		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].ambient", m_ECSManager->m_SpotLights[lightIndex].m_Ambient);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].diffuse", m_ECSManager->m_SpotLights[lightIndex].m_Diffuse);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].specular", m_ECSManager->m_SpotLights[lightIndex].m_Specular);
+		shader.SetVec3("spotLights[" + std::to_string(i) + "].position", glm::vec3(viewMatrix*glm::vec4(m_ECSManager->m_Transforms[transformIndex].m_Position, 1.0f))); //W = 1 as we want to translate the position
+		shader.SetVec3("spotLights[" + std::to_string(i) + "].direction", glm::vec3(viewMatrix*glm::vec4(m_ECSManager->m_SpotLights[lightIndex].m_Direction, 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
+		shader.SetVec3("spotLights[" + std::to_string(i) + "].color", m_ECSManager->m_SpotLights[lightIndex].m_Color);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].kC", m_ECSManager->m_SpotLights[lightIndex].m_kConstant);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].kL", m_ECSManager->m_SpotLights[lightIndex].m_kLinear);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].kQ", m_ECSManager->m_SpotLights[lightIndex].m_kQuadratic);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].inner_cutoff", m_ECSManager->m_SpotLights[lightIndex].m_InnerCutoff);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].outer_cutoff", m_ECSManager->m_SpotLights[lightIndex].m_OuterCutoff);
+		i++;
+	}
+	shader.SetInt("n_SpotLights", i);
 }
 

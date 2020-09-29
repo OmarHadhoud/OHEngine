@@ -1,13 +1,13 @@
 #ifndef SPOT_LIGHT_H
 #define SPOT_LIGHT_H
 
-#include <unordered_map>
 #include <glm/glm.hpp>
 
-struct SpotLight
+#include "game/ecs/Components/Component.h"
+
+struct SpotLight : Component
 {
 	glm::vec3 m_Color;
-	glm::vec3 m_Position;
 	glm::vec3 m_Direction;
 	float m_Ambient;
 	float m_Diffuse;
@@ -19,9 +19,8 @@ struct SpotLight
 	float m_InnerCutoffAngle;
 	float m_OuterCutoff;
 	float m_OuterCutoffAngle;
-	bool m_Enabled;
 	static unsigned int m_Count;
-	static std::unordered_map<unsigned int, unsigned int> m_Map;
+ static std::unordered_map<int, int> m_Map;
 };
 
 #endif // !SPOT_LIGHT_H

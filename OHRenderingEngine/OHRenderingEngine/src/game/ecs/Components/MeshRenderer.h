@@ -1,21 +1,27 @@
 #ifndef MESH_RENDERER_H
 #define MESH_RENDERER_H
 
-#include <unordered_map>
 #include <glm/glm.hpp>
 
+#include "game/ecs/Components/Component.h"
 #include "renderer/Model.h"
 
-struct MeshRenderer
+enum class Transparency
+{
+	kNonTransparent,
+	kSemiTransparent,
+	kTransparent
+};
+
+struct MeshRenderer : Component
 {
 	std::unique_ptr<Model> m_Model;
 	glm::vec3 m_BorderColor;
 	bool m_BorderEnabled;
-	bool m_IsTransparent;
+	Transparency m_Transparency;
 	bool m_IsSolid;
-	bool m_Enabled;
 	static unsigned int m_Count;
-	static std::unordered_map<unsigned int, unsigned int> m_Map;
+ static std::unordered_map<int, int> m_Map;
 };
 
 #endif // !MESH_RENDERER_H

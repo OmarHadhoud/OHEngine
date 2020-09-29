@@ -53,10 +53,14 @@ bool Game::GameEnded()
 
 int Game::RunLevel()
 {
+	m_RenderSystem->CreateSkybox("res/textures/", "png");
 	//Load scene from scene manager
 	m_Scene.LoadScene(&m_ECSManager, 0);
-	m_RenderSystem->CreateSkybox("res/textures/", "png");
 	bool levelEnded = false;
+	//TODO: REMOVE
+	//TURN VSYNC OFF FOR DEBUGGING PURPOSES
+	glfwSwapInterval(0);
+	
 	while(m_GameLogicSystem->GetGameState()== GameState::kLevelRunning)
 	{
 		//Update timings
