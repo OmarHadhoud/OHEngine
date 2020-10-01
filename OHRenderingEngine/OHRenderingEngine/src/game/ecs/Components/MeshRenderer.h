@@ -2,7 +2,6 @@
 #define MESH_RENDERER_H
 
 #include <glm/glm.hpp>
-
 #include "game/ecs/Components/Component.h"
 #include "renderer/Model.h"
 
@@ -21,7 +20,7 @@ struct MeshRenderer : Component
 	Transparency m_Transparency;
 	bool m_IsSolid;
 	static unsigned int m_Count;
- static std::unordered_map<int, int> m_Map;
+	static int m_Indices[MAX_ENTITY_COUNT];
 };
 
 #endif // !MESH_RENDERER_H

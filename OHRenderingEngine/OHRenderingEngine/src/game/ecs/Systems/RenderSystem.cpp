@@ -1,10 +1,9 @@
 #include "RenderSystem.h"
 #include "game/Game.h"
 
-
-//===================================================================//
-//========================Post procesing data=======================//
-//=================================================================//
+//==========================================================================//
+//===========================Post procesing data===========================//
+//========================================================================//
 float quadVertices[] =
 {
 	-1.0f,  1.0f,	0.0f, 1.0f,		//0
@@ -19,8 +18,28 @@ unsigned int quadIndices[] = {
 	0, 1, 2,
 	3, 4, 5,
 };
-
 const int MULTI_SAMPLES_COUNT = 8;
+
+//==========================================================================//
+//===========================Shadow mapping data===========================//
+//========================================================================//
+glm::vec3 directions[6] = {
+	glm::vec3(1,0,0),
+	glm::vec3(-1,0,0),
+	glm::vec3(0,1,0),
+	glm::vec3(0,-1,0),
+	glm::vec3(0,0,1),
+	glm::vec3(0,0,-1)
+};
+glm::vec3 up[6] = {
+	glm::vec3(0,-1,0),
+	glm::vec3(0,-1,0),
+	glm::vec3(0,0,1),
+	glm::vec3(0,0,-1),
+	glm::vec3(0,-1,0),
+	glm::vec3(0,-1,0)
+};
+
 
 
 RenderSystem::RenderSystem():
@@ -63,7 +82,7 @@ void RenderSystem::Setup()
 {
 	SetupPostProcessing();
 	SetupFrameBuffers();
-	SetupDethMaps();
+	SetupDepthMaps();
 	Renderer::EnableBlending();
 	Renderer::SetBlendFactors(kSrcAlpha, kOneMinusSrcAlpha);
 	Renderer::DisableBlending();
@@ -74,6 +93,11 @@ void RenderSystem::Update()
 {
 	ProcessEvents();
 	CheckWindowSize();
+
+	//Update matrices
+	UpdateModelMatrices();
+	UpdateLightTrasnformationMatrices();
+
 	//Get meshes ready to draw
 	int drawableMeshes[MAX_ENTITY_COUNT];
 	int solidMeshes[MAX_ENTITY_COUNT];
@@ -82,6 +106,11 @@ void RenderSystem::Update()
 	GetSolidMeshes(drawableMeshes, solidMeshes);
 	std::map<float, int> semiTransparentMeshes = GetSemiTransparentMeshes(drawableMeshes);
 	GetNonSolidMeshes(drawableMeshes, nonSolidMeshes);
+
+	//Shadow mapping
+	SetShadows();
+	ShadowPass(solidMeshes, nonSolidMeshes, semiTransparentMeshes);
+	
 
 	//Bind to the frame buffer, clear screen, set settings
 	m_MultisampledFBO.Bind();
@@ -105,9 +134,9 @@ void RenderSystem::Update()
 	
 	SetLights(view);
 	
-	DrawSolidObjects(solidMeshes);
-	DrawNonSolidOjects(nonSolidMeshes);
-	DrawSemiTransparentObjects(semiTransparentMeshes);	
+	DrawSolidObjects(solidMeshes, m_MainShader);
+	DrawNonSolidOjects(nonSolidMeshes, m_MainShader);
+	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);	
 	m_SkyBox->Draw(view, projection);
 	
 	DownsampleMSBuffer();
@@ -247,7 +276,7 @@ void RenderSystem::SetupFrameBuffers()
 
 }
 
-void RenderSystem::SetupDethMaps()
+void RenderSystem::SetupDepthMaps()
 {
 	for (int i = 0; i < MAX_DEPTH_MAPS; i++)
 	{
@@ -318,7 +347,7 @@ void RenderSystem::UpdateTexturesSize()
 	m_BloomTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 }
 
-void RenderSystem::DrawSolidObjects(const int * const indices)
+void RenderSystem::DrawSolidObjects(const int * const indices, const Shader &shader)
 {
 	glm::mat4 model;
 	Renderer::EnableCulling();
@@ -326,43 +355,43 @@ void RenderSystem::DrawSolidObjects(const int * const indices)
 	int i = 0;
 	while(indices[i] != -1)
 	{
-		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
-		int meshIndex = m_ECSManager->m_MeshRenderers->m_Map[indices[i]];
+		int transformIndex = Transform::m_Indices[indices[i]];
+		int meshIndex = MeshRenderer::m_Indices[indices[i]];
 		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
-		m_MainShader.SetMat4("model", model);
-		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
+		shader.SetMat4("model", model);
+		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
 		i++;
 	}
 }
 
-void RenderSystem::DrawNonSolidOjects(const int * const indices)
+void RenderSystem::DrawNonSolidOjects(const int * const indices, const Shader &shader)
 {
 	glm::mat4 model;
 	Renderer::DisableCulling();
 	int i = 0;
 	while(indices[i] != -1)
 	{
-		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
-		int meshIndex = m_ECSManager->m_MeshRenderers->m_Map[indices[i]];
+		int transformIndex = Transform::m_Indices[indices[i]];
+		int meshIndex = MeshRenderer::m_Indices[indices[i]];
 		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
-		m_MainShader.SetMat4("model", model);
-		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
+		shader.SetMat4("model", model);
+		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
 		i++;
 	}
 }
 
-void RenderSystem::DrawSemiTransparentObjects(std::map<float, int>& indices)
+void RenderSystem::DrawSemiTransparentObjects(std::map<float, int>& indices, const Shader &shader)
 {
 	glm::mat4 model;
 	Renderer::EnableBlending();
 	Renderer::DisableCulling();
 	for (auto it = indices.rbegin(); it != indices.rend(); it++)
 	{
-		int transformIndex = m_ECSManager->m_Transforms->m_Map[it->second];
-		int meshIndex = m_ECSManager->m_MeshRenderers->m_Map[it->second];
+		int transformIndex = Transform::m_Indices[it->second];
+		int meshIndex = MeshRenderer::m_Indices[it->second];
 		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
-		m_MainShader.SetMat4("model", model);
-		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
+		shader.SetMat4("model", model);
+		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
 	}
 	Renderer::DisableBlending();
 	Renderer::EnableCulling();
@@ -435,11 +464,11 @@ void RenderSystem::GetDrawableMeshes(int *indices)
 	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
-		if (Transform::m_Map.find(i) == Transform::m_Map.end() || MeshRenderer::m_Map.find(i) == MeshRenderer::m_Map.end())
+		if (Transform::m_Indices[i] == -1 || MeshRenderer::m_Indices[i] == -1)
 			continue;
 		
-		int transformIndex = Transform::m_Map[i];
-		int meshIndex = MeshRenderer::m_Map[i];
+		int transformIndex = Transform::m_Indices[i];
+		int meshIndex = MeshRenderer::m_Indices[i];
 		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_MeshRenderers[meshIndex].m_Enabled)
 			continue;
 
@@ -453,7 +482,7 @@ void RenderSystem::GetSolidMeshes(const int * const drawableMeshes, int *solidIn
 	int j = 0;
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
-		int mapIndex = MeshRenderer::m_Map[drawableMeshes[i]];
+		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
 		if (m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::kSemiTransparent)
 			solidIndices[j++] = drawableMeshes[i];
 	}
@@ -466,7 +495,7 @@ void RenderSystem::GetNonSolidMeshes(const int * const drawableMeshes, int * non
 	int j = 0;
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
-		int mapIndex = MeshRenderer::m_Map[drawableMeshes[i]];
+		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
 		if (!m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::kSemiTransparent)
 			nonSolidIndices[j++] = drawableMeshes[i];
 	}
@@ -478,10 +507,10 @@ std::map<float, int> RenderSystem::GetSemiTransparentMeshes(const int * const dr
 	std::map<float, int> indices;
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
-		int mapIndex = MeshRenderer::m_Map[drawableMeshes[i]];
+		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
 		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::kSemiTransparent) )
 			continue;
-		int transformIndex = Transform::m_Map[drawableMeshes[i]];
+		int transformIndex = Transform::m_Indices[drawableMeshes[i]];
 		float distance = glm::length(m_FPSCamera.GetPosition() - m_ECSManager->m_Transforms[transformIndex].m_Position);
 		indices[distance] = drawableMeshes[i];
 	}
@@ -495,11 +524,11 @@ void RenderSystem::GetDirectionalLights(int *indices)
 	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
-		if (Transform::m_Map.find(i) == Transform::m_Map.end() || DirectionalLight::m_Map.find(i) == DirectionalLight::m_Map.end())
+		if (Transform::m_Indices[i] == -1|| DirectionalLight::m_Indices[i] == -1)
 			continue;
 
-		int transformIndex = Transform::m_Map[i];
-		int directionalLightIndex = DirectionalLight::m_Map[i];
+		int transformIndex = Transform::m_Indices[i];
+		int directionalLightIndex = DirectionalLight::m_Indices[i];
 		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_DirectionalLights[directionalLightIndex].m_Enabled)
 			continue;
 
@@ -513,11 +542,11 @@ void RenderSystem::GetPointLights(int *indices)
 	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
-		if (Transform::m_Map.find(i) == Transform::m_Map.end() || PointLight::m_Map.find(i) == PointLight::m_Map.end())
+		if (Transform::m_Indices[i] == -1 || PointLight::m_Indices[i] == -1)
 			continue;
 
-		int transformIndex = Transform::m_Map[i];
-		int pointLightIndex = PointLight::m_Map[i];
+		int transformIndex = Transform::m_Indices[i];
+		int pointLightIndex = PointLight::m_Indices[i];
 		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_PointLights[pointLightIndex].m_Enabled)
 			continue;
 
@@ -531,11 +560,11 @@ void RenderSystem::GetSpotlights(int *indices)
 	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
-		if (Transform::m_Map.find(i) == Transform::m_Map.end() || SpotLight::m_Map.find(i) == SpotLight::m_Map.end())
+		if (Transform::m_Indices[i] == -1 || SpotLight::m_Indices[i] == -1)
 			continue;
 
-		int transformIndex = Transform::m_Map[i];
-		int spotLightIndex = SpotLight::m_Map[i];
+		int transformIndex = Transform::m_Indices[i];
+		int spotLightIndex = SpotLight::m_Indices[i];
 		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_SpotLights[spotLightIndex].m_Enabled)
 			continue;
 
@@ -565,13 +594,14 @@ void RenderSystem::SetDirectionalLights(const int * const indices, Shader &shade
 	int i = 0;
 	while(indices[i] != -1)
 	{
-		int lightIndex = m_ECSManager->m_DirectionalLights->m_Map[indices[i]];
-		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
+		int lightIndex = DirectionalLight::m_Indices[indices[i]];
+		int transformIndex = Transform::m_Indices[indices[i]];
 		shader.SetFloat("directionalLights[" + std::to_string(i) + "].ambient", m_ECSManager->m_DirectionalLights[lightIndex].m_Ambient);
 		shader.SetFloat("directionalLights[" + std::to_string(i) + "].diffuse", m_ECSManager->m_DirectionalLights[lightIndex].m_Diffuse);
 		shader.SetFloat("directionalLights[" + std::to_string(i) + "].specular", m_ECSManager->m_DirectionalLights[lightIndex].m_Specular);
 		shader.SetVec3("directionalLights[" + std::to_string(i) + "].direction", glm::vec3(viewMatrix*glm::vec4(m_ECSManager->m_DirectionalLights[lightIndex].m_Direction, 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("directionalLights[" + std::to_string(i) + "].color", m_ECSManager->m_DirectionalLights[lightIndex].m_Color);
+		shader.SetBool("directionalLights[" + std::to_string(i) + "].HasShadow", false);
 		i++;
 	}
 	shader.SetInt("n_DirectionalLights", i);
@@ -584,8 +614,8 @@ void RenderSystem::SetPointLights(const int * const indices, Shader &shader, con
 	int i = 0;
 	while (indices[i] != -1)
 	{
-		int lightIndex = m_ECSManager->m_PointLights->m_Map[indices[i]];
-		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
+		int lightIndex = PointLight::m_Indices[indices[i]];
+		int transformIndex = Transform::m_Indices[indices[i]];
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].ambient", m_ECSManager->m_PointLights[lightIndex].m_Ambient);
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].diffuse", m_ECSManager->m_PointLights[lightIndex].m_Diffuse);
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].specular", m_ECSManager->m_PointLights[lightIndex].m_Specular);
@@ -595,6 +625,7 @@ void RenderSystem::SetPointLights(const int * const indices, Shader &shader, con
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].kC", m_ECSManager->m_PointLights[lightIndex].m_kConstant);
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].kL", m_ECSManager->m_PointLights[lightIndex].m_kLinear);
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].kQ", m_ECSManager->m_PointLights[lightIndex].m_kQuadratic);
+		shader.SetBool("pointLights[" + std::to_string(i) + "].HasShadow", false);
 		i++;
 	}
 	//TODO: should be removed and handled in shadows code
@@ -612,8 +643,8 @@ void RenderSystem::SetSpotLights(const int * const indices, Shader &shader, cons
 	int i = 0;
 	while (indices[i] != -1)
 	{
-		int lightIndex = m_ECSManager->m_SpotLights->m_Map[indices[i]];
-		int transformIndex = m_ECSManager->m_Transforms->m_Map[indices[i]];
+		int lightIndex = SpotLight::m_Indices[indices[i]];
+		int transformIndex = Transform::m_Indices[indices[i]];
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].ambient", m_ECSManager->m_SpotLights[lightIndex].m_Ambient);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].diffuse", m_ECSManager->m_SpotLights[lightIndex].m_Diffuse);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].specular", m_ECSManager->m_SpotLights[lightIndex].m_Specular);
@@ -625,8 +656,173 @@ void RenderSystem::SetSpotLights(const int * const indices, Shader &shader, cons
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].kQ", m_ECSManager->m_SpotLights[lightIndex].m_kQuadratic);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].inner_cutoff", m_ECSManager->m_SpotLights[lightIndex].m_InnerCutoff);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].outer_cutoff", m_ECSManager->m_SpotLights[lightIndex].m_OuterCutoff);
+		shader.SetBool("spotLights[" + std::to_string(i) + "].HasShadow", false);
 		i++;
 	}
 	shader.SetInt("n_SpotLights", i);
+}
+
+void RenderSystem::SetShadows()
+{
+	for (int i = 0; i < LightShadow::m_Count; i++)
+	{
+		int entityId = m_ECSManager->m_LightShadows[i].m_EntityID;
+		if (DirectionalLight::m_Indices[entityId] != -1)
+		{
+			m_MainShader.SetMat4("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows->m_TransformationMatrix[0]);
+			m_MainShader.SetInt("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].DepthMap", 32-i);
+			m_MainShader.SetBool("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].HasShadow", true);
+		}
+		else if (PointLight::m_Indices[entityId] != -1)
+		{
+			m_MainShader.SetInt("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].far_plane", m_ECSManager->m_LightShadows[i].m_FarPlane);
+			m_MainShader.SetInt("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].DepthMap", 32-i);
+			m_MainShader.SetBool("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].HasShadow", true);
+		}
+		else if (SpotLight::m_Indices[entityId] != -1)
+		{
+			m_MainShader.SetMat4("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows->m_TransformationMatrix[0]);
+			m_MainShader.SetInt("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].DepthMap", 32-i);
+			m_MainShader.SetBool("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].HasShadow", true);
+		}
+
+	}
+}
+
+void RenderSystem::ShadowPass(const int * const solidMeshes, const int * const nonSolidMeshes, std::map<float, int>& transparentMeshes)
+{
+	//Cull Front Face to prevent shadow acne
+	Renderer::EnableCulling();
+	Renderer::CullFace(kFront);
+	//Clear depth buffer
+	Renderer::Clear(kDepthBufferBit,glm::vec4(0.0));
+	//Update the size of the viewport
+	Renderer::ResizeWindow(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE);
+	m_ShadowShader.Use();
+
+	int normalDepthMapsIndex = 0;
+	int cubeDepthMapsIndex = MAX_DEPTH_MAPS;
+
+	for (int i = 0; i < LightShadow::m_Count; i++)
+	{
+		int entityId = m_ECSManager->m_LightShadows[i].m_EntityID;
+		if (DirectionalLight::m_Indices[entityId] != -1)
+		{
+			m_ShadowMapFBO[normalDepthMapsIndex++].Bind();
+			m_ShadowShader.SetMat4("TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
+			DrawSolidObjects(solidMeshes, m_ShadowShader);
+			DrawNonSolidOjects(nonSolidMeshes, m_ShadowShader);
+			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
+			Texture::Activate(32 - i);
+			m_DepthMaps[i].Bind();
+		}
+		else if (PointLight::m_Indices[entityId] != -1)
+		{
+			m_ShadowMapFBO[cubeDepthMapsIndex++].Bind();
+			int transformIndex = Transform::m_Indices[entityId];
+			for(int j = 0; j < 6; j++)
+				m_ShadowShader.SetMat4("TransformationMatrix["+std::to_string(j)+"]", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[j]);
+			m_ShadowShader.SetFloat("FarPlane", m_ECSManager->m_LightShadows[i].m_FarPlane);
+			m_ShadowShader.SetVec3("LightPosition", m_ECSManager->m_Transforms[transformIndex].m_Position);
+			DrawSolidObjects(solidMeshes, m_ShadowShader);
+			DrawNonSolidOjects(nonSolidMeshes, m_ShadowShader);
+			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
+			Texture::Activate(32 - i);
+			m_DepthCubeMaps[i].Bind();
+		}
+		else if (SpotLight::m_Indices[entityId] != -1)
+		{
+			m_ShadowMapFBO[normalDepthMapsIndex++].Bind();
+			m_ShadowShader.SetMat4("TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
+			DrawSolidObjects(solidMeshes, m_ShadowShader);
+			DrawNonSolidOjects(nonSolidMeshes, m_ShadowShader);
+			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
+			Texture::Activate(32-i);
+			m_DepthMaps[i].Bind();
+		}
+	}
+	Renderer::CullFace(kBack);
+	Renderer::DisableCulling();
+	Renderer::ResizeWindow(m_WindowWidth, m_WindowHeight);
+}
+
+
+void RenderSystem::UpdateModelMatrices()
+{
+	glm::mat4 model;
+	for (int i = 0; i < Transform::m_Count; i++)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, m_ECSManager->m_Transforms[i].m_Position);
+		model = glm::rotate(model, glm::radians(m_ECSManager->m_Transforms[i].m_RotationAngle), m_ECSManager->m_Transforms[i].m_RotationAxis);
+		model = glm::scale(model, m_ECSManager->m_Transforms[i].m_Scale);
+		m_ECSManager->m_Transforms[i].m_ModelMatrix = model;
+	}
+}
+
+void RenderSystem::UpdateLightTrasnformationMatrices()
+{
+	for (int i = 0; i < LightShadow::m_Count; i++)
+	{
+		int entityId = m_ECSManager->m_LightShadows[i].m_EntityID;
+		if (DirectionalLight::m_Indices[entityId] != -1)
+		{
+			UpdateDirectionalLightTransformationMatrix(i, entityId);
+		}
+		else if (PointLight::m_Indices[entityId] != -1)
+		{
+			UpdatePointLightTransformationMatrix(i, entityId);
+		}
+		else if (SpotLight::m_Indices[entityId] != -1)
+		{
+			UpdateSpotLightTransformationMatrix(i, entityId);
+		}
+
+	}
+}
+
+void RenderSystem::UpdateDirectionalLightTransformationMatrix(int shadowIndex, int entityId)
+{
+	int directionalLightComponentIndex = DirectionalLight::m_Indices[entityId];
+	float frustumSize = m_ECSManager->m_LightShadows[shadowIndex].m_FrustumSize;
+	float nearPlane = m_ECSManager->m_LightShadows[shadowIndex].m_NearPlane;
+	float farPlane = m_ECSManager->m_LightShadows[shadowIndex].m_FarPlane;
+	glm::vec3 pos = -m_ECSManager->m_DirectionalLights[directionalLightComponentIndex].m_Direction;
+	glm::mat4 viewMatrix = glm::lookAt(pos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 projectionMatrix = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, nearPlane, farPlane);
+	glm::mat4 transformationMatrix = projectionMatrix * viewMatrix;
+	m_ECSManager->m_LightShadows->m_TransformationMatrix = std::vector<glm::mat4>(1, transformationMatrix);
+}
+
+void RenderSystem::UpdateSpotLightTransformationMatrix(int shadowIndex, int entityId)
+{
+	int spotLightComponentIndex = SpotLight::m_Indices[entityId];
+	int transformComponentIndex = Transform::m_Indices[entityId];
+	float frustumSize = m_ECSManager->m_LightShadows[shadowIndex].m_FrustumSize;
+	float nearPlane = m_ECSManager->m_LightShadows[shadowIndex].m_NearPlane;
+	float farPlane = m_ECSManager->m_LightShadows[shadowIndex].m_FarPlane;
+	glm::vec3 pos = m_ECSManager->m_Transforms[transformComponentIndex].m_Position;
+	glm::vec3 dir = m_ECSManager->m_SpotLights[spotLightComponentIndex].m_Direction;
+	glm::mat4 viewMatrix = glm::lookAt(pos, pos + dir, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 projectionMatrix = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, nearPlane, farPlane);
+	glm::mat4 transformationMatrix = projectionMatrix * viewMatrix;
+	m_ECSManager->m_LightShadows->m_TransformationMatrix = std::vector<glm::mat4>(1, transformationMatrix);
+}
+
+void RenderSystem::UpdatePointLightTransformationMatrix(int shadowIndex, int entityId)
+{
+	int transformComponentIndex = Transform::m_Indices[entityId];
+	float nearPlane = m_ECSManager->m_LightShadows[shadowIndex].m_NearPlane;
+	float farPlane = m_ECSManager->m_LightShadows[shadowIndex].m_FarPlane;
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), (float)1.0f, nearPlane, farPlane);
+	std::vector<glm::mat4> matrices;
+	for (int i = 0; i < 6; i++)
+	{
+		glm::vec3 pos = m_ECSManager->m_Transforms[transformComponentIndex].m_Position;
+		glm::mat4 viewMatrix = glm::lookAt(pos, pos + directions[i], up[i]);
+		glm::mat4 transformationMatrix = projectionMatrix * viewMatrix;
+		matrices.push_back(transformationMatrix);
+	}
+	m_ECSManager->m_LightShadows->m_TransformationMatrix = matrices;
 }
 

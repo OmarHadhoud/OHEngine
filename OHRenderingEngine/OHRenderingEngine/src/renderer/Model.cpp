@@ -7,7 +7,7 @@ Model::Model(const char* path)
 	loadModel(path);
 }
 
-void Model::Draw(Shader & shader)
+void Model::Draw(const Shader & shader)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader, texturesLoaded);

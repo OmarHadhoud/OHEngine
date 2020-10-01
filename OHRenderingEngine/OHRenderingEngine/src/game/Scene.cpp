@@ -249,10 +249,8 @@ void Scene::ParseSpotLight(int entityId, ECSManager* manager)
 	manager->m_SpotLights[id].m_kConstant = constant;
 	manager->m_SpotLights[id].m_kLinear = linear;
 	manager->m_SpotLights[id].m_kQuadratic = quadratic;
-	manager->m_SpotLights[id].m_InnerCutoffAngle = innerCutOffAngle;
-	manager->m_SpotLights[id].m_InnerCutoff = cos(innerCutOffAngle);
-	manager->m_SpotLights[id].m_OuterCutoffAngle = outterCutOffAngle;
-	manager->m_SpotLights[id].m_OuterCutoff = cos(outterCutOffAngle);
+	manager->m_SpotLights[id].m_InnerCutoff = cos(glm::radians(innerCutOffAngle));
+	manager->m_SpotLights[id].m_OuterCutoff = cos(glm::radians(outterCutOffAngle));
 	manager->m_SpotLights[id].m_Enabled = enabled;
 }
 

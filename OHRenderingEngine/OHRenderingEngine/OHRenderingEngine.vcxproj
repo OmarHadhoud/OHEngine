@@ -63,6 +63,7 @@
     <ClInclude Include="src\game\ecs\Components\RigidBody.h" />
     <ClInclude Include="src\game\ecs\Components\SpotLight.h" />
     <ClInclude Include="src\game\ecs\Components\Transform.h" />
+    <ClInclude Include="src\game\ecs\ECSCount.h" />
     <ClInclude Include="src\game\ecs\ECSManager.h" />
     <ClInclude Include="src\game\ecs\Events\EventsController.h" />
     <ClInclude Include="src\game\ecs\Events\Event.h" />

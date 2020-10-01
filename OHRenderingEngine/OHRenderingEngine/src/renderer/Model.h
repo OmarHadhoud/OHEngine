@@ -14,7 +14,7 @@ class Model
 {
 public:
 	Model(const char* path);
-	void Draw(Shader &shader);
+	void Draw(const Shader &shader);
 	void UpdateTexturesWrap(WrapDir dir, WrapType type);
 	~Model();
 private:

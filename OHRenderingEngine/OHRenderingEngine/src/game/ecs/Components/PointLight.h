@@ -2,7 +2,6 @@
 #define POINT_LIGHT_H
 
 #include <glm/glm.hpp>
-
 #include "game/ecs/Components/Component.h"
 
 struct PointLight : Component
@@ -15,7 +14,7 @@ struct PointLight : Component
 	float m_kLinear;
 	float m_kQuadratic;
 	static unsigned int m_Count;
- static std::unordered_map<int, int> m_Map;
+	static int m_Indices[MAX_ENTITY_COUNT];
 };
 
 #endif // !POINT_LIGHT_H

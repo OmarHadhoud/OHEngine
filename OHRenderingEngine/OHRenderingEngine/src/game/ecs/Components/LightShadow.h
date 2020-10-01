@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-
 #include "game/ecs/Components/Component.h"
 
 struct LightShadow : Component
@@ -14,7 +13,7 @@ struct LightShadow : Component
 	float m_NearPlane;
 	float m_FarPlane;
 	static unsigned int m_Count;
- static std::unordered_map<int, int> m_Map;
+	static int m_Indices[MAX_ENTITY_COUNT];
 };
 
 #endif // !LIGHT_SHADOW_H

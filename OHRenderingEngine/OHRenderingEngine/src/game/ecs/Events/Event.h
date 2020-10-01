@@ -13,10 +13,14 @@ enum class EventType
 	kPlayerShoots,
 	kPlayerSelects,
 	//Game logic events
-
+	kPlayerWins,
+	kPlayerDies,
+	kPlayerHit,
+	kEnemyHit,
 
 	//AI events
-
+	kEnemyMove,
+	kEnemyShoots,
 
 	//Renderer events
 

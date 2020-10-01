@@ -85,5 +85,6 @@
     <ClInclude Include="src\game\ecs\Components\SpotLight.h" />
     <ClInclude Include="src\game\Skybox.h" />
     <ClInclude Include="src\game\ecs\Components\Component.h" />
+    <ClInclude Include="src\game\ecs\ECSCount.h" />
   </ItemGroup>
 </Project>

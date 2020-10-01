@@ -61,11 +61,11 @@ MODEL_PATH = res/objects/grass/grass.obj
 BORDER_COLOR = 0 0 0
 BORDER_ENABLED = 0
 IS_TRANSPARENT = 2
-IS_SOLID = 1
+IS_SOLID = 0
 ENABLED = 1
 
 TRANSFORM
-POSITION = -4 -2 0
+POSITION = -8 -2 0
 SCALE = 1 1 1
 ROTATION_AXIS = 1 0 0
 ROTATION_ANGLE = 90
@@ -132,6 +132,12 @@ ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
 ENABLED = 1
+
+LIGHT_SHADOW
+FRUSTUM_SIZE = 10
+NEAR_PLANE = 1
+FAR_PLANE = 50
+ENABLED = 1
 ========================================== ENTITY_END ==================================
 
 ========================================== ENTITY_START ==================================
@@ -155,6 +161,9 @@ ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
 ENABLED = 1
+
+
+
 ========================================== ENTITY_END ==================================
 
 
@@ -175,3 +184,4 @@ ROTATION_ANGLE = 0
 FORWARD = 0 0 1
 ENABLED = 0
 ========================================== ENTITY_END ==================================
+

@@ -73,8 +73,8 @@ public:
 	Mesh& operator=(const Mesh& other) = delete;
 	//Move assignment operator
 	Mesh& operator=(Mesh&& other) noexcept;
-	void PreDraw(Shader &shader, std::vector<TextureMaterial> &textures);
-	void Draw(Shader &shader, std::vector<TextureMaterial> &textures);
+	void PreDraw(const Shader &shader, std::vector<TextureMaterial> &textures);
+	void Draw(const Shader &shader, std::vector<TextureMaterial> &textures);
 	~Mesh();
 	
 private:

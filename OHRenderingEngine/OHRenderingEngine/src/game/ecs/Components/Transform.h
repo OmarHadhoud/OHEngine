@@ -2,7 +2,6 @@
 #define TRANSFORM_H
 
 #include <glm/glm.hpp>
-
 #include "game/ecs/Components/Component.h"
 
 struct Transform : Component
@@ -14,7 +13,7 @@ struct Transform : Component
 	glm::vec3 m_Forward;
 	glm::mat4 m_ModelMatrix;
 	static unsigned int m_Count;
- static std::unordered_map<int, int> m_Map;
+	static int m_Indices[MAX_ENTITY_COUNT];
 };
 
 #endif // !TRANSFORM_H

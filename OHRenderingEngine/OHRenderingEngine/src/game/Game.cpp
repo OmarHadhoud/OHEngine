@@ -55,6 +55,7 @@ int Game::RunLevel()
 {
 	m_RenderSystem->CreateSkybox("res/textures/", "png");
 	//Load scene from scene manager
+	m_ECSManager.SetupComponents();
 	m_Scene.LoadScene(&m_ECSManager, 0);
 	bool levelEnded = false;
 	//TODO: REMOVE

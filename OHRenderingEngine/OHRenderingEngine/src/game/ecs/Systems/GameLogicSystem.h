@@ -2,10 +2,8 @@
 #define GAME_LOGIC_SYSTEM_H
 
 #include <vector>
-
 #include "game/ecs/Systems/System.h"
 #include "game/ecs/Events/Event.h"
-
 #include <GLFW/glfw3.h>
 
 enum class GameState 
@@ -25,7 +23,9 @@ public:
 	void Update();
 	GameState GetGameState() const;
 private:
+	//Gamestate variables
 	GameState m_gameState;
+	//Functions
 	void ProcessEvent(Event*);
 };
 

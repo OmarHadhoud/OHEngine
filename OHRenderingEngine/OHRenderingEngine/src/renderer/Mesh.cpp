@@ -37,7 +37,7 @@ Mesh & Mesh::operator=(Mesh && other) noexcept
 	return *this;
 }
 
-void Mesh::PreDraw(Shader & shader, std::vector<TextureMaterial>& textures)
+void Mesh::PreDraw(const Shader & shader, std::vector<TextureMaterial>& textures)
 {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
@@ -62,7 +62,7 @@ void Mesh::PreDraw(Shader & shader, std::vector<TextureMaterial>& textures)
 	}
 }
 
-void Mesh::Draw(Shader & shader, std::vector<TextureMaterial> &textures)
+void Mesh::Draw(const Shader & shader, std::vector<TextureMaterial> &textures)
 {
 	PreDraw(shader, textures);
 	Renderer::Draw(m_VAO, shader, m_Indices.size(), 0);
