@@ -63,4 +63,7 @@ void main()
 	//Do tone mapping and gamma correction
 	FragColor = vec4(vec3(1.0f) - exp(-FragColor.xyz*exposure),1.0f);
 	FragColor = vec4(pow(vec3(FragColor),vec3(1.0f/gammaCorrection)),1.0f);
+
+	//Shdaow map debugging
+	//FragColor = vec4(vec3(texture(quadTex,v_TexCoords).r),1.0f);
 }

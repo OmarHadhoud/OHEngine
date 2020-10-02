@@ -107,9 +107,16 @@ void RenderSystem::Update()
 	std::map<float, int> semiTransparentMeshes = GetSemiTransparentMeshes(drawableMeshes);
 	GetNonSolidMeshes(drawableMeshes, nonSolidMeshes);
 
+	//Get matrices needed for all drawings
+	glm::mat4 view = m_FPSCamera.GetViewMatrix();
+	glm::mat4 projection = glm::perspective(glm::radians(m_FPSCamera.GetFOV()), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f, 200.0f);
+	glm::mat4 model;
+
+	SetLights(view);
 	//Shadow mapping
-	SetShadows();
-	ShadowPass(solidMeshes, nonSolidMeshes, semiTransparentMeshes);
+	int enabledShadows[MAX_DEPTH_MAPS + MAX_DEPTH_CUBE_MAPS];
+	SetShadows(enabledShadows);
+	ShadowPass(enabledShadows, solidMeshes, nonSolidMeshes, semiTransparentMeshes);
 	
 
 	//Bind to the frame buffer, clear screen, set settings
@@ -120,10 +127,6 @@ void RenderSystem::Update()
 
 	//=============Start rendering objects=================
 
-	//Get matrices needed for all drawings
-	glm::mat4 view = m_FPSCamera.GetViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(m_FPSCamera.GetFOV()), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f, 200.0f);
-	glm::mat4 model;
 
 	//Bind to the main shader and set uniforms that are constant per frame
 	m_MainShader.Use();
@@ -132,12 +135,17 @@ void RenderSystem::Update()
 	m_MainShader.SetFloat("material.shineness", 64);
 	m_MainShader.SetBool("material.blinn", true);
 	
-	SetLights(view);
-	
-	DrawSolidObjects(solidMeshes, m_MainShader);
-	DrawNonSolidOjects(nonSolidMeshes, m_MainShader);
-	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);	
+	Renderer::EnableCulling();
+	Renderer::CullFace(kBack);
+	DrawNonTransparentObjects(solidMeshes, m_MainShader);
+	Renderer::DisableCulling();
+	DrawNonTransparentObjects(nonSolidMeshes, m_MainShader);
+	Renderer::EnableBlending();
+	Renderer::DisableCulling();
 	m_SkyBox->Draw(view, projection);
+	m_MainShader.Use();
+	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);	
+	Renderer::DisableBlending();
 	
 	DownsampleMSBuffer();
 	ApplyBloom();
@@ -281,7 +289,7 @@ void RenderSystem::SetupDepthMaps()
 	for (int i = 0; i < MAX_DEPTH_MAPS; i++)
 	{
 		m_DepthMaps[i].SetType(k2D);
-		m_DepthMaps[i].Activate(1);
+		m_DepthMaps[i].Activate(32 - i);
 		m_DepthMaps[i].Bind();
 		float color[] = { 1.0f,1.0f,1.0f,1.0f };
 		m_DepthMaps[i].SetBorderColor(color);
@@ -302,7 +310,7 @@ void RenderSystem::SetupDepthMaps()
 	for (int i = 0; i < MAX_DEPTH_CUBE_MAPS; i++)
 	{
 		m_DepthCubeMaps[i].SetType(kCubeMap);
-		m_DepthCubeMaps[i].Activate(1);
+		m_DepthCubeMaps[i].Activate(32 - i - MAX_DEPTH_MAPS);
 		m_DepthCubeMaps[i].Bind();
 		m_DepthCubeMaps[i].SetWrap(kS, kClampToBorder);
 		m_DepthCubeMaps[i].SetWrap(kT, kClampToBorder);
@@ -347,11 +355,10 @@ void RenderSystem::UpdateTexturesSize()
 	m_BloomTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
 }
 
-void RenderSystem::DrawSolidObjects(const int * const indices, const Shader &shader)
+void RenderSystem::DrawNonTransparentObjects(const int * const indices, const Shader &shader)
 {
+	shader.Use();
 	glm::mat4 model;
-	Renderer::EnableCulling();
-	Renderer::CullFace(kBack);
 	int i = 0;
 	while(indices[i] != -1)
 	{
@@ -364,27 +371,12 @@ void RenderSystem::DrawSolidObjects(const int * const indices, const Shader &sha
 	}
 }
 
-void RenderSystem::DrawNonSolidOjects(const int * const indices, const Shader &shader)
-{
-	glm::mat4 model;
-	Renderer::DisableCulling();
-	int i = 0;
-	while(indices[i] != -1)
-	{
-		int transformIndex = Transform::m_Indices[indices[i]];
-		int meshIndex = MeshRenderer::m_Indices[indices[i]];
-		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
-		shader.SetMat4("model", model);
-		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
-		i++;
-	}
-}
 
 void RenderSystem::DrawSemiTransparentObjects(std::map<float, int>& indices, const Shader &shader)
 {
+	shader.Use();
 	glm::mat4 model;
-	Renderer::EnableBlending();
-	Renderer::DisableCulling();
+
 	for (auto it = indices.rbegin(); it != indices.rend(); it++)
 	{
 		int transformIndex = Transform::m_Indices[it->second];
@@ -393,8 +385,6 @@ void RenderSystem::DrawSemiTransparentObjects(std::map<float, int>& indices, con
 		shader.SetMat4("model", model);
 		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
 	}
-	Renderer::DisableBlending();
-	Renderer::EnableCulling();
 }
 
 
@@ -449,6 +439,13 @@ void RenderSystem::DrawInBuffer()
 	m_BloomTex[0].Bind();
 	m_PostProcessShader.SetInt("quadTex", 1);
 	m_PostProcessShader.SetInt("brightTex", 2);
+
+	//TODO: remove Shadow debugging
+//	Texture::Activate(1);
+//	m_DepthMaps[0].Bind();
+//	m_DepthMaps[0].Activate(2);
+//	m_DepthMaps[0].Bind();
+	
 	//If player is moving, apply blur
 	m_PostProcessShader.SetBool("moving", false);
 	m_PostProcessShader.SetFloat("blurStrength", 0.0f);
@@ -662,84 +659,116 @@ void RenderSystem::SetSpotLights(const int * const indices, Shader &shader, cons
 	shader.SetInt("n_SpotLights", i);
 }
 
-void RenderSystem::SetShadows()
+void RenderSystem::SetShadows(int* const enabledShadows)
 {
+	m_MainShader.Use();
+	int shadowCounter = 0;
 	for (int i = 0; i < LightShadow::m_Count; i++)
 	{
+		//If light shadows are disabled, skip this iteration
+		if (!m_ECSManager->m_LightShadows[i].m_Enabled)
+			continue;
+		
 		int entityId = m_ECSManager->m_LightShadows[i].m_EntityID;
-		if (DirectionalLight::m_Indices[entityId] != -1)
-		{
-			m_MainShader.SetMat4("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows->m_TransformationMatrix[0]);
-			m_MainShader.SetInt("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].DepthMap", 32-i);
-			m_MainShader.SetBool("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].HasShadow", true);
-		}
-		else if (PointLight::m_Indices[entityId] != -1)
-		{
-			m_MainShader.SetInt("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].far_plane", m_ECSManager->m_LightShadows[i].m_FarPlane);
-			m_MainShader.SetInt("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].DepthMap", 32-i);
-			m_MainShader.SetBool("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].HasShadow", true);
-		}
-		else if (SpotLight::m_Indices[entityId] != -1)
-		{
-			m_MainShader.SetMat4("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows->m_TransformationMatrix[0]);
-			m_MainShader.SetInt("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].DepthMap", 32-i);
-			m_MainShader.SetBool("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].HasShadow", true);
-		}
+		int transformIndex = Transform::m_Indices[entityId];
+		//If no transform component exists for this light source, skip this iteration
+		if (transformIndex == -1) 
+			continue;
 
+		int lightIndex;
+
+		lightIndex = DirectionalLight::m_Indices[entityId];
+		if (lightIndex!= -1 && m_ECSManager->m_DirectionalLights[lightIndex].m_Enabled)
+		{
+			m_MainShader.SetMat4("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
+			m_MainShader.SetInt("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].DepthMap", 32 - shadowCounter);
+			m_MainShader.SetBool("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].HasShadow", true);
+			enabledShadows[shadowCounter++] = i;
+			continue;
+		}
+		lightIndex = PointLight::m_Indices[entityId];
+		if (lightIndex != -1 && m_ECSManager->m_PointLights[lightIndex].m_Enabled)
+		{
+			m_MainShader.SetFloat("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].far_plane", m_ECSManager->m_LightShadows[i].m_FarPlane);
+			m_MainShader.SetInt("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].DepthMap", 32 - shadowCounter);
+			m_MainShader.SetBool("pointLights[" + std::to_string(PointLight::m_Indices[entityId]) + "].HasShadow", true);
+			enabledShadows[shadowCounter++] = i;
+			continue;
+		}
+		lightIndex = SpotLight::m_Indices[entityId];
+		if (lightIndex != -1 && m_ECSManager->m_SpotLights[lightIndex].m_Enabled)
+		{
+			m_MainShader.SetMat4("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
+			m_MainShader.SetInt("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].DepthMap", 32 - shadowCounter);
+			m_MainShader.SetBool("spotLights[" + std::to_string(SpotLight::m_Indices[entityId]) + "].HasShadow", true);
+			enabledShadows[shadowCounter++] = i;
+			continue;
+		}
 	}
+	enabledShadows[shadowCounter++] = -1;
 }
 
-void RenderSystem::ShadowPass(const int * const solidMeshes, const int * const nonSolidMeshes, std::map<float, int>& transparentMeshes)
+void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const solidMeshes, const int * const nonSolidMeshes, std::map<float, int>& transparentMeshes)
 {
+	Renderer::EnableDepthTesting();
 	//Cull Front Face to prevent shadow acne
 	Renderer::EnableCulling();
 	Renderer::CullFace(kFront);
-	//Clear depth buffer
-	Renderer::Clear(kDepthBufferBit,glm::vec4(0.0));
 	//Update the size of the viewport
 	Renderer::ResizeWindow(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE);
-	m_ShadowShader.Use();
+	
 
 	int normalDepthMapsIndex = 0;
 	int cubeDepthMapsIndex = MAX_DEPTH_MAPS;
 
-	for (int i = 0; i < LightShadow::m_Count; i++)
+	int j = 0;
+	while(enabledShadows[j]!=-1)
 	{
+		int i = enabledShadows[j];
+
 		int entityId = m_ECSManager->m_LightShadows[i].m_EntityID;
 		if (DirectionalLight::m_Indices[entityId] != -1)
 		{
-			m_ShadowMapFBO[normalDepthMapsIndex++].Bind();
+			m_ShadowShader.Use();
+			m_ShadowMapFBO[normalDepthMapsIndex].Bind();
+			Renderer::Clear(kDepthBufferBit, glm::vec4(0.0f));
 			m_ShadowShader.SetMat4("TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
-			DrawSolidObjects(solidMeshes, m_ShadowShader);
-			DrawNonSolidOjects(nonSolidMeshes, m_ShadowShader);
+			DrawNonTransparentObjects(solidMeshes, m_ShadowShader);
+			DrawNonTransparentObjects(nonSolidMeshes, m_ShadowShader);
 			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
-			Texture::Activate(32 - i);
-			m_DepthMaps[i].Bind();
+			Texture::Activate(32 - j);
+			m_DepthMaps[normalDepthMapsIndex++].Bind();
 		}
 		else if (PointLight::m_Indices[entityId] != -1)
 		{
-			m_ShadowMapFBO[cubeDepthMapsIndex++].Bind();
+			m_CubemmapShadowShader.Use();
+			m_ShadowMapFBO[cubeDepthMapsIndex].Bind();
+			Renderer::Clear(kDepthBufferBit, glm::vec4(0.0f));
 			int transformIndex = Transform::m_Indices[entityId];
-			for(int j = 0; j < 6; j++)
-				m_ShadowShader.SetMat4("TransformationMatrix["+std::to_string(j)+"]", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[j]);
-			m_ShadowShader.SetFloat("FarPlane", m_ECSManager->m_LightShadows[i].m_FarPlane);
-			m_ShadowShader.SetVec3("LightPosition", m_ECSManager->m_Transforms[transformIndex].m_Position);
-			DrawSolidObjects(solidMeshes, m_ShadowShader);
-			DrawNonSolidOjects(nonSolidMeshes, m_ShadowShader);
-			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
-			Texture::Activate(32 - i);
-			m_DepthCubeMaps[i].Bind();
+			for(int k = 0; k < 6; k++)
+				m_CubemmapShadowShader.SetMat4("TransformationMatrix["+std::to_string(k)+"]", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[k]);
+			m_CubemmapShadowShader.SetFloat("FarPlane", m_ECSManager->m_LightShadows[i].m_FarPlane);
+			m_CubemmapShadowShader.SetVec3("LightPosition", m_ECSManager->m_Transforms[transformIndex].m_Position);
+			DrawNonTransparentObjects(solidMeshes, m_CubemmapShadowShader);
+			DrawNonTransparentObjects(nonSolidMeshes, m_CubemmapShadowShader);
+			DrawSemiTransparentObjects(transparentMeshes, m_CubemmapShadowShader);
+			Texture::Activate(32 - j);
+			m_DepthCubeMaps[cubeDepthMapsIndex-MAX_DEPTH_MAPS].Bind();
+			cubeDepthMapsIndex++;
 		}
 		else if (SpotLight::m_Indices[entityId] != -1)
 		{
-			m_ShadowMapFBO[normalDepthMapsIndex++].Bind();
+			m_ShadowShader.Use();
+			m_ShadowMapFBO[normalDepthMapsIndex].Bind();
+			Renderer::Clear(kDepthBufferBit, glm::vec4(0.0f));
 			m_ShadowShader.SetMat4("TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
-			DrawSolidObjects(solidMeshes, m_ShadowShader);
-			DrawNonSolidOjects(nonSolidMeshes, m_ShadowShader);
+			DrawNonTransparentObjects(solidMeshes, m_ShadowShader);
+			DrawNonTransparentObjects(nonSolidMeshes, m_ShadowShader);
 			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
-			Texture::Activate(32-i);
-			m_DepthMaps[i].Bind();
+			Texture::Activate(32-j);
+			m_DepthMaps[normalDepthMapsIndex++].Bind();
 		}
+		j++;
 	}
 	Renderer::CullFace(kBack);
 	Renderer::DisableCulling();
@@ -787,11 +816,11 @@ void RenderSystem::UpdateDirectionalLightTransformationMatrix(int shadowIndex, i
 	float frustumSize = m_ECSManager->m_LightShadows[shadowIndex].m_FrustumSize;
 	float nearPlane = m_ECSManager->m_LightShadows[shadowIndex].m_NearPlane;
 	float farPlane = m_ECSManager->m_LightShadows[shadowIndex].m_FarPlane;
-	glm::vec3 pos = -m_ECSManager->m_DirectionalLights[directionalLightComponentIndex].m_Direction;
-	glm::mat4 viewMatrix = glm::lookAt(pos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::vec3 dir = m_ECSManager->m_DirectionalLights[directionalLightComponentIndex].m_Direction;
+	glm::mat4 viewMatrix = glm::lookAt(-dir, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 projectionMatrix = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, nearPlane, farPlane);
 	glm::mat4 transformationMatrix = projectionMatrix * viewMatrix;
-	m_ECSManager->m_LightShadows->m_TransformationMatrix = std::vector<glm::mat4>(1, transformationMatrix);
+	m_ECSManager->m_LightShadows[shadowIndex].m_TransformationMatrix = std::vector<glm::mat4>(1, transformationMatrix);
 }
 
 void RenderSystem::UpdateSpotLightTransformationMatrix(int shadowIndex, int entityId)
@@ -806,7 +835,7 @@ void RenderSystem::UpdateSpotLightTransformationMatrix(int shadowIndex, int enti
 	glm::mat4 viewMatrix = glm::lookAt(pos, pos + dir, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 projectionMatrix = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, nearPlane, farPlane);
 	glm::mat4 transformationMatrix = projectionMatrix * viewMatrix;
-	m_ECSManager->m_LightShadows->m_TransformationMatrix = std::vector<glm::mat4>(1, transformationMatrix);
+	m_ECSManager->m_LightShadows[shadowIndex].m_TransformationMatrix = std::vector<glm::mat4>(1, transformationMatrix);
 }
 
 void RenderSystem::UpdatePointLightTransformationMatrix(int shadowIndex, int entityId)
@@ -815,14 +844,14 @@ void RenderSystem::UpdatePointLightTransformationMatrix(int shadowIndex, int ent
 	float nearPlane = m_ECSManager->m_LightShadows[shadowIndex].m_NearPlane;
 	float farPlane = m_ECSManager->m_LightShadows[shadowIndex].m_FarPlane;
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), (float)1.0f, nearPlane, farPlane);
-	std::vector<glm::mat4> matrices;
+	std::vector<glm::mat4> matrices(6);
 	for (int i = 0; i < 6; i++)
 	{
 		glm::vec3 pos = m_ECSManager->m_Transforms[transformComponentIndex].m_Position;
 		glm::mat4 viewMatrix = glm::lookAt(pos, pos + directions[i], up[i]);
 		glm::mat4 transformationMatrix = projectionMatrix * viewMatrix;
-		matrices.push_back(transformationMatrix);
+		matrices[i] = transformationMatrix;
 	}
-	m_ECSManager->m_LightShadows->m_TransformationMatrix = matrices;
+	m_ECSManager->m_LightShadows[shadowIndex].m_TransformationMatrix = matrices;
 }
 

@@ -91,11 +91,10 @@ private:
 	void SetDirectionalLights(const int * const indices, Shader &shader,const glm::mat4 &viewMatrix);
 	void SetPointLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix);
 	void SetSpotLights(const int * const indices, Shader &shader, const glm::mat4 &viewMatrix);
-	void SetShadows();
-	void ShadowPass(const int * const solidMeshes, const int * const nonSolidMeshes, std::map<float, int> &transparentMeshes);
+	void SetShadows(int* const enabledShadows);
+	void ShadowPass(const int* const enabledShadows, const int * const solidMeshes, const int * const nonSolidMeshes, std::map<float, int> &transparentMeshes);
 	
-	void DrawSolidObjects(const int * const indices, const Shader &shader);
-	void DrawNonSolidOjects(const int * const indices, const Shader &shader);
+	void DrawNonTransparentObjects(const int * const indices, const Shader &shader);
 	void DrawSemiTransparentObjects(std::map<float, int> &indices, const Shader &shader);
 	void DownsampleMSBuffer();
 	void ApplyBloom();
