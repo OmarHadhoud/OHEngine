@@ -5,7 +5,7 @@
 //COMPONENTS COUNT
 unsigned int Entity::m_Count = 0;
 unsigned int BoxCollider::m_Count = 0;
-//unsigned int Camera::m_Count = 0;
+unsigned int CameraCOMP::m_Count = 0;
 unsigned int DirectionalLight::m_Count = 0;
 unsigned int LightShadow::m_Count = 0;
 unsigned int MeshRenderer::m_Count = 0;
@@ -15,6 +15,7 @@ unsigned int SpotLight::m_Count = 0;
 unsigned int Transform::m_Count = 0;
 //MAPS
 int BoxCollider::m_Indices[MAX_ENTITY_COUNT];
+int CameraCOMP::m_Indices[MAX_ENTITY_COUNT];
 int DirectionalLight::m_Indices[MAX_ENTITY_COUNT];
 int LightShadow::m_Indices[MAX_ENTITY_COUNT];
 int MeshRenderer::m_Indices[MAX_ENTITY_COUNT];
@@ -22,15 +23,6 @@ int PointLight::m_Indices[MAX_ENTITY_COUNT];
 int RigidBody::m_Indices[MAX_ENTITY_COUNT];
 int SpotLight::m_Indices[MAX_ENTITY_COUNT];
 int Transform::m_Indices[MAX_ENTITY_COUNT];
-////std::unordered_map<unsigned int, unsigned int> Camera::m_Map;
-//std::unordered_map<int, int> DirectionalLight::m_Map;
-//std::unordered_map<int, int> LightShadow::m_Map;
-//std::unordered_map<int, int> MeshRenderer::m_Map;
-//std::unordered_map<int, int> PointLight::m_Map;
-//std::unordered_map<int, int> RigidBody::m_Map;
-//std::unordered_map<int, int> SpotLight::m_Map;
-//std::unordered_map<int, int> Transform::m_Map;
-//
 
 
 
@@ -88,6 +80,17 @@ template<> unsigned int ECSManager::AddComponent<BoxCollider>(unsigned int entit
 	BoxCollider::m_Indices[entityId] = BoxCollider::m_Count;
 	BoxCollider::m_Count++;
 	return BoxCollider::m_Count - 1;
+}
+
+template<> unsigned int ECSManager::AddComponent<CameraCOMP>(unsigned int entityId)
+{
+	assert(CameraCOMP::m_Count != MAX_BOX_COLLIDERS_COUNT);
+	assert(entityId < CameraCOMP::m_Count);
+	assert(CameraCOMP::m_Indices[entityId] == -1);
+	m_BoxColliders[CameraCOMP::m_Count].m_EntityID = entityId;
+	CameraCOMP::m_Indices[entityId] = CameraCOMP::m_Count;
+	CameraCOMP::m_Count++;
+	return CameraCOMP::m_Count - 1;
 }
 
 template<> unsigned int ECSManager::AddComponent<DirectionalLight>(unsigned int entityId)

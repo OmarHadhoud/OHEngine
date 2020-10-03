@@ -84,8 +84,15 @@ void Scene::ParseBoxCollider(int entityId, ECSManager* manager)
 	manager->m_BoxColliders[id].m_Enabled = enabled;
 }
 
+//TODO: Make it generic
 void Scene::ParseCamera(int entityId, ECSManager* manager)
 {
+	int enabled;
+	std::string tmp;
+	m_sceneStream >> tmp >> tmp >> enabled;
+	int id = manager->AddComponent<CameraCOMP>(entityId);
+	manager->m_Cameras[id].m_Camera = std::make_unique<Camera>();
+	manager->m_Cameras[id].m_Enabled = enabled;
 }
 
 void Scene::ParseDirectionalLight(int entityId, ECSManager* manager)

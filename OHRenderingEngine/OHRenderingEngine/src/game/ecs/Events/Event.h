@@ -6,10 +6,10 @@ enum class EventType
 	//Input events
 	kExitGame,
 	kPauseGame,
-	GL_TEXTURE_WRAP_ResumeGame,
-	GL_TEXTURE_WRAP_ToggleDayTime,
+	kResumeGame,
+	kToggleDayTime,
 	kMovePlayer,
-	GL_TEXTURE_WRAP_RotatePlayer,
+	kRotatePlayer,
 	kPlayerShoots,
 	kPlayerSelects,
 	//Game logic events
@@ -41,9 +41,9 @@ struct Event
 enum class MovementDirection
 {
 	kForward,
-	GL_TEXTURE_WRAP_Right,
+	kRight,
 	kLeft,
-	GL_BACKward
+	kBackward
 };
 
 struct MovePlayerEvent : Event
@@ -52,6 +52,12 @@ struct MovePlayerEvent : Event
 };
 
 struct RotatePlayerEvent : Event
+{
+	double m_MouseXPos;
+	double m_MouseYPos;
+};
+
+struct PlayerMouseClickEvent : Event
 {
 	double m_MouseXPos;
 	double m_MouseYPos;

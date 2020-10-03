@@ -41,7 +41,6 @@ private:
 	float m_Exposure;
 	//Single entities used by renderer
 	std::unique_ptr<Skybox> m_SkyBox;
-	Camera m_FPSCamera;
 	//Textures
 	MultiSampledTexture m_MSColorTex;
 	MultiSampledTexture m_MSBrightTex;

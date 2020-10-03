@@ -43,7 +43,7 @@ void InputSystem::CheckMouseMovement()
 	if (xPos != m_LastMouseXPos || yPos != m_LastMouseYPos)
 	{
 		RotatePlayerEvent *e = new RotatePlayerEvent();
-		e->m_EventType = EventType::GL_TEXTURE_WRAP_RotatePlayer;
+		e->m_EventType = EventType::kRotatePlayer;
 		e->m_MouseXPos = xPos;
 		e->m_MouseYPos = yPos;
 		m_EventsController->AddEvent(e);
@@ -56,11 +56,16 @@ void InputSystem::CheckMouseClicks()
 {
 	int leftMouseClick = glfwGetMouseButton(m_CurrentWindow, GLFW_MOUSE_BUTTON_LEFT);
 	int rightMouseClick = glfwGetMouseButton(m_CurrentWindow, GLFW_MOUSE_BUTTON_RIGHT);
+	double xPos, yPos;
+	glfwGetCursorPos(m_CurrentWindow, &xPos, &yPos);
+
 	if (leftMouseClick == GLFW_PRESS && m_LeftMouseReleased)
 	{
 		m_LeftMouseReleased = false;
-		Event *e = new Event();
+		PlayerMouseClickEvent *e = new PlayerMouseClickEvent();
 		e->m_EventType = EventType::kPlayerShoots;
+		e->m_MouseXPos = xPos;
+		e->m_MouseYPos = yPos;
 		m_EventsController->AddEvent(e);
 	}
 	else if (leftMouseClick == GLFW_RELEASE)
@@ -68,8 +73,10 @@ void InputSystem::CheckMouseClicks()
 	if (rightMouseClick == GLFW_PRESS && m_RightMouseReleased)
 	{
 		m_RightMouseReleased = false;
-		Event *e = new Event();
+		PlayerMouseClickEvent *e = new PlayerMouseClickEvent();
 		e->m_EventType = EventType::kPlayerSelects;
+		e->m_MouseXPos = xPos;
+		e->m_MouseYPos = yPos;
 		m_EventsController->AddEvent(e);
 	}
 	else if (rightMouseClick == GLFW_RELEASE)
@@ -97,7 +104,7 @@ void InputSystem::CheckKeyboardInput()
 	{
 		MovePlayerEvent *e = new MovePlayerEvent();
 		e->m_EventType = EventType::kMovePlayer;
-		e->m_MovementDirection = MovementDirection::GL_BACKward;
+		e->m_MovementDirection = MovementDirection::kBackward;
 		m_EventsController->AddEvent(e);
 		return;
 	}
@@ -105,7 +112,7 @@ void InputSystem::CheckKeyboardInput()
 	{
 		MovePlayerEvent *e = new MovePlayerEvent();
 		e->m_EventType = EventType::kMovePlayer;
-		e->m_MovementDirection = MovementDirection::GL_TEXTURE_WRAP_Right;
+		e->m_MovementDirection = MovementDirection::kRight;
 		m_EventsController->AddEvent(e);
 		return;
 	}
@@ -120,7 +127,7 @@ void InputSystem::CheckKeyboardInput()
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_T))
 	{
 		Event *e = new Event();
-		e->m_EventType = EventType::GL_TEXTURE_WRAP_ToggleDayTime;
+		e->m_EventType = EventType::kToggleDayTime;
 		m_EventsController->AddEvent(e);
 		return;
 	}
@@ -134,7 +141,7 @@ void InputSystem::CheckKeyboardInput()
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_R))
 	{
 		Event *e = new Event();
-		e->m_EventType = EventType::GL_TEXTURE_WRAP_ResumeGame;
+		e->m_EventType = EventType::kResumeGame;
 		m_EventsController->AddEvent(e);
 		return;
 	}

@@ -2,7 +2,7 @@
 #define ECSMANAGER_H
 
 #include "game/ecs/Components/BoxCollider.h"
-//#include "game/ecs/Components/Camera.h"
+#include "game/ecs/Components/CameraComponent.h"
 #include "game/ecs/Components/DirectionalLight.h"
 #include "game/ecs/Components/LightShadow.h"
 #include "game/ecs/Components/MeshRenderer.h"
@@ -25,7 +25,7 @@ public:
 	Entity m_Entities[MAX_ENTITY_COUNT];
 	//Components
 	BoxCollider m_BoxColliders[MAX_BOX_COLLIDERS_COUNT];
-	//Camera m_Cameras[MAX_CAMERA_COUNT];
+	CameraCOMP m_Cameras[MAX_CAMERA_COUNT];
 	DirectionalLight m_DirectionalLights[MAX_DIRECTIONAL_LIGHTS_COUNT];
 	LightShadow m_LightShadows[MAX_LIGHT_SHADHOWS_COUNT];
 	MeshRenderer m_MeshRenderers[MAX_MESH_RENDERER_COUNT];

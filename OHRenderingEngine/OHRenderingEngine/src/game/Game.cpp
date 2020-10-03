@@ -157,6 +157,7 @@ void Game::AssignWindow()
 	m_InputSystem->SetCurrentWindow(m_CurrentWindow);
 	m_RenderSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 	m_GUISystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
+	m_GameLogicSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 }
 
 void Game::ProcessInput()

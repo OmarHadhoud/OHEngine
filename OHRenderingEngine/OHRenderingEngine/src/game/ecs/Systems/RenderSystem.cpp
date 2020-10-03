@@ -108,8 +108,8 @@ void RenderSystem::Update()
 	GetNonSolidMeshes(drawableMeshes, nonSolidMeshes);
 
 	//Get matrices needed for all drawings
-	glm::mat4 view = m_FPSCamera.GetViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(m_FPSCamera.GetFOV()), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f, 200.0f);
+	glm::mat4 view = m_ECSManager->m_Cameras[0].m_Camera->GetViewMatrix();
+	glm::mat4 projection = glm::perspective(glm::radians(m_ECSManager->m_Cameras[0].m_Camera->GetFOV()), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f, 200.0f);
 	glm::mat4 model;
 
 	//Set the lightings in the shaders
@@ -170,13 +170,13 @@ void RenderSystem::ProcessEvent(Event* event)
 	case EventType::kMovePlayer:
 	{
 		MovePlayerEvent* moveEvent = dynamic_cast<MovePlayerEvent*>(event);
-		m_FPSCamera.UpdatePosition(moveEvent->m_MovementDirection, Game::m_DeltaTime);
+		m_ECSManager->m_Cameras[0].m_Camera->UpdatePosition(moveEvent->m_MovementDirection, Game::m_DeltaTime);
 		break;
 	}
-	case EventType::GL_TEXTURE_WRAP_RotatePlayer:
+	case EventType::kRotatePlayer:
 	{
 		RotatePlayerEvent* rotateEvent = dynamic_cast<RotatePlayerEvent*> (event);
-		m_FPSCamera.UpdateRotation(rotateEvent->m_MouseXPos, rotateEvent->m_MouseYPos);
+		m_ECSManager->m_Cameras[0].m_Camera->UpdateRotation(rotateEvent->m_MouseXPos, rotateEvent->m_MouseYPos);
 		break;
 	}
 	case EventType::kUpdatePostProcessingParams:
@@ -512,7 +512,7 @@ std::map<float, int> RenderSystem::GetSemiTransparentMeshes(const int * const dr
 		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::GL_TEXTURE_WRAP_SemiTransparent) )
 			continue;
 		int transformIndex = Transform::m_Indices[drawableMeshes[i]];
-		float distance = glm::length(m_FPSCamera.GetPosition() - m_ECSManager->m_Transforms[transformIndex].m_Position);
+		float distance = glm::length(m_ECSManager->m_Cameras[0].m_Camera->GetPosition() - m_ECSManager->m_Transforms[transformIndex].m_Position);
 		indices[distance] = drawableMeshes[i];
 	}
 	return indices;

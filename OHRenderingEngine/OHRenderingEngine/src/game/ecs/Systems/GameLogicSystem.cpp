@@ -11,6 +11,13 @@ GameLogicSystem::~GameLogicSystem()
 {
 }
 
+void GameLogicSystem::SetCurrentWindow(GLFWwindow * currentWindow, int width, int height)
+{
+	m_CurrentWindow = currentWindow;
+	m_WindowWidth = width;
+	m_WindowHeight = height;
+}
+
 
 void GameLogicSystem::Update()
 {
@@ -31,9 +38,18 @@ void GameLogicSystem::ProcessEvent(Event* event)
 		m_gameState = GameState::kGameExited;
 		break;
 	}
-	case EventType::GL_TEXTURE_WRAP_RotatePlayer:
+	case EventType::kRotatePlayer:
 	{
 		RotatePlayerEvent *e = dynamic_cast<RotatePlayerEvent*>(event);
+		break;
+	}
+	case EventType::kPlayerShoots:
+	{
+
+		break;
+	}
+	case EventType::kPlayerSelects:
+	{
 		break;
 	}
 	default:
