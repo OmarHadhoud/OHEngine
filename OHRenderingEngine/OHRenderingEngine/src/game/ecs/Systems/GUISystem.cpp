@@ -36,7 +36,7 @@ void GUISystem::Setup()
 void GUISystem::Update()
 {
 	StartFrame();
-	CheckSliders();
+	ChecGL_TEXTURE_WRAP_Sliders();
 
 }
 
@@ -67,7 +67,7 @@ void GUISystem::StartFrame()
 	ImGui::End();
 }
 
-void GUISystem::CheckSliders()
+void GUISystem::ChecGL_TEXTURE_WRAP_Sliders()
 {
 	//Check post processing sliders
 	if (m_LastSentExposure != m_Exposure || m_LastSentGammaCorrection != m_GammaCorrection)

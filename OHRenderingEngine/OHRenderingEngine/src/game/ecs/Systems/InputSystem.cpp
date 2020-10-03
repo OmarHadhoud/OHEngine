@@ -43,7 +43,7 @@ void InputSystem::CheckMouseMovement()
 	if (xPos != m_LastMouseXPos || yPos != m_LastMouseYPos)
 	{
 		RotatePlayerEvent *e = new RotatePlayerEvent();
-		e->m_EventType = EventType::kRotatePlayer;
+		e->m_EventType = EventType::GL_TEXTURE_WRAP_RotatePlayer;
 		e->m_MouseXPos = xPos;
 		e->m_MouseYPos = yPos;
 		m_EventsController->AddEvent(e);
@@ -97,7 +97,7 @@ void InputSystem::CheckKeyboardInput()
 	{
 		MovePlayerEvent *e = new MovePlayerEvent();
 		e->m_EventType = EventType::kMovePlayer;
-		e->m_MovementDirection = MovementDirection::kBackward;
+		e->m_MovementDirection = MovementDirection::GL_BACKward;
 		m_EventsController->AddEvent(e);
 		return;
 	}
@@ -105,7 +105,7 @@ void InputSystem::CheckKeyboardInput()
 	{
 		MovePlayerEvent *e = new MovePlayerEvent();
 		e->m_EventType = EventType::kMovePlayer;
-		e->m_MovementDirection = MovementDirection::kRight;
+		e->m_MovementDirection = MovementDirection::GL_TEXTURE_WRAP_Right;
 		m_EventsController->AddEvent(e);
 		return;
 	}
@@ -120,7 +120,7 @@ void InputSystem::CheckKeyboardInput()
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_T))
 	{
 		Event *e = new Event();
-		e->m_EventType = EventType::kToggleDayTime;
+		e->m_EventType = EventType::GL_TEXTURE_WRAP_ToggleDayTime;
 		m_EventsController->AddEvent(e);
 		return;
 	}
@@ -134,7 +134,7 @@ void InputSystem::CheckKeyboardInput()
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_R))
 	{
 		Event *e = new Event();
-		e->m_EventType = EventType::kResumeGame;
+		e->m_EventType = EventType::GL_TEXTURE_WRAP_ResumeGame;
 		m_EventsController->AddEvent(e);
 		return;
 	}

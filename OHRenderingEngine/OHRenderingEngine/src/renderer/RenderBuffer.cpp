@@ -28,7 +28,7 @@ void RenderBuffer::Unbind() const
 	GlCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 }
 
-void RenderBuffer::Create(float width, float height, BufferType bType) const
+void RenderBuffer::Create(float width, float height, GLenum bType) const
 {
 	if (m_MultiSampledEnabled)
 		CreateMultiSampled(width, height, bType);
@@ -56,33 +56,33 @@ bool RenderBuffer::IsMultiSampled() const
 	return m_MultiSampledEnabled;
 }
 
-void RenderBuffer::CreateMultiSampled(float width, float height, BufferType bType) const
+void RenderBuffer::CreateMultiSampled(float width, float height, GLenum bType) const
 {
-	if (bType == kDepth)
+	if (bType == GL_DEPTH_COMPONENT)
 	{
 		GlCall(glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_NumSamples, GL_DEPTH, width, height));
 	}
-	else if (bType == kStencil)
+	else if (bType == GL_STENCIL_ATTACHMENT)
 	{
 		GlCall(glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_NumSamples, GL_STENCIL, width, height));
 	}
-	else if (bType == kDepthStencil)
+	else if (bType == GL_DEPTH_STENCIL_ATTACHMENT)
 	{
 		GlCall(glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_NumSamples, GL_DEPTH24_STENCIL8, width, height));
 	}
 }
 
-void RenderBuffer::CreateNonSampled(float width, float height, BufferType bType) const
+void RenderBuffer::CreateNonSampled(float width, float height, GLenum bType) const
 {
-	if (bType == kDepth)
+	if (bType == GL_DEPTH_COMPONENT)
 	{
 		GlCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH, width, height));
 	}
-	else if (bType == kStencil)
+	else if (bType == GL_STENCIL_ATTACHMENT)
 	{
 		GlCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL, width, height));
 	}
-	else if (bType == kDepthStencil)
+	else if (bType == GL_DEPTH_STENCIL_ATTACHMENT)
 	{
 		GlCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
 	}

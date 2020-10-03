@@ -172,14 +172,14 @@ void Game::ProcessInput()
 	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_S))
 	{
-		m_Camera.UpdatePosition(kBackward, m_DeltaTime);
+		m_Camera.UpdatePosition(GL_BACKward, m_DeltaTime);
 		m_Moving = true;
 		m_MovingSpeed += 0.005;
 		return;
 	}
 	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_D))
 	{
-		m_Camera.UpdatePosition(kRight, m_DeltaTime);
+		m_Camera.UpdatePosition(GL_TEXTURE_WRAP_Right, m_DeltaTime);
 		m_Moving = true;
 		m_MovingSpeed += 0.005;
 		return;

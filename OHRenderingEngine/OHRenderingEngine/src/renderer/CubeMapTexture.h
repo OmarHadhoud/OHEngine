@@ -8,7 +8,7 @@ class CubeMapTexture : public Texture
 public:
 	CubeMapTexture();
 	CubeMapTexture(std::vector<std::string> images);
-	virtual void CreateTexImage(float width, float height, BufferType bType) const;
+	virtual void CreateTexImage(float width, float height, GLenum bType) const;
 	virtual ~CubeMapTexture();
 private:
 

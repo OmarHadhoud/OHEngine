@@ -5,7 +5,7 @@
 
 MultiSampledTexture::MultiSampledTexture()
 {
-	SetType(k2DMS);
+	SetType(GL_TEXTURE_2D_MULTISAMPLE);
 }
 
 
@@ -13,25 +13,25 @@ MultiSampledTexture::~MultiSampledTexture()
 {
 }
 
-void MultiSampledTexture::CreateTexImage(float width, float height, BufferType bType) const
+void MultiSampledTexture::CreateTexImage(float width, float height, GLenum bType) const
 {
-	if (bType == kColor)
+	if (bType == GL_RGB)
 	{
 		GlCall(glTexImage2DMultisample(GetType() , m_NumSamples, GL_RGB16, width, height, GL_TRUE));
 	}
-	else if (bType == kColorF)
+	else if (bType == GL_RGB16F)
 	{
 		GlCall(glTexImage2DMultisample(GetType(), m_NumSamples, GL_RGB16F, width, height, GL_TRUE));
 	}
-	else if (bType == kDepth)
+	else if (bType == GL_DEPTH_COMPONENT)
 	{
 		GlCall(glTexImage2DMultisample(GetType(), m_NumSamples, GL_DEPTH_COMPONENT, width, height, GL_TRUE));
 	}
-	else if (bType == kStencil)
+	else if (bType == GL_STENCIL_ATTACHMENT)
 	{
 		GlCall(glTexImage2DMultisample(GetType(), m_NumSamples, GL_STENCIL_INDEX, width, height, GL_TRUE));
 	}
-	else if (bType == kDepthStencil)
+	else if (bType == GL_DEPTH_STENCIL_ATTACHMENT)
 	{
 		GlCall(glTexImage2DMultisample(GetType(), m_NumSamples, GL_DEPTH24_STENCIL8, width, height, GL_TRUE));
 	}

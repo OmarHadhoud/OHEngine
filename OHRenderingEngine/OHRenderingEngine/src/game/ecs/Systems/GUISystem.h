@@ -29,7 +29,7 @@ private:
 	//Functions
 	void ProcessEvent(Event*);
 	void StartFrame();
-	void CheckSliders();
+	void ChecGL_TEXTURE_WRAP_Sliders();
 };
 
 #endif // !GUI_SYSTEM_H

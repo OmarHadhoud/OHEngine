@@ -13,7 +13,7 @@ void Model::Draw(const Shader & shader)
 		meshes[i].Draw(shader, texturesLoaded);
 }
 
-void Model::UpdateTexturesWrap(WrapDir dir, WrapType type)
+void Model::UpdateTexturesWrap(GLenum dir, GLenum type)
 {
 	for (int i = 0; i < texturesLoaded.size(); i++)
 	{
@@ -138,7 +138,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 	return Mesh(vertices, indices, textures_indices);
 }
 
-std::vector<unsigned int> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName)
+std::vector<unsigned int> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType  type, std::string typeName)
 {
 	std::vector<unsigned int> texture_indices;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)

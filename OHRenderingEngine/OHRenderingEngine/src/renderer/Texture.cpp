@@ -5,13 +5,13 @@
 #include "Texture.h"
 
 
-Texture::Texture():m_Type(k2D), m_Path(""), m_ID(0), m_IsGammaCorrected(false)
+Texture::Texture():m_Type(GL_TEXTURE_2D), m_Path(""), m_ID(0), m_IsGammaCorrected(false)
 {
 	//Generate the texture
 	GlCall(glGenTextures(1, &m_ID));
 }
 
-Texture::Texture(const char *path, bool gamma_corrected):m_Type(k2D), m_Path(path), m_ID(0), m_IsGammaCorrected(gamma_corrected)
+Texture::Texture(const char *path, bool gamma_corrected):m_Type(GL_TEXTURE_2D), m_Path(path), m_ID(0), m_IsGammaCorrected(gamma_corrected)
 {
 	//Generate the texture
 	GlCall(glGenTextures(1, &m_ID));
@@ -49,7 +49,7 @@ Texture::Texture(Texture && other) noexcept
 	//Clean the moved texture
 	other.m_ID = 0;
 	other.m_Path = "";
-	other.m_Format = kRGB;	
+	other.m_Format = GL_RGB;	
 }
 
 Texture & Texture::operator=(const Texture & other)
@@ -82,7 +82,7 @@ Texture & Texture::operator=(Texture && other) noexcept
 	//Clean the moved texture
 	other.m_ID = 0;
 	other.m_Path = "";
-	other.m_Format = kRGB;
+	other.m_Format = GL_RGB;
 
 	return *this;
 }
@@ -97,22 +97,22 @@ std::string Texture::GetPath() const
 	return m_Path;
 }
 
-TextureFormat Texture::GetFormat() const
+GLenum Texture::GetFormat() const
 {
 	return m_Format;
 }
 
-TextureFormat Texture::GetInternalFormat() const
+GLenum Texture::GetInternalFormat() const
 {
 	return m_InternalFormat;
 }
 
-void Texture::SetInternalFormat(TextureFormat format)
+void Texture::SetInternalFormat(GLenum format)
 {
 	m_InternalFormat = format;
 }
 
-TextureType Texture::GetType() const
+GLenum Texture::GetType() const
 {
 	return m_Type;
 }
@@ -137,13 +137,13 @@ void Texture::CreateTextureFromPath()
 	{
 		if (nrChannels == 3)
 		{
-			SetInternalFormat(m_IsGammaCorrected == true ? kSRGB : kRGB);
-			SetFormat(kRGB);
+			SetInternalFormat(m_IsGammaCorrected == true ? GL_SRGB : GL_RGB);
+			SetFormat(GL_RGB);
 		}
 		else if (nrChannels == 4)
 		{
-			SetInternalFormat(m_IsGammaCorrected == true ? kSRGBA :  kRGBA);
-			SetFormat(kRGBA);
+			SetInternalFormat(m_IsGammaCorrected == true ? GL_SRGB_ALPHA :  GL_RGBA);
+			SetFormat(GL_RGBA);
 		}
 		GlCall(glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, width, height, 0, m_Format, GL_UNSIGNED_BYTE, data));
 		GlCall(glGenerateMipmap(GL_TEXTURE_2D));
@@ -155,25 +155,25 @@ void Texture::CreateTextureFromPath()
 	stbi_image_free(data);
 }
 
-void Texture::CreateTexImage(float width, float height, BufferType bType) const
+void Texture::CreateTexImage(float width, float height, GLenum bType) const
 {
-	if (bType == kColor )
+	if (bType == GL_RGB )
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_RGB16, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
 	}
-	else if (bType == kColorF)
+	else if (bType == GL_RGB16F)
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL));
 	}
-	else if (bType == kDepth)
+	else if (bType == GL_DEPTH_COMPONENT)
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
 	}
-	else if (bType == kStencil)
+	else if (bType == GL_STENCIL_ATTACHMENT)
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_ATTACHMENT, GL_UNSIGNED_BYTE, NULL));
 	}
-	else if (bType == kDepthStencil)
+	else if (bType == GL_DEPTH_STENCIL_ATTACHMENT)
 	{
 		GlCall(glTexImage2D(m_Type, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL_ATTACHMENT, GL_UNSIGNED_INT_24_8, NULL));
 	}
@@ -184,7 +184,7 @@ void Texture::Bind() const
 	GlCall(glBindTexture(m_Type, m_ID));
 }
 
-void Texture::SetWrap(WrapDir dir, WrapType type) const
+void Texture::SetWrap(GLenum dir, GLenum type) const
 {
 	//Set the texture wrapping Settings
 	GlCall(glTexParameteri(m_Type, dir, type));
@@ -195,23 +195,23 @@ void Texture::SetBorderColor(float* color) const
 	GlCall(glTexParameterfv(m_Type,GL_TEXTURE_BORDER_COLOR, color));
 }
 
-void Texture::SetMinFilter(TextureFilter filter) const
+void Texture::SetMinFilter(GLenum filter) const
 {	
 	//Set the texture filtering Settings
 	GlCall(glTexParameteri(m_Type, GL_TEXTURE_MIN_FILTER, filter));
 }
 
-void Texture::SetMagFilter(TextureFilter filter) const
+void Texture::SetMagFilter(GLenum filter) const
 {
 	//Set the texture filtering Settings
 	GlCall(glTexParameteri(m_Type, GL_TEXTURE_MAG_FILTER, filter));
 }
 
-void Texture::SetType(TextureType type)
+void Texture::SetType(GLenum type)
 {
 	m_Type = type;
 }
-void Texture::SetFormat(TextureFormat format)
+void Texture::SetFormat(GLenum format)
 {
 	m_Format = format;
 }
@@ -230,7 +230,7 @@ void Texture::Activate(unsigned int num)
 
 bool Texture::IsMultiSampled() const
 {
-	return m_Type==k2DMS;
+	return m_Type==GL_TEXTURE_2D_MULTISAMPLE;
 }
 
 void Texture::SetGammaCorrection(bool val)

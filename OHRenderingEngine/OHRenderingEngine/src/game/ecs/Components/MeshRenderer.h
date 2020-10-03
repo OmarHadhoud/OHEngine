@@ -8,8 +8,8 @@
 enum class Transparency
 {
 	kNonTransparent,
-	kSemiTransparent,
-	kTransparent
+	GL_TEXTURE_WRAP_SemiTransparent,
+	GL_TEXTURE_WRAP_Transparent
 };
 
 struct MeshRenderer : Component

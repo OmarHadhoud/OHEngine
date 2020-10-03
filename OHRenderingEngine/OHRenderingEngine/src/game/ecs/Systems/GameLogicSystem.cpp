@@ -31,7 +31,7 @@ void GameLogicSystem::ProcessEvent(Event* event)
 		m_gameState = GameState::kGameExited;
 		break;
 	}
-	case EventType::kRotatePlayer:
+	case EventType::GL_TEXTURE_WRAP_RotatePlayer:
 	{
 		RotatePlayerEvent *e = dynamic_cast<RotatePlayerEvent*>(event);
 		break;

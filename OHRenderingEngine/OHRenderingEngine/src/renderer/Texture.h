@@ -25,18 +25,18 @@ public:
 	Texture& operator=(Texture&& other) noexcept;
 	unsigned int GetId() const;
 	std::string GetPath() const;
-	virtual TextureType GetType() const;
+	virtual GLenum GetType() const;
 	//Loads the image texture
 	void CreateTextureFromPath();
 	//Creates the texture with the passed screen size for the passed buffer type
-	virtual void CreateTexImage(float width, float height, BufferType bType) const;
+	virtual void CreateTexImage(float width, float height, GLenum bType) const;
 	//Binds the 2D texture to this texture
 	void Bind() const;
-	void SetWrap(WrapDir dir, WrapType type) const;
+	void SetWrap(GLenum dir, GLenum type) const;
 	void SetBorderColor(float* color) const;
-	void SetMinFilter(TextureFilter filter) const;
-	void SetMagFilter(TextureFilter filter) const;
-	void SetType(TextureType type);
+	void SetMinFilter(GLenum filter) const;
+	void SetMagFilter(GLenum filter) const;
+	void SetType(GLenum type);
 	//Unbinds the current 2D texture
 	void Unbind() const;
 	//Activates the texture with number passed
@@ -48,15 +48,15 @@ public:
 private:
 	unsigned int m_ID;
 	bool m_IsGammaCorrected;
-	TextureFormat m_Format;
-	TextureFormat m_InternalFormat;
-	TextureType m_Type;
+	GLenum m_Format;
+	GLenum m_InternalFormat;
+	GLenum m_Type;
 	std::string m_Path;
 protected:
-	TextureFormat GetFormat() const;
-	TextureFormat GetInternalFormat() const;
-	void SetFormat(TextureFormat format);
-	void SetInternalFormat(TextureFormat format);
+	GLenum GetFormat() const;
+	GLenum GetInternalFormat() const;
+	void SetFormat(GLenum format);
+	void SetInternalFormat(GLenum format);
 };
 
 #endif // !TEXTURE_H

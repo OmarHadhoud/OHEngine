@@ -8,26 +8,26 @@
 class FrameBuffer
 {
 public:
-	FrameBuffer(FrameBufferTarget target = kReadDraw);
+	FrameBuffer(GLenum target = GL_FRAMEBUFFER);
 	~FrameBuffer();
 	unsigned int GetID() const;
 	//Binds the current frame buffer to this
 	void Bind() const;
-	void Bind(FrameBufferTarget target) const;
+	void Bind(GLenum target) const;
 	//Unbinds the frame buffer
 	void Unbind() const;
 	//Attaches texture object to frame buffer
-	void AttachTexture(Texture &tex, FrameBufferAttachement attach, bool is_cubemap = false) const;
+	void AttachTexture(Texture &tex, GLenum attach, bool is_cubemap = false) const;
 	//Attaches render object to frame buffer
-	void AttachRenderObject(RenderBuffer &rbo, FrameBufferAttachement attach) const;
+	void AttachRenderObject(RenderBuffer &rbo, GLenum attach) const;
 	//Checks if the frame buffer is complete
 	bool IsComplete() const;
 	//Sets the read and draw buffer
-	void DrawBuffer(FrameBufferAttachement buffer);
-	void ReadBuffer(FrameBufferAttachement buffer);
+	void DrawBuffer(GLenum buffer);
+	void ReadBuffer(GLenum buffer);
 private:
 	unsigned int m_ID;
-	FrameBufferTarget m_Target;
+	GLenum m_Target;
 };
 
 #endif	//FRAME_BUFFER_H

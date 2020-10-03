@@ -69,10 +69,10 @@ Skybox::Skybox(std::vector<std::string> images): m_Tex(images), m_Shader("res/sh
 	m_VAO.Bind();
 
 	m_VBO.Bind();
-	m_VBO.BufferData(skyboxVertices, 6 * 6 * 3 * sizeof(float), kStaticDraw);
+	m_VBO.BufferData(skyboxVertices, 6 * 6 * 3 * sizeof(float), GL_STATIC_DRAW);
 
 	m_IBO.Bind();
-	m_IBO.BufferData(skyboxIndices, 6 * 2 * 3 * sizeof(unsigned int), kStaticDraw);
+	m_IBO.BufferData(skyboxIndices, 6 * 2 * 3 * sizeof(unsigned int), GL_STATIC_DRAW);
 
 	m_VBL.Push<float>(3, false);
 	m_VBO.SetLayout(m_VBL);
@@ -80,11 +80,11 @@ Skybox::Skybox(std::vector<std::string> images): m_Tex(images), m_Shader("res/sh
 	m_VAO.AddBuffer(m_VBO);
 
 	m_Tex.Bind();
-	m_Tex.SetWrap(kS, kClampToEdge);
-	m_Tex.SetWrap(kR, kClampToEdge);
-	m_Tex.SetWrap(kT, kClampToEdge);
-	m_Tex.SetMinFilter(kLinear);
-	m_Tex.SetMagFilter(kLinear);
+	m_Tex.SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	m_Tex.SetWrap(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	m_Tex.SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	m_Tex.SetMinFilter(GL_LINEAR);
+	m_Tex.SetMagFilter(GL_LINEAR);
 }
 
 Skybox::~Skybox()
@@ -93,7 +93,7 @@ Skybox::~Skybox()
 
 void Skybox::Draw(glm::mat4 &view, glm::mat4 &projection) const
 {
-	Renderer::SetDepthFunc(kLEqual);
+	Renderer::SetDepthFunc(GL_LEQUAL);
 	m_Shader.Use();
 	m_Shader.SetMat4("view", glm::mat4(glm::mat3(view)));
 	m_Shader.SetMat4("projection", projection);
@@ -103,7 +103,7 @@ void Skybox::Draw(glm::mat4 &view, glm::mat4 &projection) const
 	Renderer::Draw(m_VAO, m_Shader, 6 * 6, 0);
 	m_Tex.Unbind();
 	m_VAO.Unbind();
-	Renderer::SetDepthFunc(kLess);
+	Renderer::SetDepthFunc(GL_LESS);
 }
 
 

@@ -152,15 +152,15 @@ void Scene::ParseMeshRenderer(int entityId, ECSManager* manager)
 	manager->m_MeshRenderers[id].m_Model = std::make_unique<Model>(modelPath.c_str());
 	manager->m_MeshRenderers[id].m_BorderColor = borderColor;
 	manager->m_MeshRenderers[id].m_BorderEnabled = borderEnabled;
-	manager->m_MeshRenderers[id].m_Transparency = isTransparent == 0 ? Transparency::kNonTransparent : isTransparent == 1 ? Transparency::kSemiTransparent : Transparency::kTransparent;
+	manager->m_MeshRenderers[id].m_Transparency = isTransparent == 0 ? Transparency::kNonTransparent : isTransparent == 1 ? Transparency::GL_TEXTURE_WRAP_SemiTransparent : Transparency::GL_TEXTURE_WRAP_Transparent;
 	manager->m_MeshRenderers[id].m_IsSolid= isSolid;
 	manager->m_MeshRenderers[id].m_Enabled = enabled;
 	//Set texture settings for transparent/semi transparent objects
 	if (isTransparent == 1 || isTransparent == 2)
 	{
-		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(kS, kClampToEdge);
-		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(kT, kClampToEdge);
-		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(kR, kClampToEdge);
+		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		manager->m_MeshRenderers[id].m_Model->UpdateTexturesWrap(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	}
 }
 
@@ -190,7 +190,7 @@ void Scene::ParsePointLight(int entityId, ECSManager* manager)
 	manager->m_PointLights[id].m_Diffuse = diffuse;
 	manager->m_PointLights[id].m_Specular = specular;
 	manager->m_PointLights[id].m_kConstant= constant;
-	manager->m_PointLights[id].m_kLinear= linear;
+	manager->m_PointLights[id].m_GL_LINEAR= linear;
 	manager->m_PointLights[id].m_kQuadratic= quadratic;
 	manager->m_PointLights[id].m_Enabled = enabled;
 }
@@ -247,7 +247,7 @@ void Scene::ParseSpotLight(int entityId, ECSManager* manager)
 	manager->m_SpotLights[id].m_Diffuse = diffuse;
 	manager->m_SpotLights[id].m_Specular = specular;
 	manager->m_SpotLights[id].m_kConstant = constant;
-	manager->m_SpotLights[id].m_kLinear = linear;
+	manager->m_SpotLights[id].m_GL_LINEAR = linear;
 	manager->m_SpotLights[id].m_kQuadratic = quadratic;
 	manager->m_SpotLights[id].m_InnerCutoff = cos(glm::radians(innerCutOffAngle));
 	manager->m_SpotLights[id].m_OuterCutoff = cos(glm::radians(outterCutOffAngle));

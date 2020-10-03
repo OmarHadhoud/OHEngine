@@ -12,7 +12,7 @@ struct SpotLight : Component
 	float m_Diffuse;
 	float m_Specular;
 	float m_kConstant;
-	float m_kLinear;
+	float m_GL_LINEAR;
 	float m_kQuadratic;
 	float m_InnerCutoff;
 	float m_OuterCutoff;

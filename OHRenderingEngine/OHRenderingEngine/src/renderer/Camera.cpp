@@ -63,10 +63,10 @@ void Camera::UpdatePosition(MovementDirection dir, float delta_time)
 	case MovementDirection::kForward: 
 		m_Pos += movement_direction * m_CameraSpeed * delta_time;
 		break;
-	case MovementDirection::kBackward:
+	case MovementDirection::GL_BACKward:
 		m_Pos -= movement_direction * m_CameraSpeed * delta_time;
 		break;
-	case MovementDirection::kRight:
+	case MovementDirection::GL_TEXTURE_WRAP_Right:
 		m_Pos += m_Right * delta_time * m_CameraSpeed;
 		break;
 	case MovementDirection::kLeft:

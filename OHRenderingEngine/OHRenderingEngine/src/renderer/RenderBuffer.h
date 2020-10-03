@@ -14,7 +14,7 @@ public:
 	//Unbinds the render buffer
 	void Unbind() const;
 	//Creates the render buffer object
-	void Create(float width, float height, BufferType bType) const;
+	void Create(float width, float height, GLenum bType) const;
 	void EnableMultiSampled();
 	void DisableMultiSampled();
 	void SetMultiSamples(unsigned int samples);
@@ -23,8 +23,8 @@ private:
 	unsigned int m_ID;
 	unsigned int m_NumSamples;
 	bool m_MultiSampledEnabled;
-	void CreateMultiSampled(float width, float height, BufferType bType) const;
-	void CreateNonSampled(float width, float height, BufferType bType) const;
+	void CreateMultiSampled(float width, float height, GLenum bType) const;
+	void CreateNonSampled(float width, float height, GLenum bType) const;
 };
 
 #endif	//RENDER_BUFFER_H

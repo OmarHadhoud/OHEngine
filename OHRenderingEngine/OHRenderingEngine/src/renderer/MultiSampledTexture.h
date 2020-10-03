@@ -9,7 +9,7 @@ public:
 	MultiSampledTexture();
 	virtual ~MultiSampledTexture();
 	//Creates the texture with the passed screen size for the passed buffer type
-	virtual void CreateTexImage(float width, float height, BufferType bType) const;
+	virtual void CreateTexImage(float width, float height, GLenum bType) const;
 	void SetMultiSamples(unsigned int samples);
 private:
 	unsigned int m_NumSamples;

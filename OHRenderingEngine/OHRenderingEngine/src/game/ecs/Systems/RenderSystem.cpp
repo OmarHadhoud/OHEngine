@@ -84,7 +84,7 @@ void RenderSystem::Setup()
 	SetupFrameBuffers();
 	SetupDepthMaps();
 	Renderer::EnableBlending();
-	Renderer::SetBlendFactors(kSrcAlpha, kOneMinusSrcAlpha);
+	Renderer::SetBlendFactors(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Renderer::DisableBlending();
 }
 
@@ -122,7 +122,7 @@ void RenderSystem::Update()
 
 	//Bind to the frame buffer, clear screen, set settings
 	m_MultisampledFBO.Bind();
-	Renderer::Clear(kColorBufferBit | kDepthBufferBit | kStencilBufferBit, glm::vec4(0.4f, 0.2f, 0.4f, 1.0f));
+	Renderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, glm::vec4(0.4f, 0.2f, 0.4f, 1.0f));
 	Renderer::EnableDepthTesting();
 	Renderer::EnableAntiAliasing();
 
@@ -137,7 +137,7 @@ void RenderSystem::Update()
 	m_MainShader.SetBool("material.blinn", true);
 	
 	Renderer::EnableCulling();
-	Renderer::CullFace(kBack);
+	Renderer::CullFace(GL_BACK);
 	DrawNonTransparentObjects(solidMeshes, m_MainShader);
 
 	Renderer::DisableCulling();
@@ -173,7 +173,7 @@ void RenderSystem::ProcessEvent(Event* event)
 		m_FPSCamera.UpdatePosition(moveEvent->m_MovementDirection, Game::m_DeltaTime);
 		break;
 	}
-	case EventType::kRotatePlayer:
+	case EventType::GL_TEXTURE_WRAP_RotatePlayer:
 	{
 		RotatePlayerEvent* rotateEvent = dynamic_cast<RotatePlayerEvent*> (event);
 		m_FPSCamera.UpdateRotation(rotateEvent->m_MouseXPos, rotateEvent->m_MouseYPos);
@@ -204,8 +204,8 @@ void RenderSystem::SetupPostProcessing()
 	//Setup post processing VAO
 	VertexBufferLayout tmpVBL;
 	m_PostProcessVAO.Bind();
-	m_PostProcessVBO = VertexBuffer(quadVertices, 6 * 4 * sizeof(float), kStaticDraw);
-	m_PostProcessIBO = IndexBuffer(quadIndices, 6 * 1 * sizeof(unsigned int), kStaticDraw);
+	m_PostProcessVBO = VertexBuffer(quadVertices, 6 * 4 * sizeof(float), GL_STATIC_DRAW);
+	m_PostProcessIBO = IndexBuffer(quadIndices, 6 * 1 * sizeof(unsigned int), GL_STATIC_DRAW);
 	m_PostProcessVBO.Bind();
 	m_PostProcessIBO.Bind();
 	tmpVBL.Push<float>(2, false);
@@ -218,71 +218,71 @@ void RenderSystem::SetupFrameBuffers()
 {
 	GLenum attach[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	//Multisampled textures needed
-	m_MSColorTex.SetType(k2DMS);
+	m_MSColorTex.SetType(GL_TEXTURE_2D_MULTISAMPLE);
 	m_MSColorTex.Bind();
 	m_MSColorTex.SetMultiSamples(MULTI_SAMPLES_COUNT);
-	m_MSColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_MSColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 
-	m_MSBrightTex.SetType(k2DMS);
+	m_MSBrightTex.SetType(GL_TEXTURE_2D_MULTISAMPLE);
 	m_MSBrightTex.Bind();
 	m_MSBrightTex.SetMultiSamples(MULTI_SAMPLES_COUNT);
-	m_MSBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_MSBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 
 	m_MultisampledRBO.Bind();
 	m_MultisampledRBO.EnableMultiSampled();
 	m_MultisampledRBO.SetMultiSamples(MULTI_SAMPLES_COUNT);
-	m_MultisampledRBO.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+	m_MultisampledRBO.Create(m_WindowWidth, m_WindowHeight, GL_DEPTH_STENCIL_ATTACHMENT);
 
 	//Main framebuffer for drawing
 	m_MultisampledFBO.Bind();
-	m_MultisampledFBO.AttachRenderObject(m_MultisampledRBO, kDepthStencilAttach);
-	m_MultisampledFBO.AttachTexture(m_MSColorTex, kColorAttach0);
-	m_MultisampledFBO.AttachTexture(m_MSBrightTex, kColorAttach1);
+	m_MultisampledFBO.AttachRenderObject(m_MultisampledRBO, GL_DEPTH_STENCIL_ATTACHMENT);
+	m_MultisampledFBO.AttachTexture(m_MSColorTex, GL_COLOR_ATTACHMENT0);
+	m_MultisampledFBO.AttachTexture(m_MSBrightTex, GL_COLOR_ATTACHMENT1);
 	glDrawBuffers(2, attach);
 	assert(m_MultisampledFBO.IsComplete());
 
 	//Intermediate buffers to be able to make post processing with multisampling
-	m_IntermediateColorTex.SetType(k2D);
+	m_IntermediateColorTex.SetType(GL_TEXTURE_2D);
 	m_IntermediateColorTex.Activate(2);
 	m_IntermediateColorTex.Bind();
-	m_IntermediateColorTex.SetWrap(kS, kRepeat);
-	m_IntermediateColorTex.SetWrap(kT, kRepeat);
-	m_IntermediateColorTex.SetMinFilter(kLinear);
-	m_IntermediateColorTex.SetMagFilter(kLinear);
-	m_IntermediateColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_IntermediateColorTex.SetWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	m_IntermediateColorTex.SetWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	m_IntermediateColorTex.SetMinFilter(GL_LINEAR);
+	m_IntermediateColorTex.SetMagFilter(GL_LINEAR);
+	m_IntermediateColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 	
-	m_IntermediateBrightTex.SetType(k2D);
+	m_IntermediateBrightTex.SetType(GL_TEXTURE_2D);
 	m_IntermediateBrightTex.Activate(3);
 	m_IntermediateBrightTex.Bind();
-	m_IntermediateBrightTex.SetWrap(kS, kRepeat);
-	m_IntermediateBrightTex.SetWrap(kT, kRepeat);
-	m_IntermediateBrightTex.SetMinFilter(kLinear);
-	m_IntermediateBrightTex.SetMagFilter(kLinear);
-	m_IntermediateBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_IntermediateBrightTex.SetWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	m_IntermediateBrightTex.SetWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	m_IntermediateBrightTex.SetMinFilter(GL_LINEAR);
+	m_IntermediateBrightTex.SetMagFilter(GL_LINEAR);
+	m_IntermediateBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 
 	m_IntermediateRBO.Bind();
-	m_IntermediateRBO.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+	m_IntermediateRBO.Create(m_WindowWidth, m_WindowHeight, GL_DEPTH_STENCIL_ATTACHMENT);
 
 	m_IntermediateFBO.Bind();
-	m_IntermediateFBO.AttachRenderObject(m_IntermediateRBO, kDepthStencilAttach);
-	m_IntermediateFBO.AttachTexture(m_IntermediateColorTex, kColorAttach0);
-	m_IntermediateFBO.AttachTexture(m_IntermediateBrightTex, kColorAttach1);
+	m_IntermediateFBO.AttachRenderObject(m_IntermediateRBO, GL_DEPTH_STENCIL_ATTACHMENT);
+	m_IntermediateFBO.AttachTexture(m_IntermediateColorTex, GL_COLOR_ATTACHMENT0);
+	m_IntermediateFBO.AttachTexture(m_IntermediateBrightTex, GL_COLOR_ATTACHMENT1);
 	glDrawBuffers(2, attach);
 	assert(m_IntermediateFBO.IsComplete());
 
 	//Ping pong buffers for bloom effect
 	for (int i = 0; i < 2; i++)
 	{
-		m_BloomTex[i].SetType(k2D);
+		m_BloomTex[i].SetType(GL_TEXTURE_2D);
 		m_BloomTex[i].Activate(4);
 		m_BloomTex[i].Bind();
-		m_BloomTex[i].SetWrap(kS, kRepeat);
-		m_BloomTex[i].SetWrap(kT, kRepeat);
-		m_BloomTex[i].SetMinFilter(kLinear);
-		m_BloomTex[i].SetMagFilter(kLinear);
-		m_BloomTex[i].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+		m_BloomTex[i].SetWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		m_BloomTex[i].SetWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		m_BloomTex[i].SetMinFilter(GL_LINEAR);
+		m_BloomTex[i].SetMagFilter(GL_LINEAR);
+		m_BloomTex[i].CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 		m_BloomFBO[i].Bind();
-		m_BloomFBO[i].AttachTexture(m_BloomTex[i], kColorAttach0);
+		m_BloomFBO[i].AttachTexture(m_BloomTex[i], GL_COLOR_ATTACHMENT0);
 		assert(m_BloomFBO[i].IsComplete());
 	}
 
@@ -292,41 +292,41 @@ void RenderSystem::SetupDepthMaps()
 {
 	for (int i = 0; i < MAX_DEPTH_MAPS; i++)
 	{
-		m_DepthMaps[i].SetType(k2D);
+		m_DepthMaps[i].SetType(GL_TEXTURE_2D);
 		m_DepthMaps[i].Activate(32 - i);
 		m_DepthMaps[i].Bind();
 		float color[] = { 1.0f,1.0f,1.0f,1.0f };
 		m_DepthMaps[i].SetBorderColor(color);
-		m_DepthMaps[i].SetWrap(kS, kClampToBorder);
-		m_DepthMaps[i].SetWrap(kT, kClampToBorder);
-		m_DepthMaps[i].SetMinFilter(kNearest);
-		m_DepthMaps[i].SetMagFilter(kNearest);
-		m_DepthMaps[i].CreateTexImage(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE, kDepth);
+		m_DepthMaps[i].SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		m_DepthMaps[i].SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		m_DepthMaps[i].SetMinFilter(GL_NEAREST);
+		m_DepthMaps[i].SetMagFilter(GL_NEAREST);
+		m_DepthMaps[i].CreateTexImage(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE, GL_DEPTH_COMPONENT);
 
 		m_ShadowMapFBO[i].Bind();
-		m_ShadowMapFBO[i].AttachTexture(m_DepthMaps[i], kDepthAttach);
-		m_ShadowMapFBO[i].DrawBuffer(kNone);
-		m_ShadowMapFBO[i].ReadBuffer(kNone);
+		m_ShadowMapFBO[i].AttachTexture(m_DepthMaps[i], GL_DEPTH_ATTACHMENT);
+		m_ShadowMapFBO[i].DrawBuffer(GL_NONE);
+		m_ShadowMapFBO[i].ReadBuffer(GL_NONE);
 		assert(m_ShadowMapFBO[i].IsComplete());
 		m_ShadowMapFBO[i].Unbind();
 	}
 
 	for (int i = 0; i < MAX_DEPTH_CUBE_MAPS; i++)
 	{
-		m_DepthCubeMaps[i].SetType(kCubeMap);
+		m_DepthCubeMaps[i].SetType(GL_TEXTURE_CUBE_MAP);
 		m_DepthCubeMaps[i].Activate(32 - i - MAX_DEPTH_MAPS);
 		m_DepthCubeMaps[i].Bind();
-		m_DepthCubeMaps[i].SetWrap(kS, kClampToBorder);
-		m_DepthCubeMaps[i].SetWrap(kT, kClampToBorder);
-		m_DepthCubeMaps[i].SetWrap(kR, kClampToBorder);
-		m_DepthCubeMaps[i].SetMagFilter(kNearest);
-		m_DepthCubeMaps[i].SetMinFilter(kNearest);
-		m_DepthCubeMaps[i].CreateTexImage(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE, kDepth);
+		m_DepthCubeMaps[i].SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		m_DepthCubeMaps[i].SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		m_DepthCubeMaps[i].SetWrap(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+		m_DepthCubeMaps[i].SetMagFilter(GL_NEAREST);
+		m_DepthCubeMaps[i].SetMinFilter(GL_NEAREST);
+		m_DepthCubeMaps[i].CreateTexImage(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE, GL_DEPTH_COMPONENT);
 
 		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].Bind();
-		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].AttachTexture(m_DepthCubeMaps[i], kDepthAttach, true);
-		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].DrawBuffer(kNone);
-		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].ReadBuffer(kNone);
+		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].AttachTexture(m_DepthCubeMaps[i], GL_DEPTH_ATTACHMENT, true);
+		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].DrawBuffer(GL_NONE);
+		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].ReadBuffer(GL_NONE);
 		assert(m_ShadowMapFBO[i + MAX_DEPTH_MAPS].IsComplete());
 		m_ShadowMapFBO[i + MAX_DEPTH_MAPS].Unbind();
 	}
@@ -342,21 +342,21 @@ void RenderSystem::UpdateWindowSize(int width, int height)
 void RenderSystem::UpdateTexturesSize()
 {
 	m_MultisampledRBO.Bind();
-	m_MultisampledRBO.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+	m_MultisampledRBO.Create(m_WindowWidth, m_WindowHeight, GL_DEPTH_STENCIL_ATTACHMENT);
 	m_IntermediateRBO.Bind();
-	m_IntermediateRBO.Create(m_WindowWidth, m_WindowHeight, kDepthStencil);
+	m_IntermediateRBO.Create(m_WindowWidth, m_WindowHeight, GL_DEPTH_STENCIL_ATTACHMENT);
 	m_MSColorTex.Bind();
-	m_MSColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_MSColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 	m_IntermediateColorTex.Bind();
-	m_IntermediateColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_IntermediateColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 	m_MSBrightTex.Bind();
-	m_MSBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_MSBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 	m_IntermediateBrightTex.Bind();
-	m_IntermediateBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_IntermediateBrightTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 	m_BloomTex[0].Bind();
-	m_BloomTex[0].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_BloomTex[0].CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 	m_BloomTex[1].Bind();
-	m_BloomTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, kColorF);
+	m_BloomTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 }
 
 void RenderSystem::DrawNonTransparentObjects(const int * const indices, const Shader &shader)
@@ -395,13 +395,13 @@ void RenderSystem::DrawSemiTransparentObjects(std::map<float, int>& indices, con
 void RenderSystem::DownsampleMSBuffer()
 {
 	//Copying from MS buffer to normal one
-	m_MultisampledFBO.Bind(kRead);
-	m_IntermediateFBO.Bind(kDraw);
-	m_MultisampledFBO.ReadBuffer(kColorAttach0);
-	m_IntermediateFBO.DrawBuffer(kColorAttach0);
+	m_MultisampledFBO.Bind(GL_READ_FRAMEBUFFER);
+	m_IntermediateFBO.Bind(GL_DRAW_FRAMEBUFFER);
+	m_MultisampledFBO.ReadBuffer(GL_COLOR_ATTACHMENT0);
+	m_IntermediateFBO.DrawBuffer(GL_COLOR_ATTACHMENT0);
 	Renderer::BlitNamedFrameBuffer(m_MultisampledFBO, m_IntermediateFBO, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
-	m_MultisampledFBO.ReadBuffer(kColorAttach1);
-	m_IntermediateFBO.DrawBuffer(kColorAttach1);
+	m_MultisampledFBO.ReadBuffer(GL_COLOR_ATTACHMENT1);
+	m_IntermediateFBO.DrawBuffer(GL_COLOR_ATTACHMENT1);
 	Renderer::BlitNamedFrameBuffer(m_MultisampledFBO, m_IntermediateFBO, 0, 0, m_WindowWidth, m_WindowHeight, 0, 0, m_WindowWidth, m_WindowHeight);
 }
 
@@ -484,7 +484,7 @@ void RenderSystem::GetSolidMeshes(const int * const drawableMeshes, int *solidIn
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
-		if (m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::kSemiTransparent)
+		if (m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::GL_TEXTURE_WRAP_SemiTransparent)
 			solidIndices[j++] = drawableMeshes[i];
 	}
 	solidIndices[j] = -1;
@@ -497,7 +497,7 @@ void RenderSystem::GetNonSolidMeshes(const int * const drawableMeshes, int * non
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
-		if (!m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::kSemiTransparent)
+		if (!m_ECSManager->m_MeshRenderers[mapIndex].m_IsSolid && m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency != Transparency::GL_TEXTURE_WRAP_SemiTransparent)
 			nonSolidIndices[j++] = drawableMeshes[i];
 	}
 	nonSolidIndices[j] = -1;
@@ -509,7 +509,7 @@ std::map<float, int> RenderSystem::GetSemiTransparentMeshes(const int * const dr
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
-		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::kSemiTransparent) )
+		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::GL_TEXTURE_WRAP_SemiTransparent) )
 			continue;
 		int transformIndex = Transform::m_Indices[drawableMeshes[i]];
 		float distance = glm::length(m_FPSCamera.GetPosition() - m_ECSManager->m_Transforms[transformIndex].m_Position);
@@ -624,12 +624,11 @@ void RenderSystem::SetPointLights(const int * const indices, Shader &shader, con
 		shader.SetVec3("pointLights[" + std::to_string(i) + "].world_position", glm::vec3(m_ECSManager->m_Transforms[transformIndex].m_Position));
 		shader.SetVec3("pointLights[" + std::to_string(i) + "].color", m_ECSManager->m_PointLights[lightIndex].m_Color);
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].kC", m_ECSManager->m_PointLights[lightIndex].m_kConstant);
-		shader.SetFloat("pointLights[" + std::to_string(i) + "].kL", m_ECSManager->m_PointLights[lightIndex].m_kLinear);
+		shader.SetFloat("pointLights[" + std::to_string(i) + "].kL", m_ECSManager->m_PointLights[lightIndex].m_GL_LINEAR);
 		shader.SetFloat("pointLights[" + std::to_string(i) + "].kQ", m_ECSManager->m_PointLights[lightIndex].m_kQuadratic);
 		shader.SetBool("pointLights[" + std::to_string(i) + "].HasShadow", false);
 		i++;
 	}
-	//TODO: should be removed and handled in shadows code
 	//Setting all samplerCubes that are not used as GLSL requires to.
 	for (int i = 0; i < MAX_POINT_LIGHT_COUNT; i++)
 	{
@@ -653,7 +652,7 @@ void RenderSystem::SetSpotLights(const int * const indices, Shader &shader, cons
 		shader.SetVec3("spotLights[" + std::to_string(i) + "].direction", glm::vec3(viewMatrix*glm::vec4(m_ECSManager->m_SpotLights[lightIndex].m_Direction, 0.0f))); //W = 0 as we only want to rotate the direction, not move it with the camera
 		shader.SetVec3("spotLights[" + std::to_string(i) + "].color", m_ECSManager->m_SpotLights[lightIndex].m_Color);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].kC", m_ECSManager->m_SpotLights[lightIndex].m_kConstant);
-		shader.SetFloat("spotLights[" + std::to_string(i) + "].kL", m_ECSManager->m_SpotLights[lightIndex].m_kLinear);
+		shader.SetFloat("spotLights[" + std::to_string(i) + "].kL", m_ECSManager->m_SpotLights[lightIndex].m_GL_LINEAR);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].kQ", m_ECSManager->m_SpotLights[lightIndex].m_kQuadratic);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].inner_cutoff", m_ECSManager->m_SpotLights[lightIndex].m_InnerCutoff);
 		shader.SetFloat("spotLights[" + std::to_string(i) + "].outer_cutoff", m_ECSManager->m_SpotLights[lightIndex].m_OuterCutoff);
@@ -717,7 +716,7 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 	Renderer::EnableDepthTesting();
 	//Cull Front Face to prevent shadow acne
 	Renderer::EnableCulling();
-	Renderer::CullFace(kFront);
+	Renderer::CullFace(GL_FRONT);
 	//Update the size of the viewport
 	Renderer::ResizeWindow(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE);
 	
@@ -735,7 +734,7 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 		{
 			m_ShadowShader.Use();
 			m_ShadowMapFBO[normalDepthMapsIndex].Bind();
-			Renderer::Clear(kDepthBufferBit, glm::vec4(0.0f));
+			Renderer::Clear(GL_DEPTH_BUFFER_BIT, glm::vec4(0.0f));
 			m_ShadowShader.SetMat4("TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
 			DrawNonTransparentObjects(solidMeshes, m_ShadowShader);
 			DrawNonTransparentObjects(nonSolidMeshes, m_ShadowShader);
@@ -747,7 +746,7 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 		{
 			m_CubemmapShadowShader.Use();
 			m_ShadowMapFBO[cubeDepthMapsIndex].Bind();
-			Renderer::Clear(kDepthBufferBit, glm::vec4(0.0f));
+			Renderer::Clear(GL_DEPTH_BUFFER_BIT, glm::vec4(0.0f));
 			int transformIndex = Transform::m_Indices[entityId];
 			for(int k = 0; k < 6; k++)
 				m_CubemmapShadowShader.SetMat4("TransformationMatrix["+std::to_string(k)+"]", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[k]);
@@ -764,7 +763,7 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 		{
 			m_ShadowShader.Use();
 			m_ShadowMapFBO[normalDepthMapsIndex].Bind();
-			Renderer::Clear(kDepthBufferBit, glm::vec4(0.0f));
+			Renderer::Clear(GL_DEPTH_BUFFER_BIT, glm::vec4(0.0f));
 			m_ShadowShader.SetMat4("TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
 			DrawNonTransparentObjects(solidMeshes, m_ShadowShader);
 			DrawNonTransparentObjects(nonSolidMeshes, m_ShadowShader);
@@ -774,7 +773,7 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 		}
 		j++;
 	}
-	Renderer::CullFace(kBack);
+	Renderer::CullFace(GL_BACK);
 	Renderer::DisableCulling();
 	Renderer::ResizeWindow(m_WindowWidth, m_WindowHeight);
 }

@@ -39,21 +39,21 @@ public:
 	static void EnableStencilTesting() ;
 	static void DisableStencilTesting() ;
 	static void SetDepthMask(bool mask) ;
-	static void SetDepthFunc(ComparisonFunc fn) ;
+	static void SetDepthFunc(GLenum fn) ;
 	static void SetStencilMask(unsigned int mask) ;
-	static void SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask) ;
-	static void SetStencilOp(TestOption stencilFail, TestOption depthFail, TestOption stencilDepthPass) ;
+	static void SetStencilFunc(GLenum fn, int ref, unsigned int mask) ;
+	static void SetStencilOp(GLenum stencilFail, GLenum depthFail, GLenum stencilDepthPass) ;
 	//Blending related functions
 	static void EnableBlending();
 	static void DisableBlending();
-	static void SetBlendFactors(kBlendFactor source_factor, kBlendFactor dest_factor);
-	static void SetBlendFactorsSeparate(kBlendFactor source_factor_rgb, kBlendFactor dest_factor_rgb, kBlendFactor source_factor_a, kBlendFactor dest_factor_a);
-	static void SetBlendEquation(kBlendFunc func);
+	static void SetBlendFactors(GLenum source_factor, GLenum dest_factor);
+	static void SetBlendFactorsSeparate(GLenum source_factor_rgb, GLenum dest_factor_rgb, GLenum source_factor_a, GLenum dest_factor_a);
+	static void SetBlendEquation(GLenum func);
 	//Culling related functions
 	static void EnableCulling();
 	static void DisableCulling();
-	static void CullFace(kFace face);
-	static void SetFrontFace(kWinding dir);
+	static void CullFace(GLenum face);
+	static void SetFrontFace(GLenum dir);
 	//Gamma correction functions
 	static void EnableGammaCorrection();
 	static void DisableGammaCorrection();

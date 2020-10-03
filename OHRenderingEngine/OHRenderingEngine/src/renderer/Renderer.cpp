@@ -66,12 +66,12 @@ void Renderer::EnableBlending()
 	GlCall(glEnable(GL_BLEND));
 }
 
-void Renderer::SetDepthFunc(ComparisonFunc fn)
+void Renderer::SetDepthFunc(GLenum fn)
 {
 	GlCall(glDepthFunc(fn));
 }
 
-void Renderer::SetStencilOp(TestOption sfail, TestOption dpthfail, TestOption dpthpass)
+void Renderer::SetStencilOp(GLenum sfail, GLenum dpthfail, GLenum dpthpass)
 {
 	GlCall(glStencilOp(sfail, dpthfail, dpthpass));
 }
@@ -88,8 +88,8 @@ void Renderer::DisableGammaCorrection()
 
 void Renderer::BlitNamedFrameBuffer(const FrameBuffer & fboRead, const FrameBuffer & fboDraw, unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1, unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1)
 {
-	fboRead.Bind(kRead);
-	fboDraw.Bind(kDraw);
+	fboRead.Bind(GL_READ_FRAMEBUFFER);
+	fboDraw.Bind(GL_DRAW_FRAMEBUFFER);
 	GlCall(glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, GL_COLOR_BUFFER_BIT, GL_NEAREST));
 }
 
@@ -98,7 +98,7 @@ void Renderer::SetStencilMask(unsigned int mask)
 	GlCall(glStencilMask(mask));
 }
 
-void Renderer::SetStencilFunc(ComparisonFunc fn, int ref, unsigned int mask)
+void Renderer::SetStencilFunc(GLenum fn, int ref, unsigned int mask)
 {
 	GlCall(glStencilFunc(fn, ref, mask));
 }
@@ -108,17 +108,17 @@ void Renderer::DisableBlending()
 	GlCall(glDisable(GL_BLEND));
 }
 
-void Renderer::SetBlendFactors(kBlendFactor source_factor, kBlendFactor dest_factor)
+void Renderer::SetBlendFactors(GLenum source_factor, GLenum dest_factor)
 {
 	GlCall(glBlendFunc(source_factor, dest_factor));
 }
 
-void Renderer::SetBlendFactorsSeparate(kBlendFactor source_factor_rgb, kBlendFactor dest_factor_rgb, kBlendFactor source_factor_a, kBlendFactor dest_factor_a)
+void Renderer::SetBlendFactorsSeparate(GLenum source_factor_rgb, GLenum dest_factor_rgb, GLenum source_factor_a, GLenum dest_factor_a)
 {
 	GlCall(glBlendFuncSeparate(source_factor_rgb, dest_factor_rgb, source_factor_a, dest_factor_a));
 }
 
-void Renderer::SetBlendEquation(kBlendFunc func)
+void Renderer::SetBlendEquation(GLenum func)
 {
 	GlCall(glBlendEquation(func));
 }
@@ -133,12 +133,12 @@ void Renderer::DisableCulling()
 	GlCall(glDisable(GL_CULL_FACE));
 }
 
-void Renderer::CullFace(kFace face)
+void Renderer::CullFace(GLenum face)
 {
 	GlCall(glCullFace(face));
 }
 
-void Renderer::SetFrontFace(kWinding dir)
+void Renderer::SetFrontFace(GLenum dir)
 {
 	GlCall(glFrontFace(dir));
 }

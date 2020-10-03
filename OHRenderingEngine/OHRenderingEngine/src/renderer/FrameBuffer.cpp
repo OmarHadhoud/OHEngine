@@ -3,7 +3,7 @@
 #include "FrameBuffer.h"
 #include "Debugger.h"
 
-FrameBuffer::FrameBuffer(FrameBufferTarget target)
+FrameBuffer::FrameBuffer(GLenum target)
 {
 	GlCall(glGenFramebuffers(1, &m_ID));
 	GlCall(glBindFramebuffer(target, m_ID));
@@ -26,7 +26,7 @@ void FrameBuffer::Bind() const
 	GlCall(glBindFramebuffer(m_Target, m_ID));
 }
 
-void FrameBuffer::Bind(FrameBufferTarget target) const
+void FrameBuffer::Bind(GLenum target) const
 {
 	GlCall(glBindFramebuffer(target, m_ID));
 }
@@ -36,7 +36,7 @@ void FrameBuffer::Unbind() const
 	GlCall(glBindFramebuffer(m_Target, 0));
 }
 
-void FrameBuffer::AttachTexture(Texture & tex, FrameBufferAttachement attach, bool is_cubemap) const
+void FrameBuffer::AttachTexture(Texture & tex, GLenum attach, bool is_cubemap) const
 {
 	if (!is_cubemap)
 	{
@@ -48,7 +48,7 @@ void FrameBuffer::AttachTexture(Texture & tex, FrameBufferAttachement attach, bo
 	}
 }
 
-void FrameBuffer::AttachRenderObject(RenderBuffer & rbo, FrameBufferAttachement attach) const
+void FrameBuffer::AttachRenderObject(RenderBuffer & rbo, GLenum attach) const
 {
 	GlCall(glFramebufferRenderbuffer(m_Target, attach, GL_RENDERBUFFER, rbo.GetId()));
 }
@@ -65,12 +65,12 @@ bool FrameBuffer::IsComplete() const
 	return ret;
 }
 
-void FrameBuffer::DrawBuffer(FrameBufferAttachement buffer)
+void FrameBuffer::DrawBuffer(GLenum buffer)
 {
 	GlCall(glDrawBuffer(buffer));
 }
 
-void FrameBuffer::ReadBuffer(FrameBufferAttachement buffer)
+void FrameBuffer::ReadBuffer(GLenum buffer)
 {
 	GlCall(glReadBuffer(buffer));
 }

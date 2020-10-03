@@ -5,12 +5,12 @@
 
 CubeMapTexture::CubeMapTexture()
 {
-	SetType(kCubeMap);
+	SetType(GL_TEXTURE_CUBE_MAP);
 }
 
 CubeMapTexture::CubeMapTexture(std::vector<std::string> images)
 {
-	SetType(kCubeMap);
+	SetType(GL_TEXTURE_CUBE_MAP);
 	Bind();
 	//Load and generate the texture
 	int width, height, nrChannels;
@@ -21,16 +21,16 @@ CubeMapTexture::CubeMapTexture(std::vector<std::string> images)
 		{
 			if (nrChannels == 3)
 			{
-				SetFormat(kRGB);
-				SetInternalFormat(kSRGB);
+				SetFormat(GL_RGB);
+				SetInternalFormat(GL_SRGB);
 			}
 			else if (nrChannels == 4)
 			{
-				SetFormat(kRGBA);
-				SetInternalFormat(kSRGBA);
+				SetFormat(GL_RGBA);
+				SetInternalFormat(GL_SRGB_ALPHA);
 			}
-			TextureFormat format = GetFormat();
-			TextureFormat internalFormat = GetInternalFormat();
+			GLenum format = GetFormat();
+			GLenum internalFormat = GetInternalFormat();
 			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data));
 			stbi_image_free(data);
 		}
@@ -43,26 +43,26 @@ CubeMapTexture::CubeMapTexture(std::vector<std::string> images)
 	Unbind();
 }
 
-void CubeMapTexture::CreateTexImage(float width, float height, BufferType bType) const
+void CubeMapTexture::CreateTexImage(float width, float height, GLenum bType) const
 {
 	Bind();
 	
 	//Load and generate the texture
 	for (int i = 0; i < 6; i++)
 	{
-		if (bType == kColor)
+		if (bType == GL_RGB)
 		{
 			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr));
 		}
-		else if (bType == kDepth)
+		else if (bType == GL_DEPTH_COMPONENT)
 		{
 			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
 		}
-		else if (bType == kStencil)
+		else if (bType == GL_STENCIL_ATTACHMENT)
 		{
 			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_ATTACHMENT, GL_UNSIGNED_BYTE, nullptr));
 		}
-		else if (bType == kDepthStencil)
+		else if (bType == GL_DEPTH_STENCIL_ATTACHMENT)
 		{
 			GlCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL_ATTACHMENT, GL_UNSIGNED_INT_24_8, nullptr));
 		}

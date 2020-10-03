@@ -15,7 +15,7 @@ class Model
 public:
 	Model(const char* path);
 	void Draw(const Shader &shader);
-	void UpdateTexturesWrap(WrapDir dir, WrapType type);
+	void UpdateTexturesWrap(GLenum dir, GLenum type);
 	~Model();
 private:
 	//Model data
@@ -26,7 +26,7 @@ private:
 	void loadModel(std::string path);
 	void processNode(aiNode *node, const aiScene *scene);
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-	std::vector<unsigned int> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+	std::vector<unsigned int> loadMaterialTextures(aiMaterial *mat, aiTextureType  type, std::string typeName);
 };
 
 #endif // !MODEL_H

@@ -8,7 +8,7 @@ VertexBuffer::VertexBuffer()
 	GlCall(glGenBuffers(1, &m_ID));
 }
 
-VertexBuffer::VertexBuffer(unsigned int size, BUFFER_USAGE usage = kStaticDraw)
+VertexBuffer::VertexBuffer(unsigned int size, GLenum usage = GL_STATIC_DRAW)
 {
 	GlCall(glGenBuffers(1, &m_ID));
 	GlCall(glBindBuffer(GL_ARRAY_BUFFER, m_ID));
@@ -16,7 +16,7 @@ VertexBuffer::VertexBuffer(unsigned int size, BUFFER_USAGE usage = kStaticDraw)
 	Unbind();
 }
 
-VertexBuffer::VertexBuffer(void * data, unsigned int size, BUFFER_USAGE usage = kStaticDraw)
+VertexBuffer::VertexBuffer(void * data, unsigned int size, GLenum usage = GL_STATIC_DRAW)
 {
 	GlCall(glGenBuffers(1, &m_ID));
 	GlCall(glBindBuffer(GL_ARRAY_BUFFER, m_ID));
@@ -65,7 +65,7 @@ void VertexBuffer::Unbind()
 	GlCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-void VertexBuffer::BufferData(void * data, unsigned int size, BUFFER_USAGE usage)
+void VertexBuffer::BufferData(void * data, unsigned int size, GLenum usage)
 {
 	Bind();
 	GlCall(glBufferData(GL_ARRAY_BUFFER, size, data, usage));

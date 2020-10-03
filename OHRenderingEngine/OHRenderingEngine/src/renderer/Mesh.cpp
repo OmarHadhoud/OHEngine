@@ -76,8 +76,8 @@ void Mesh::SetupMesh()
 	m_VAO.Bind();
 	m_VBO.Bind();
 	m_IBO.Bind();
-	m_VBO.BufferData(&m_Vertices[0], sizeof(Vertex) * m_Vertices.size(), kStaticDraw);
-	m_IBO.BufferData(&m_Indices[0], sizeof(unsigned int) * m_Indices.size(), kStaticDraw);
+	m_VBO.BufferData(&m_Vertices[0], sizeof(Vertex) * m_Vertices.size(), GL_STATIC_DRAW);
+	m_IBO.BufferData(&m_Indices[0], sizeof(unsigned int) * m_Indices.size(), GL_STATIC_DRAW);
 	//Vertex positions
 	m_VBL.Push<glm::vec3>(1, false);
 	//Vertex normal
