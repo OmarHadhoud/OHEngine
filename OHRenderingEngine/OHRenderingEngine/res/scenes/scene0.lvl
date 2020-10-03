@@ -116,7 +116,7 @@ ENABLED = 1
 
 ========================================== ENTITY_START ==================================
 POINT_LIGHT
-COLOR = 1 0 0
+COLOR = 10 0 0
 AMBIENT = 0.3
 DIFFUSE = 1
 SPECULAR = 1
@@ -142,7 +142,7 @@ ENABLED = 1
 
 ========================================== ENTITY_START ==================================
 SPOT_LIGHT
-COLOR = 0.1 1 1
+COLOR = 0.1 10 10
 DIRECTION = 1 -0.1 1
 AMBIENT = 0.2
 DIFFUSE = 1
@@ -175,7 +175,7 @@ ENABLED = 1
 ========================================== ENTITY_START ==================================
 DIRECTIONAL_LIGHT
 COLOR = 0.99215 0.9843 0.8274
-DIRECTION = 15 -20 15
+DIRECTION = 15 -20 -15
 AMBIENT = 0.4
 DIFFUSE = 1
 SPECULAR = 1
@@ -187,12 +187,12 @@ SCALE = 1 1 1
 ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
-ENABLED = 0
+ENABLED = 1
 
 LIGHT_SHADOW
 FRUSTUM_SIZE = 20
 NEAR_PLANE = 1
 FAR_PLANE = 50
-ENABLED = 0
+ENABLED = 1
 ========================================== ENTITY_END ==================================
 

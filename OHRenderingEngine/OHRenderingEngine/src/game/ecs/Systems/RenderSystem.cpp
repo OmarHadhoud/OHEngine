@@ -112,6 +112,7 @@ void RenderSystem::Update()
 	glm::mat4 projection = glm::perspective(glm::radians(m_FPSCamera.GetFOV()), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f, 200.0f);
 	glm::mat4 model;
 
+	//Set the lightings in the shaders
 	SetLights(view);
 	//Shadow mapping
 	int enabledShadows[MAX_DEPTH_MAPS + MAX_DEPTH_CUBE_MAPS];
@@ -138,11 +139,14 @@ void RenderSystem::Update()
 	Renderer::EnableCulling();
 	Renderer::CullFace(kBack);
 	DrawNonTransparentObjects(solidMeshes, m_MainShader);
+
 	Renderer::DisableCulling();
 	DrawNonTransparentObjects(nonSolidMeshes, m_MainShader);
+
 	Renderer::EnableBlending();
 	Renderer::DisableCulling();
 	m_SkyBox->Draw(view, projection);
+
 	m_MainShader.Use();
 	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);	
 	Renderer::DisableBlending();
