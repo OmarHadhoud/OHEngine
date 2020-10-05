@@ -42,7 +42,7 @@ glm::vec3 up[6] = {
 
 
 
-RenderSystem::RenderSystem():
+RenderSystem::RenderSystem() :
 	m_MainShader(Shader("res/shaders/simple_lighting.vert", "res/shaders/simple_lighting.frag", "res/shaders/simple_lighting.geom")),
 	m_DebugShader(Shader("res/shaders/debug.vert", "res/shaders/debug.frag", "res/shaders/debug.geom")),
 	m_BorderShader(Shader("res/shaders/simple_lighting.vert", "res/shaders/border.frag", "res/shaders/simple_lighting.geom")),
@@ -50,21 +50,19 @@ RenderSystem::RenderSystem():
 	m_BloomShader(Shader("res/shaders/post_process.vert", "res/shaders/bloom.frag")),
 	m_ShadowShader(Shader("res/shaders/shadow_shader.vert", "res/shaders/shadow_shader.frag")),
 	m_CubemmapShadowShader(Shader("res/shaders/shadow_shader_cubemap.vert", "res/shaders/shadow_shader_cubemap.frag", "res/shaders/shadow_shader_cubemap.geom")),
+	m_BoxCollidersShader(Shader("res/shaders/box_collider.vert", "res/shaders/box_collider.frag", "res/shaders/box_collider.geom")),
+	m_CrosshairTex(Texture("res/textures/crosshair.png", true)),
+	m_GunTex(Texture("res/textures/gun.png", true)),
+	m_GunFireTex(Texture("res/textures/gunfire.png", true)),
 	m_GammaCorrection(2.2f),
-	m_Exposure(1.0f)
+	m_Exposure(1.0f),
+	m_CurrentCamera(0)
 {
 }
 
 
 RenderSystem::~RenderSystem()
 {
-}
-
-void RenderSystem::SetCurrentWindow(GLFWwindow * currentWindow, int width, int height)
-{
-	m_CurrentWindow = currentWindow;
-	m_WindowWidth = width;
-	m_WindowHeight = height;
 }
 
 void RenderSystem::CreateSkybox(const char *path, const char* format)
@@ -97,6 +95,7 @@ void RenderSystem::Update()
 	//Update matrices
 	UpdateModelMatrices();
 	UpdateLightTrasnformationMatrices();
+	UpdateColliders();
 
 	//Get meshes ready to draw
 	int drawableMeshes[MAX_ENTITY_COUNT];
@@ -108,8 +107,8 @@ void RenderSystem::Update()
 	GetNonSolidMeshes(drawableMeshes, nonSolidMeshes);
 
 	//Get matrices needed for all drawings
-	glm::mat4 view = m_ECSManager->m_Cameras[0].m_Camera->GetViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(m_ECSManager->m_Cameras[0].m_Camera->GetFOV()), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f, 200.0f);
+	glm::mat4 view = GetCameraViewMatrix(m_CurrentCamera);
+	glm::mat4 projection = glm::perspective(glm::radians(m_ECSManager->m_Cameras[m_CurrentCamera].m_FOV), (float)m_WindowWidth / (float)m_WindowHeight, m_ECSManager->m_Cameras[m_CurrentCamera].m_NearPlane, m_ECSManager->m_Cameras[m_CurrentCamera].m_FarPlane);
 	glm::mat4 model;
 
 	//Set the lightings in the shaders
@@ -118,7 +117,7 @@ void RenderSystem::Update()
 	int enabledShadows[MAX_DEPTH_MAPS + MAX_DEPTH_CUBE_MAPS];
 	SetShadows(enabledShadows);
 	ShadowPass(enabledShadows, solidMeshes, nonSolidMeshes, semiTransparentMeshes);
-	
+
 
 	//Bind to the frame buffer, clear screen, set settings
 	m_MultisampledFBO.Bind();
@@ -135,7 +134,7 @@ void RenderSystem::Update()
 	m_MainShader.SetMat4("projection", projection);
 	m_MainShader.SetFloat("material.shineness", 64);
 	m_MainShader.SetBool("material.blinn", true);
-	
+
 	Renderer::EnableCulling();
 	Renderer::CullFace(GL_BACK);
 	DrawNonTransparentObjects(solidMeshes, m_MainShader);
@@ -148,9 +147,12 @@ void RenderSystem::Update()
 	m_SkyBox->Draw(view, projection);
 
 	m_MainShader.Use();
-	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);	
+	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);
 	Renderer::DisableBlending();
-	
+
+	//=============Start rendering level editor objects=================
+	DrawColliders(view, projection);
+
 	DownsampleMSBuffer();
 	ApplyBloom();
 	DrawInBuffer();
@@ -162,28 +164,22 @@ void RenderSystem::Draw()
 }
 
 
+
 void RenderSystem::ProcessEvent(Event* event)
 {
-	//TODO: Remove this and add it to either Input System or Game logic system
 	switch (event->m_EventType)
 	{
-	case EventType::kMovePlayer:
-	{
-		MovePlayerEvent* moveEvent = dynamic_cast<MovePlayerEvent*>(event);
-		m_ECSManager->m_Cameras[0].m_Camera->UpdatePosition(moveEvent->m_MovementDirection, Game::m_DeltaTime);
-		break;
-	}
-	case EventType::kRotatePlayer:
-	{
-		RotatePlayerEvent* rotateEvent = dynamic_cast<RotatePlayerEvent*> (event);
-		m_ECSManager->m_Cameras[0].m_Camera->UpdateRotation(rotateEvent->m_MouseXPos, rotateEvent->m_MouseYPos);
-		break;
-	}
+
 	case EventType::kUpdatePostProcessingParams:
 	{
 		UpdatePostProcessingParams* updEvent = dynamic_cast<UpdatePostProcessingParams*> (event);
 		m_Exposure = updEvent->m_Exposure;
 		m_GammaCorrection = updEvent->m_GammaCorrection;
+	}
+	case EventType::kPlayerShoots:
+	{
+		m_RecoilStartedTime = glfwGetTime();
+		m_ShootingFireStartedTime = glfwGetTime();
 	}
 	default:
 		break;
@@ -212,6 +208,24 @@ void RenderSystem::SetupPostProcessing()
 	tmpVBL.Push<float>(2, false);
 	m_PostProcessVBO.SetLayout(tmpVBL);
 	m_PostProcessVAO.AddBuffer(m_PostProcessVBO);
+	m_CrosshairTex.Activate(0);
+	m_CrosshairTex.Bind();
+	m_CrosshairTex.SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	m_CrosshairTex.SetWrap(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	m_CrosshairTex.SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	m_CrosshairTex.Unbind();
+	m_GunTex.Activate(0);
+	m_GunTex.Bind();
+	m_GunTex.SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	m_GunTex.SetWrap(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	m_GunTex.SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	m_GunTex.Unbind();
+	m_GunFireTex.Activate(0);
+	m_GunFireTex.Bind();
+	m_GunFireTex.SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	m_GunFireTex.SetWrap(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	m_GunFireTex.SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	m_GunFireTex.Unbind();
 }
 
 void RenderSystem::SetupFrameBuffers()
@@ -250,7 +264,7 @@ void RenderSystem::SetupFrameBuffers()
 	m_IntermediateColorTex.SetMinFilter(GL_LINEAR);
 	m_IntermediateColorTex.SetMagFilter(GL_LINEAR);
 	m_IntermediateColorTex.CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
-	
+
 	m_IntermediateBrightTex.SetType(GL_TEXTURE_2D);
 	m_IntermediateBrightTex.Activate(3);
 	m_IntermediateBrightTex.Bind();
@@ -359,12 +373,22 @@ void RenderSystem::UpdateTexturesSize()
 	m_BloomTex[1].CreateTexImage(m_WindowWidth, m_WindowHeight, GL_RGB16F);
 }
 
+glm::mat4 RenderSystem::GetCameraViewMatrix(int index) const
+{
+	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[index].m_EntityID];
+	glm::vec3 pos = m_ECSManager->m_Transforms[transformIndex].m_Position;
+	glm::vec3 forward = m_ECSManager->m_Transforms[transformIndex].m_Forward;
+	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
+	glm::vec3 up = glm::normalize(glm::cross(right, forward));
+	return glm::lookAt(pos, pos + forward, up);
+}
+
 void RenderSystem::DrawNonTransparentObjects(const int * const indices, const Shader &shader)
 {
 	shader.Use();
 	glm::mat4 model;
 	int i = 0;
-	while(indices[i] != -1)
+	while (indices[i] != -1)
 	{
 		int transformIndex = Transform::m_Indices[indices[i]];
 		int meshIndex = MeshRenderer::m_Indices[indices[i]];
@@ -441,15 +465,26 @@ void RenderSystem::DrawInBuffer()
 	m_IntermediateColorTex.Bind();
 	m_BloomTex[0].Activate(2);
 	m_BloomTex[0].Bind();
+	m_CrosshairTex.Activate(3);
+	m_CrosshairTex.Bind();
+	m_GunTex.Activate(4);
+	m_GunTex.Bind();
+	m_GunFireTex.Activate(5);
+	m_GunFireTex.Bind();
 	m_PostProcessShader.SetInt("quadTex", 1);
 	m_PostProcessShader.SetInt("brightTex", 2);
+	m_PostProcessShader.SetInt("crosshairTex", 3);
+	m_PostProcessShader.SetInt("gunTex", 4);
+	m_PostProcessShader.SetInt("gunfireTex", 5);
+	m_PostProcessShader.SetVec2("resolution", glm::vec2(m_WindowWidth, m_WindowHeight));
+	DrawShootingEffects();
 
 	//TODO: remove Shadow debugging
 //	Texture::Activate(1);
 //	m_DepthMaps[0].Bind();
 //	m_DepthMaps[0].Activate(2);
 //	m_DepthMaps[0].Bind();
-	
+
 	//If player is moving, apply blur
 	m_PostProcessShader.SetBool("moving", false);
 	m_PostProcessShader.SetFloat("blurStrength", 0.0f);
@@ -460,6 +495,32 @@ void RenderSystem::DrawInBuffer()
 	Renderer::Draw(m_PostProcessVAO, m_PostProcessShader, 6 * 1, 0);
 }
 
+void RenderSystem::DrawShootingEffects()
+{
+	float time = glfwGetTime();
+	float timeSinceRecoilStarted = time - m_RecoilStartedTime;
+	if (timeSinceRecoilStarted < RECOIL_DURATION)
+	{
+		if (timeSinceRecoilStarted < RECOIL_DURATION*0.5f)
+		{
+			m_PostProcessShader.SetFloat("recoilPower", timeSinceRecoilStarted*0.1);
+		}
+		else
+		{
+			m_PostProcessShader.SetFloat("recoilPower", (RECOIL_DURATION*0.5 - (timeSinceRecoilStarted - RECOIL_DURATION * 0.5))*0.1);
+		}
+	}
+	else
+		m_PostProcessShader.SetFloat("recoilPower", 0);
+
+	float timeSinceShotFireStarted = time - m_ShootingFireStartedTime;
+	if (timeSinceShotFireStarted < RECOIL_DURATION / 4)
+		m_PostProcessShader.SetBool("shootingFire", true);
+	else
+		m_PostProcessShader.SetBool("shootingFire", false);
+
+}
+
 void RenderSystem::GetDrawableMeshes(int *indices)
 {
 	int j = 0;
@@ -467,7 +528,7 @@ void RenderSystem::GetDrawableMeshes(int *indices)
 	{
 		if (Transform::m_Indices[i] == -1 || MeshRenderer::m_Indices[i] == -1)
 			continue;
-		
+
 		int transformIndex = Transform::m_Indices[i];
 		int meshIndex = MeshRenderer::m_Indices[i];
 		if (!m_ECSManager->m_Transforms[transformIndex].m_Enabled || !m_ECSManager->m_MeshRenderers[meshIndex].m_Enabled)
@@ -505,14 +566,16 @@ void RenderSystem::GetNonSolidMeshes(const int * const drawableMeshes, int * non
 
 std::map<float, int> RenderSystem::GetSemiTransparentMeshes(const int * const drawableMeshes)
 {
+	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[m_CurrentCamera].m_EntityID];
+	glm::vec3 cameraPosition = m_ECSManager->m_Transforms[transformIndex].m_Position;
 	std::map<float, int> indices;
 	for (int i = 0; drawableMeshes[i] != -1; i++)
 	{
 		int mapIndex = MeshRenderer::m_Indices[drawableMeshes[i]];
-		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::GL_TEXTURE_WRAP_SemiTransparent) )
+		if (!(m_ECSManager->m_MeshRenderers[mapIndex].m_Transparency == Transparency::GL_TEXTURE_WRAP_SemiTransparent))
 			continue;
 		int transformIndex = Transform::m_Indices[drawableMeshes[i]];
-		float distance = glm::length(m_ECSManager->m_Cameras[0].m_Camera->GetPosition() - m_ECSManager->m_Transforms[transformIndex].m_Position);
+		float distance = glm::length(cameraPosition - m_ECSManager->m_Transforms[transformIndex].m_Position);
 		indices[distance] = drawableMeshes[i];
 	}
 	return indices;
@@ -525,7 +588,7 @@ void RenderSystem::GetDirectionalLights(int *indices)
 	int j = 0;
 	for (int i = 0; i < Entity::m_Count; i++)
 	{
-		if (Transform::m_Indices[i] == -1|| DirectionalLight::m_Indices[i] == -1)
+		if (Transform::m_Indices[i] == -1 || DirectionalLight::m_Indices[i] == -1)
 			continue;
 
 		int transformIndex = Transform::m_Indices[i];
@@ -593,7 +656,7 @@ void RenderSystem::SetDirectionalLights(const int * const indices, Shader &shade
 {
 	shader.Use();
 	int i = 0;
-	while(indices[i] != -1)
+	while (indices[i] != -1)
 	{
 		int lightIndex = DirectionalLight::m_Indices[indices[i]];
 		int transformIndex = Transform::m_Indices[indices[i]];
@@ -671,17 +734,17 @@ void RenderSystem::SetShadows(int* const enabledShadows)
 		//If light shadows are disabled, skip this iteration
 		if (!m_ECSManager->m_LightShadows[i].m_Enabled)
 			continue;
-		
+
 		int entityId = m_ECSManager->m_LightShadows[i].m_EntityID;
 		int transformIndex = Transform::m_Indices[entityId];
 		//If no transform component exists for this light source, skip this iteration
-		if (transformIndex == -1) 
+		if (transformIndex == -1)
 			continue;
 
 		int lightIndex;
 
 		lightIndex = DirectionalLight::m_Indices[entityId];
-		if (lightIndex!= -1 && m_ECSManager->m_DirectionalLights[lightIndex].m_Enabled)
+		if (lightIndex != -1 && m_ECSManager->m_DirectionalLights[lightIndex].m_Enabled)
 		{
 			m_MainShader.SetMat4("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].TransformationMatrix", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[0]);
 			m_MainShader.SetInt("directionalLights[" + std::to_string(DirectionalLight::m_Indices[entityId]) + "].DepthMap", 32 - shadowCounter);
@@ -719,13 +782,13 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 	Renderer::CullFace(GL_FRONT);
 	//Update the size of the viewport
 	Renderer::ResizeWindow(SHADOW_MAP_TEXTURE_SIZE, SHADOW_MAP_TEXTURE_SIZE);
-	
+
 
 	int normalDepthMapsIndex = 0;
 	int cubeDepthMapsIndex = MAX_DEPTH_MAPS;
 
 	int j = 0;
-	while(enabledShadows[j]!=-1)
+	while (enabledShadows[j] != -1)
 	{
 		int i = enabledShadows[j];
 
@@ -748,15 +811,15 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 			m_ShadowMapFBO[cubeDepthMapsIndex].Bind();
 			Renderer::Clear(GL_DEPTH_BUFFER_BIT, glm::vec4(0.0f));
 			int transformIndex = Transform::m_Indices[entityId];
-			for(int k = 0; k < 6; k++)
-				m_CubemmapShadowShader.SetMat4("TransformationMatrix["+std::to_string(k)+"]", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[k]);
+			for (int k = 0; k < 6; k++)
+				m_CubemmapShadowShader.SetMat4("TransformationMatrix[" + std::to_string(k) + "]", m_ECSManager->m_LightShadows[i].m_TransformationMatrix[k]);
 			m_CubemmapShadowShader.SetFloat("FarPlane", m_ECSManager->m_LightShadows[i].m_FarPlane);
 			m_CubemmapShadowShader.SetVec3("LightPosition", m_ECSManager->m_Transforms[transformIndex].m_Position);
 			DrawNonTransparentObjects(solidMeshes, m_CubemmapShadowShader);
 			DrawNonTransparentObjects(nonSolidMeshes, m_CubemmapShadowShader);
 			DrawSemiTransparentObjects(transparentMeshes, m_CubemmapShadowShader);
 			Texture::Activate(32 - j);
-			m_DepthCubeMaps[cubeDepthMapsIndex-MAX_DEPTH_MAPS].Bind();
+			m_DepthCubeMaps[cubeDepthMapsIndex - MAX_DEPTH_MAPS].Bind();
 			cubeDepthMapsIndex++;
 		}
 		else if (SpotLight::m_Indices[entityId] != -1)
@@ -768,7 +831,7 @@ void RenderSystem::ShadowPass(const int* const enabledShadows, const int * const
 			DrawNonTransparentObjects(solidMeshes, m_ShadowShader);
 			DrawNonTransparentObjects(nonSolidMeshes, m_ShadowShader);
 			DrawSemiTransparentObjects(transparentMeshes, m_ShadowShader);
-			Texture::Activate(32-j);
+			Texture::Activate(32 - j);
 			m_DepthMaps[normalDepthMapsIndex++].Bind();
 		}
 		j++;
@@ -858,3 +921,33 @@ void RenderSystem::UpdatePointLightTransformationMatrix(int shadowIndex, int ent
 	m_ECSManager->m_LightShadows[shadowIndex].m_TransformationMatrix = matrices;
 }
 
+void RenderSystem::UpdateColliders()
+{
+#ifdef LEVEL_EDITOR
+	m_CollidersVAO.Bind();
+	m_CollidersVBO.Bind();
+	m_CollidersVBO.BufferData(m_ECSManager->m_BoxColliders, BoxCollider::m_Count * sizeof(BoxCollider), GL_STATIC_DRAW);
+	Renderer::VertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(BoxCollider), (void*)offsetof(BoxCollider, m_Bounds[0]));
+	Renderer::EnableVertexAttribArray(0);
+	Renderer::VertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(BoxCollider), (void*)offsetof(BoxCollider, m_Bounds[1]));
+	Renderer::EnableVertexAttribArray(1);
+	m_CollidersVAO.Unbind();
+#endif	
+}
+
+void RenderSystem::DrawColliders(glm::mat4 view, glm::mat4 proj)
+{
+#ifdef LEVEL_EDITOR
+	Renderer::DisableDepthTesting();
+	Renderer::SetLineWidth(2);
+	m_BoxCollidersShader.Use();
+	m_BoxCollidersShader.SetMat4("view", view);
+	m_BoxCollidersShader.SetMat4("projection", proj);
+	m_CollidersVAO.Bind();
+	Renderer::DrawPoints(BoxCollider::m_Count);
+	m_CollidersVAO.Unbind();
+	Renderer::SetLineWidth(1);
+	Renderer::EnableDepthTesting();
+	Texture::Activate(0);
+#endif
+}

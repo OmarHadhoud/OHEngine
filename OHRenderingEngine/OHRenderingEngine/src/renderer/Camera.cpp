@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(float sensetivity, float speed):
+CameraDeleted::CameraDeleted(float sensetivity, float speed):
 	m_CameraSpeed(speed),
 	m_Yaw(-90),
 	m_Pitch(0),
@@ -19,11 +19,11 @@ Camera::Camera(float sensetivity, float speed):
 }
 
 
-Camera::~Camera()
+CameraDeleted::~CameraDeleted()
 {
 }
 
-void Camera::UpdateRotation(double xpos, double ypos)
+void CameraDeleted::UpdateRotation(double xpos, double ypos)
 {
 	//If first time to hold the cursor in the window
 	if (m_FirstMouseMotion)
@@ -54,7 +54,7 @@ void Camera::UpdateRotation(double xpos, double ypos)
 	UpdateCameraVectors();
 }
 
-void Camera::UpdatePosition(MovementDirection dir, float delta_time)
+void CameraDeleted::UpdatePosition(MovementDirection dir, float delta_time)
 {
 	glm::vec3 movement_direction = m_Camerafront;
 	if (m_YLocked) movement_direction.y = 0;
@@ -75,12 +75,12 @@ void Camera::UpdatePosition(MovementDirection dir, float delta_time)
 	}
 }
 
-void Camera::ResetSpeed()
+void CameraDeleted::ResetSpeed()
 {
 	m_CameraSpeed = NORMAL_CAM_SPEED;
 }
 
-void Camera::UpdateCameraVectors()
+void CameraDeleted::UpdateCameraVectors()
 {
 	m_Direction.y = sin(glm::radians(m_Pitch));
 	m_Direction.x = cos(glm::radians(m_Pitch)) * cos(glm::radians(m_Yaw));
@@ -91,50 +91,50 @@ void Camera::UpdateCameraVectors()
 	m_Up = glm::normalize(glm::cross(m_Right, m_Camerafront));
 }
 
-glm::mat4 Camera::GetViewMatrix() const
+glm::mat4 CameraDeleted::GetViewMatrix() const
 {
 	return glm::lookAt(m_Pos, m_Pos + m_Camerafront, m_Up);
 }
 
-void Camera::SetCameraSpeed(float value)
+void CameraDeleted::SetCameraSpeed(float value)
 {
 	m_CameraSpeed = value > 0 ? value : m_CameraSpeed;
 }
 
 
-void Camera::Zoom()
+void CameraDeleted::Zoom()
 {
 	this->m_FOV--;
 	if (this->m_FOV <= 20.0f)
 		this->m_FOV = 20.0f;
 }
 
-void Camera::ResetZoom()
+void CameraDeleted::ResetZoom()
 {
 	this->m_FOV = 45.0f;
 }
 
-float Camera::GetSpeed() const
+float CameraDeleted::GetSpeed() const
 {
 	return m_CameraSpeed;
 }
 
-float Camera::GetFOV() const
+float CameraDeleted::GetFOV() const
 {
 	return m_FOV;
 }
 
-float Camera::GetSensetivity() const
+float CameraDeleted::GetSensetivity() const
 {
 	return m_Sensetivity;
 }
 
-glm::vec3 Camera::GetPosition() const
+glm::vec3 CameraDeleted::GetPosition() const
 {
 	return m_Pos;
 }
 
-glm::vec3 Camera::GetFront() const
+glm::vec3 CameraDeleted::GetFront() const
 {
 	return m_Camerafront;
 }

@@ -12,12 +12,6 @@ GUISystem::~GUISystem()
 {
 }
 
-void GUISystem::SetCurrentWindow(GLFWwindow * currentWindow, int width, int height)
-{
-	m_CurrentWindow = currentWindow;
-	m_WindowWidth = width;
-	m_WindowHeight = height;
-}
 
 void GUISystem::Setup()
 {

@@ -5,7 +5,7 @@
 //COMPONENTS COUNT
 unsigned int Entity::m_Count = 0;
 unsigned int BoxCollider::m_Count = 0;
-unsigned int CameraCOMP::m_Count = 0;
+unsigned int Camera::m_Count = 0;
 unsigned int DirectionalLight::m_Count = 0;
 unsigned int LightShadow::m_Count = 0;
 unsigned int MeshRenderer::m_Count = 0;
@@ -15,7 +15,7 @@ unsigned int SpotLight::m_Count = 0;
 unsigned int Transform::m_Count = 0;
 //MAPS
 int BoxCollider::m_Indices[MAX_ENTITY_COUNT];
-int CameraCOMP::m_Indices[MAX_ENTITY_COUNT];
+int Camera::m_Indices[MAX_ENTITY_COUNT];
 int DirectionalLight::m_Indices[MAX_ENTITY_COUNT];
 int LightShadow::m_Indices[MAX_ENTITY_COUNT];
 int MeshRenderer::m_Indices[MAX_ENTITY_COUNT];
@@ -40,6 +40,7 @@ void ECSManager::SetupComponents()
 	for (int i = 0; i < MAX_ENTITY_COUNT; i++)
 	{
 		BoxCollider::m_Indices[i] = -1;
+		Camera::m_Indices[i] = -1;
 		DirectionalLight::m_Indices[i] = -1;
 		LightShadow::m_Indices[i] = -1;
 		MeshRenderer::m_Indices[i] = -1;
@@ -82,15 +83,15 @@ template<> unsigned int ECSManager::AddComponent<BoxCollider>(unsigned int entit
 	return BoxCollider::m_Count - 1;
 }
 
-template<> unsigned int ECSManager::AddComponent<CameraCOMP>(unsigned int entityId)
+template<> unsigned int ECSManager::AddComponent<Camera>(unsigned int entityId)
 {
-	assert(CameraCOMP::m_Count != MAX_BOX_COLLIDERS_COUNT);
-	assert(entityId < CameraCOMP::m_Count);
-	assert(CameraCOMP::m_Indices[entityId] == -1);
-	m_BoxColliders[CameraCOMP::m_Count].m_EntityID = entityId;
-	CameraCOMP::m_Indices[entityId] = CameraCOMP::m_Count;
-	CameraCOMP::m_Count++;
-	return CameraCOMP::m_Count - 1;
+	assert(Camera::m_Count != MAX_BOX_COLLIDERS_COUNT);
+	assert(entityId < Entity::m_Count);
+	assert(Camera::m_Indices[entityId] == -1);
+	m_BoxColliders[Camera::m_Count].m_EntityID = entityId;
+	Camera::m_Indices[entityId] = Camera::m_Count;
+	Camera::m_Count++;
+	return Camera::m_Count - 1;
 }
 
 template<> unsigned int ECSManager::AddComponent<DirectionalLight>(unsigned int entityId)

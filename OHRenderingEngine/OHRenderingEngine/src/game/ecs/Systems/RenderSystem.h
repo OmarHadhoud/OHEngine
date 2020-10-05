@@ -12,35 +12,35 @@
 #include "game/ecs/Systems/System.h"
 #include "game/ecs/Events/Event.h"
 #include "game/Skybox.h"
-//TODO: Implement Camera as a component, to support multiple cameras (for CCTV/Minimap,etc)
-#include "renderer/Camera.h"
 #include <GLFW/glfw3.h>
 
-const int MAX_DEPTH_MAPS = 20;
-const int MAX_DEPTH_CUBE_MAPS = 5;
+const int MAX_DEPTH_MAPS = 5;
+const int MAX_DEPTH_CUBE_MAPS = 1;
 const int SHADOW_MAP_TEXTURE_SIZE = 2048;
 const int GAUSSIAN_BLUR_COUNT = 5;
+const float RECOIL_DURATION = 0.2f;
 
 class RenderSystem : public System
 {
 public:
 	RenderSystem();
 	~RenderSystem();
-	void SetCurrentWindow(GLFWwindow *currentWindow, int width, int height);
 	void CreateSkybox(const char* path, const char* format);
 	void Setup();
 	void Update();
 	void Draw();
 private:
-	//Window variables
-	GLFWwindow *m_CurrentWindow;
-	int m_WindowWidth;
-	int m_WindowHeight;
 	//Render settings
 	float m_GammaCorrection;
 	float m_Exposure;
+	int m_CurrentCamera;
 	//Single entities used by renderer
 	std::unique_ptr<Skybox> m_SkyBox;
+	Texture m_CrosshairTex;
+	Texture m_GunTex;
+	Texture m_GunFireTex;
+	float m_RecoilStartedTime;
+	float m_ShootingFireStartedTime;
 	//Textures
 	MultiSampledTexture m_MSColorTex;
 	MultiSampledTexture m_MSBrightTex;
@@ -65,6 +65,7 @@ private:
 	Shader m_BloomShader;
 	Shader m_ShadowShader;
 	Shader m_CubemmapShadowShader;
+	Shader m_BoxCollidersShader;
 	//Post processing vertex array
 	VertexBuffer m_PostProcessVBO;
 	IndexBuffer m_PostProcessIBO;
@@ -79,6 +80,7 @@ private:
 	void CheckWindowSize();
 	void UpdateWindowSize(int widht, int height);
 	void UpdateTexturesSize();
+	glm::mat4 GetCameraViewMatrix(int index) const;
 	//Predrawing functions
 	void UpdateModelMatrices();
 	void UpdateLightTrasnformationMatrices();
@@ -98,6 +100,7 @@ private:
 	void DownsampleMSBuffer();
 	void ApplyBloom();
 	void DrawInBuffer();
+	void DrawShootingEffects();
 	void GetDrawableMeshes(int *indices);
 	void GetSolidMeshes(const int * const drawableMeshes, int *solidIndices);
 	void GetNonSolidMeshes(const int * const drawableMeshes, int *nonSolidIndices);
@@ -105,6 +108,14 @@ private:
 	void GetDirectionalLights(int *indices);
 	void GetPointLights(int *indices);
 	void GetSpotlights(int *indices);
+	//Editor stuff
+	VertexBuffer m_CollidersVBO;
+	VertexArray m_CollidersVAO;
+	void UpdateColliders();
+	void DrawColliders(glm::mat4 view, glm::mat4 proj);
+
+
+
 };
 
 #endif // !RENDER_SYSTEM_H

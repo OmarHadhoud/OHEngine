@@ -30,7 +30,6 @@
     <ClCompile Include="src\game\Scene.cpp" />
     <ClCompile Include="src\game\Skybox.cpp" />
     <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
-    <ClCompile Include="src\renderer\Camera.cpp" />
     <ClCompile Include="src\renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\renderer\Mesh.cpp" />
     <ClCompile Include="src\renderer\Model.cpp" />
@@ -78,7 +77,6 @@
     <ClInclude Include="src\game\Scene.h" />
     <ClInclude Include="src\game\Skybox.h" />
     <ClInclude Include="src\renderer\CubeMapTexture.h" />
-    <ClInclude Include="src\renderer\Camera.h" />
     <ClInclude Include="src\renderer\enums.h" />
     <ClInclude Include="src\renderer\FrameBuffer.h" />
     <ClInclude Include="src\renderer\Mesh.h" />

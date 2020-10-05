@@ -11,15 +11,10 @@ class GUISystem : public System
 public:
 	GUISystem();
 	~GUISystem();
-	void SetCurrentWindow(GLFWwindow *currentWindow, int width, int height);
 	void Setup();
 	void Update();
 	void Draw();
 private:
-	//Window data
-	GLFWwindow *m_CurrentWindow;
-	int m_WindowWidth;
-	int m_WindowHeight;
 	//The GUI data
 	float m_Exposure;
 	float m_GammaCorrection;

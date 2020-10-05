@@ -1,9 +1,31 @@
-
 ============================================= PLAYER =====================================
 ========================================== ENTITY_START ==================================
+TRANSFORM
+POSITION = 0 2.5 20
+SCALE = 1 1 1
+ROTATION_AXIS = 0 1 0
+ROTATION_ANGLE = 0
+FORWARD = 0 0 -1
+ENABLED = 1
+
+RIGID_BODY
+VELOCITY = 0 0 0 
+ACCELERATION = 0 0 0 
+WEIGHT = 1
+ENABLED = 1
+
 
 CAMERA
+SENSETIVITY = 0.2
+PITCH = 0
+YAW = -90
+FOV = 45
+NEAR_PLANE = 0.1
+FAR_PLANE = 200
+YLocked = 1
 ENABLED = 1
+
+
 ========================================== ENTITY_END ==================================
 
 ========================================== ENTITY_START ==================================
@@ -16,11 +38,16 @@ IS_SOLID = 1
 ENABLED = 1
 
 TRANSFORM
-POSITION = 0 0 0
+POSITION = 0 1.75 0
 SCALE = 1 1 1
 ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
+ENABLED = 1
+
+BOX_COLLIDER 
+MIN_BOUND =  -0.7 -2.8 -3.4
+MAX_BOUND = 0.9 6.5 3.5
 ENABLED = 1
 ========================================== ENTITY_END ==================================
 
@@ -42,6 +69,11 @@ ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
 ENABLED = 1
+
+BOX_COLLIDER 
+MIN_BOUND =  6.7 -1 4
+MAX_BOUND = 8.7 2 4.8
+ENABLED = 1
 ========================================== ENTITY_END ==================================
 
 
@@ -55,8 +87,8 @@ IS_SOLID = 1
 ENABLED = 1
 
 TRANSFORM
-POSITION = 0 -3 0
-SCALE = 1 1 1
+POSITION = 0 -2.9 0
+SCALE = 0.5 0.5 0.5
 ROTATION_AXIS = 0 1 0
 ROTATION_ANGLE = 0
 FORWARD = 0 0 1
@@ -203,4 +235,3 @@ NEAR_PLANE = 1
 FAR_PLANE = 50
 ENABLED = 1
 ========================================== ENTITY_END ==================================
-

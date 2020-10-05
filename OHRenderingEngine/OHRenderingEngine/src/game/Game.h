@@ -51,7 +51,6 @@ private:
 	EventsController m_EventsController;
 	//Rendering related
 	Renderer m_Renderer;
-	Camera m_Camera;
 	//Level related
 	bool m_GameEnded;
 	std::vector<Collider*> m_Colliders;

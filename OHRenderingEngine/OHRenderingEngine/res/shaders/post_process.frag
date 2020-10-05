@@ -5,10 +5,16 @@ in vec2 v_TexCoords;
 
 uniform sampler2D quadTex;
 uniform sampler2D brightTex;
+uniform sampler2D crosshairTex;
+uniform sampler2D gunTex;
+uniform sampler2D gunfireTex;
+uniform bool shootingFire;
 uniform bool moving;
+uniform float recoilPower;
 uniform float blurStrength;
 uniform float gammaCorrection;
 uniform float exposure;
+uniform vec2 resolution;
 
 const float offset = 1.0f / 300.0f;
 
@@ -60,10 +66,23 @@ void main()
 	BrightColor *= vec4(vec3(kernelConstant), 1.0f);
 	BrightColor = (1-blurStrength)*vec4(pixels_bright[4],1.0f) + blurStrength*BrightColor;
 	FragColor += vec4(vec3(BrightColor),0.0f);
-	//Do tone mapping and gamma correction
+	//Do tone mapping 
 	FragColor = vec4(vec3(1.0f) - exp(-FragColor.xyz*exposure),1.0f);
+	//Add crosshair on top [Hard coded values, should be modularized or added to HUD shader later on]
+	float invRatio = resolution.y / resolution.x;
+	vec3 crosshair = vec3(texture(crosshairTex, vec2(19,19*invRatio)*vec2(-0.474,-0.474)+(v_TexCoords.xy*vec2(19,19*invRatio))));
+	FragColor += vec4(crosshair, 0.0f);
+	//Add gun on top [Hard coded values]
+	float recoilArm = 0.8-v_TexCoords.x;
+	vec4 gun = vec4(texture(gunTex, (v_TexCoords.xy+vec2(0,-recoilPower*60*recoilArm))*vec2(1,1*invRatio)));
+	if(gun.a > 0.1f)
+		FragColor = vec4(gun.xyz,1.0f);
+	//Add gunfire
+	gun = vec4(texture(gunfireTex, (v_TexCoords.xy)*vec2(1,1*invRatio))); 
+		if(gun.a > 0.1f && shootingFire==true)
+		FragColor += gun ;
+	//Make gamma correction
 	FragColor = vec4(pow(vec3(FragColor),vec3(1.0f/gammaCorrection)),1.0f);
-
 	//Shdaow map debugging
 	//FragColor = vec4(vec3(texture(quadTex,v_TexCoords).r),1.0f);
 }

@@ -7,20 +7,24 @@
 #include "game/ecs/Events/Event.h"
 #include <GLFW/glfw3.h>
 
+const float TIME_BETWEEN_SHOTS = 0.2f;
+
+
 class InputSystem : public System
 {
 public:
 	InputSystem();
 	~InputSystem();
-	void SetCurrentWindow(GLFWwindow *currentWindow);
 	void Update();
 private:
 	//Input variables
-	GLFWwindow *m_CurrentWindow;
+	bool m_CursorEnabled;
 	double m_LastMouseXPos;
 	double m_LastMouseYPos;
+	float m_MouseLastClickedTime;
 	bool m_LeftMouseReleased;
 	bool m_RightMouseReleased;
+	bool m_FirstTimeMouseMoves;
 	//Functions
 	void ProcessEvent(Event*);
 	void ProcessInput();

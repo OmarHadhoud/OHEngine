@@ -25,7 +25,7 @@ public:
 	Entity m_Entities[MAX_ENTITY_COUNT];
 	//Components
 	BoxCollider m_BoxColliders[MAX_BOX_COLLIDERS_COUNT];
-	CameraCOMP m_Cameras[MAX_CAMERA_COUNT];
+	Camera m_Cameras[MAX_CAMERA_COUNT];
 	DirectionalLight m_DirectionalLights[MAX_DIRECTIONAL_LIGHTS_COUNT];
 	LightShadow m_LightShadows[MAX_LIGHT_SHADHOWS_COUNT];
 	MeshRenderer m_MeshRenderers[MAX_MESH_RENDERER_COUNT];

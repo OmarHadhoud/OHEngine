@@ -41,6 +41,16 @@ void Renderer::ResizeWindow(int width, int height)
 	GlCall(glViewport(0, 0, width, height));
 }
 
+void Renderer::SetLineWidth(float width)
+{
+	GlCall(glLineWidth(width));
+}
+
+void Renderer::DrawPoints(int count)
+{
+	GlCall(glDrawArrays(GL_POINTS, 0, count));
+}
+
 void Renderer::EnableDepthTesting()
 {
 	GlCall(glEnable(GL_DEPTH_TEST));
@@ -91,6 +101,16 @@ void Renderer::BlitNamedFrameBuffer(const FrameBuffer & fboRead, const FrameBuff
 	fboRead.Bind(GL_READ_FRAMEBUFFER);
 	fboDraw.Bind(GL_DRAW_FRAMEBUFFER);
 	GlCall(glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+}
+
+void Renderer::VertexAttribPointer(unsigned int index, int size, GLenum type, bool normalized, GLsizei stride, const void * pointer)
+{
+	GlCall(glVertexAttribPointer(index, size, type, normalized, stride , pointer));
+}
+
+void Renderer::EnableVertexAttribArray(int index)
+{
+	GlCall(glEnableVertexAttribArray(index));
 }
 
 void Renderer::SetStencilMask(unsigned int mask)

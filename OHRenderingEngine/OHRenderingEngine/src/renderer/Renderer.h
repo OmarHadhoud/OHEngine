@@ -28,6 +28,8 @@ public:
 	//offset: The offset in the vao to draw
 	static void Draw(const VertexArray &vao, const Shader &shader, unsigned int count, unsigned int offset);
 	static void ResizeWindow(int width, int height);
+	static void SetLineWidth(float width);
+	static void DrawPoints(int count);
 	//Sets the number of anit aliasing samples
 	//n: The number of samples for anti aliasing
 	void SetAntiAliasingSamples(unsigned int n);
@@ -61,6 +63,9 @@ public:
 	static void BlitNamedFrameBuffer(const FrameBuffer &fboRead, const FrameBuffer &fboDraw,
 		unsigned int srcX0, unsigned int srcY0, unsigned int srcX1, unsigned int srcY1,
 		unsigned int dstX0, unsigned int dstY0, unsigned int dstX1, unsigned int dstY1) ;
+	//Vertex Array related functions
+	static void VertexAttribPointer(unsigned int index, int size, GLenum type, bool normalized, GLsizei stride, const void* pointer);
+	static void EnableVertexAttribArray(int index);
 private:
 	GLFWwindow *m_ActiveWindow;
 	static bool s_AntiAliasingEnabled;

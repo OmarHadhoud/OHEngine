@@ -283,7 +283,7 @@ float CalcShadow(mat4 TransformationMatrix ,sampler2D DepthMap, vec3 normalDir, 
 	lightCoords = 0.5f * lightCoords + 0.5f;
 	float shadow = 0.0f;
 	float bias = max(0.005f, 0.05*(1-dot(normalDir, lightDir)));
-	bias = 0.0f; //Using culling, no need for bias here.
+	bias = 0.0008f; //Using culling, no need for bias here.
 	float currentPoint = lightCoords.z;
 	for(int x = -1; x < 2; x++)
 	{
@@ -315,7 +315,7 @@ float CalcShadow(samplerCube DepthMap, float far_plane, vec3 normalDir, vec3 lig
 	float currentPoint = length(lightToFragment);
 	float shadow = 0.0f;
 	float bias = max(0.005f, 0.05*(1-dot(normalDir, lightToFragment)));
-	bias = 0.0f; //Using culling, no need for bias here.
+	bias = 0.0008f; //Using culling, no need for bias here.
 	float diskRadius = (1 + (viewDistance/far_plane) ) / 25.0f;
 	for(int i = 0; i < 20; i++)
 	{

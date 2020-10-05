@@ -60,7 +60,7 @@ int Game::RunLevel()
 	bool levelEnded = false;
 	//TODO: REMOVE
 	//TURN VSYNC OFF FOR DEBUGGING PURPOSES
-	//glfwSwapInterval(0);
+	//glfwSwapInterval(1);
 	
 	while(m_GameLogicSystem->GetGameState()== GameState::kLevelRunning)
 	{
@@ -154,7 +154,7 @@ void Game::AssignECSManager()
 
 void Game::AssignWindow()
 {
-	m_InputSystem->SetCurrentWindow(m_CurrentWindow);
+	m_InputSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 	m_RenderSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 	m_GUISystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 	m_GameLogicSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
@@ -261,35 +261,35 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	g_Game->m_Camera.UpdateRotation(xpos, ypos);
+	//g_Game->m_Camera.UpdateRotation(xpos, ypos);
 }
 
 void mouse_click_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	{
-		double xPos, yPos;
-		xPos = g_Game->m_WindowWidth / 2;
-		yPos = g_Game->m_WindowHeight / 2;
-		//Commented as we are using FPS view without cursor.
-		//glfwGetCursorPos(window, &xPos, &yPos);
+	//if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	//{
+	//	double xPos, yPos;
+	//	xPos = g_Game->m_WindowWidth / 2;
+	//	yPos = g_Game->m_WindowHeight / 2;
+	//	//Commented as we are using FPS view without cursor.
+	//	//glfwGetCursorPos(window, &xPos, &yPos);
 
-		glm::vec4 ray;
-		ray.x = (xPos * 2.0f) / (float)g_Game->m_WindowWidth - 1.0f;
-		ray.y = 1.0f - (yPos * 2.0f) / (float)g_Game->m_WindowHeight;
-		ray.z = -1.0f;
-		ray.w = 1.0f;
-		glm::mat4 projection = glm::perspective(glm::radians(g_Game->m_Camera.GetFOV()), (float)g_Game->m_WindowWidth / (float)g_Game->m_WindowHeight, 0.1f, 200.0f);
-		ray = glm::inverse(projection) * ray;
-		ray.z = -1.0f;
-		ray.w = 0.0f;
-		ray = glm::inverse(g_Game->m_Camera.GetViewMatrix()) * ray;
-		glm::vec3 ray_normalized = glm::vec3(ray.x, ray.y, ray.z);
-		ray_normalized = glm::normalize(ray_normalized);
-		g_Game->CheckColliderClickedOn(ray_normalized);
-	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-	{
-		g_Game->m_Bordered = false;
-	}
+	//	glm::vec4 ray;
+	//	ray.x = (xPos * 2.0f) / (float)g_Game->m_WindowWidth - 1.0f;
+	//	ray.y = 1.0f - (yPos * 2.0f) / (float)g_Game->m_WindowHeight;
+	//	ray.z = -1.0f;
+	//	ray.w = 1.0f;
+	//	glm::mat4 projection = glm::perspective(glm::radians(g_Game->m_Camera.GetFOV()), (float)g_Game->m_WindowWidth / (float)g_Game->m_WindowHeight, 0.1f, 200.0f);
+	//	ray = glm::inverse(projection) * ray;
+	//	ray.z = -1.0f;
+	//	ray.w = 0.0f;
+	//	ray = glm::inverse(g_Game->m_Camera.GetViewMatrix()) * ray;
+	//	glm::vec3 ray_normalized = glm::vec3(ray.x, ray.y, ray.z);
+	//	ray_normalized = glm::normalize(ray_normalized);
+	//	g_Game->CheckColliderClickedOn(ray_normalized);
+	//}
+	//else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	//{
+	//	g_Game->m_Bordered = false;
+	//}
 }

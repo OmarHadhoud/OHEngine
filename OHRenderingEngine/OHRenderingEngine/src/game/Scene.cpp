@@ -87,11 +87,32 @@ void Scene::ParseBoxCollider(int entityId, ECSManager* manager)
 //TODO: Make it generic
 void Scene::ParseCamera(int entityId, ECSManager* manager)
 {
+	float sensetivity;
+	float pitch;
+	float yaw;
+	float fov;
+	float nearPlane;
+	float farPlane;
+	int yLocked;
 	int enabled;
+
 	std::string tmp;
+	m_sceneStream >> tmp >> tmp >> sensetivity;
+	m_sceneStream >> tmp >> tmp >> pitch;
+	m_sceneStream >> tmp >> tmp >> yaw;
+	m_sceneStream >> tmp >> tmp >> fov;
+	m_sceneStream >> tmp >> tmp >> nearPlane;
+	m_sceneStream >> tmp >> tmp >> farPlane;
+	m_sceneStream >> tmp >> tmp >> yLocked;
 	m_sceneStream >> tmp >> tmp >> enabled;
-	int id = manager->AddComponent<CameraCOMP>(entityId);
-	manager->m_Cameras[id].m_Camera = std::make_unique<Camera>();
+	int id = manager->AddComponent<Camera>(entityId);
+	manager->m_Cameras[id].m_Sensetivity = sensetivity;
+	manager->m_Cameras[id].m_Pitch = pitch;
+	manager->m_Cameras[id].m_Yaw = yaw;
+	manager->m_Cameras[id].m_FOV = fov;
+	manager->m_Cameras[id].m_NearPlane = nearPlane;
+	manager->m_Cameras[id].m_FarPlane = farPlane;
+	manager->m_Cameras[id].m_YLocked = yLocked;
 	manager->m_Cameras[id].m_Enabled = enabled;
 }
 

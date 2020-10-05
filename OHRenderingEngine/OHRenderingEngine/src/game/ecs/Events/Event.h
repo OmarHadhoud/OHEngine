@@ -55,6 +55,8 @@ struct RotatePlayerEvent : Event
 {
 	double m_MouseXPos;
 	double m_MouseYPos;
+	double m_LastMouseXPos;
+	double m_LastMouseYPos;
 };
 
 struct PlayerMouseClickEvent : Event

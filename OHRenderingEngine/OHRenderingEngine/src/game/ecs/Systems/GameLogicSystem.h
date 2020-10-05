@@ -14,25 +14,33 @@ enum class GameState
 	kGameExited
 };
 
+//Constant values needed
+const int MAX_VELOCITY = 20.0f;
+const float ZERO_ACCELERATION = 0.001f;
+
 
 class GameLogicSystem : public System
 {
 public:
 	GameLogicSystem();
 	~GameLogicSystem();
-	void SetCurrentWindow(GLFWwindow *currentWindow, int width, int height);
 	void Update();
 	GameState GetGameState() const;
 private:
-	//Window variables
-	GLFWwindow *m_CurrentWindow;
-	int m_WindowWidth;
-	int m_WindowHeight;
 	//Gamestate variables
 	GameState m_gameState;
+	//Camera logic variables
+	bool m_FirstMouseMotion;
+
 	//Functions
 	void ProcessEvent(Event*);
-	int GetRayPickedEntityID();
+	void UpdateCameraPosition(int index, MovementDirection dir, float delta_time);
+	void UpdateCameraRotation(int index, double xpos, double ypos, double lastx, double lasty);
+	void UpdateRigidBodyComponents();
+	//Util functions
+	glm::vec3 GetRayCameraNormalized(double xPos, double yPos) const;
+	int GetRayPickedEntityID(glm::vec3 ray);
+	std::vector<float> GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool &intersect, int colliderIndex) const;
 };
 
 #endif // !GAME_LOGIC_SYSTEM_H

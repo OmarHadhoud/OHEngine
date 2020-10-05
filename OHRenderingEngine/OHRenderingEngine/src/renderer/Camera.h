@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAMERADELETED_H
+#define CAMERADELETED_H
 
 #include <glm/glm.hpp>
 #include <glm/glm_util.hpp>
@@ -12,11 +12,11 @@ const float NORMAL_SENSETIVITY = 0.2f;
 const float NORMAL_CAM_SPEED = 12.0f;
 
 
-class Camera
+class CameraDeleted
 {
 public:
-	Camera(float sensetivity=NORMAL_SENSETIVITY, float speed=NORMAL_CAM_SPEED);
-	~Camera();
+	CameraDeleted(float sensetivity=NORMAL_SENSETIVITY, float speed=NORMAL_CAM_SPEED);
+	~CameraDeleted();
 
 	//Updates the camera after moving mouse
 	//xpos: The mouse x coordinate
@@ -68,4 +68,4 @@ private:
 	void UpdateCameraVectors();
 };
 
-#endif // !CAMERA_H
+#endif // !CAMERADELETED_H
