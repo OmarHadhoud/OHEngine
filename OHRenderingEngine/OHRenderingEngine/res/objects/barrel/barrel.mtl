@@ -1,0 +1,26 @@
+# Blender MTL File: 'barrel.blend'
+# Material Count: 2
+
+newmtl metal
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.076410 0.076410 0.076410
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+map_Kd metalDiffuse.jpg
+map_Bump metalNormal.jpg
+map_Ks metalSpecular.jpg
+
+newmtl wood
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+map_Kd woodDiffuse.jpg
+map_Bump woodNormal.jpg
+map_Ks woodSpecular.jpg

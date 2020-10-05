@@ -6,6 +6,7 @@
 #include "game/ecs/Events/Event.h"
 #include <GLFW/glfw3.h>
 
+
 enum class GameState 
 {
 	kLevelRunning,
@@ -17,6 +18,7 @@ enum class GameState
 //Constant values needed
 const int MAX_VELOCITY = 20.0f;
 const float ZERO_ACCELERATION = 0.001f;
+const float TIME_BEFORE_DESTRUCTION = 0.15f;
 
 
 class GameLogicSystem : public System
@@ -37,10 +39,12 @@ private:
 	void UpdateCameraPosition(int index, MovementDirection dir, float delta_time);
 	void UpdateCameraRotation(int index, double xpos, double ypos, double lastx, double lasty);
 	void UpdateRigidBodyComponents();
+	void DisableDeadEntities();
 	//Util functions
 	glm::vec3 GetRayCameraNormalized(double xPos, double yPos) const;
 	int GetRayPickedEntityID(glm::vec3 ray);
 	std::vector<float> GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool &intersect, int colliderIndex) const;
+	void ShootEntity(int entityId);
 };
 
 #endif // !GAME_LOGIC_SYSTEM_H

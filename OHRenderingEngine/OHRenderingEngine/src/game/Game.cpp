@@ -60,7 +60,7 @@ int Game::RunLevel()
 	bool levelEnded = false;
 	//TODO: REMOVE
 	//TURN VSYNC OFF FOR DEBUGGING PURPOSES
-	//glfwSwapInterval(1);
+	//glfwSwapInterval(0);
 	
 	while(m_GameLogicSystem->GetGameState()== GameState::kLevelRunning)
 	{
@@ -121,7 +121,7 @@ void Game::CreateWindow()
 {
 	//If we have an open window
 	if (m_CurrentWindow != nullptr) return;
-	m_CurrentWindow= glfwCreateWindow(m_WindowWidth, m_WindowHeight, "Demo Window", nullptr, nullptr);
+	m_CurrentWindow = glfwCreateWindow(m_WindowWidth, m_WindowHeight, "Demo Window", glfwGetPrimaryMonitor() , nullptr);
 	if (m_CurrentWindow == nullptr) 
 		return;
 	glfwMakeContextCurrent(m_CurrentWindow);

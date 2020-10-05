@@ -20,7 +20,7 @@ out GS_OUT
 	mat3 TBN;
 } gs_out;
 
-uniform float time;
+uniform float explodePower;
 uniform mat4 projection;
 
 vec3 GetNormal()
@@ -39,7 +39,7 @@ void main()
 		gs_out.fragPos = gs_in[index].fragPos;
 		gs_out.fragPosWorld = gs_in[index].fragPosWorld;
 		gs_out.TBN = gs_in[index].TBN;
-		gl_Position = projection * ( gl_in[index].gl_Position + vec4(GetNormal()*time,0.0f) );
+		gl_Position = projection * ( gl_in[index].gl_Position + vec4(GetNormal()*explodePower,0.0f) );
 		EmitVertex();
 	}
 	EndPrimitive();

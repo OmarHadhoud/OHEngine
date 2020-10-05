@@ -55,6 +55,7 @@ RenderSystem::RenderSystem() :
 	m_GunTex(Texture("res/textures/gun.png", true)),
 	m_GunFireTex(Texture("res/textures/gunfire.png", true)),
 	m_GammaCorrection(2.2f),
+	m_RecoilStartedTime(-1),
 	m_Exposure(1.0f),
 	m_CurrentCamera(0)
 {
@@ -388,12 +389,22 @@ void RenderSystem::DrawNonTransparentObjects(const int * const indices, const Sh
 	shader.Use();
 	glm::mat4 model;
 	int i = 0;
+	float explodeStartTime;
+	float time = glfwGetTime();
 	while (indices[i] != -1)
 	{
 		int transformIndex = Transform::m_Indices[indices[i]];
 		int meshIndex = MeshRenderer::m_Indices[indices[i]];
 		model = m_ECSManager->m_Transforms[transformIndex].m_ModelMatrix;
 		shader.SetMat4("model", model);
+		explodeStartTime = m_ECSManager->m_MeshRenderers[meshIndex].m_ExplodeStartTime;
+		if (explodeStartTime == -1)
+			shader.SetFloat("explodePower", 0);
+		else
+		{
+			float explodePower = 2.5 * abs(sin(glm::radians((explodeStartTime - time) * 300)));
+			shader.SetFloat("explodePower", explodePower);
+		}
 		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
 		i++;
 	}
@@ -497,6 +508,7 @@ void RenderSystem::DrawInBuffer()
 
 void RenderSystem::DrawShootingEffects()
 {
+	if (m_RecoilStartedTime == -1) return;
 	float time = glfwGetTime();
 	float timeSinceRecoilStarted = time - m_RecoilStartedTime;
 	if (timeSinceRecoilStarted < RECOIL_DURATION)

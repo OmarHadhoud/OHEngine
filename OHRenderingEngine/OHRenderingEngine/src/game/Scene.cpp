@@ -181,7 +181,9 @@ void Scene::ParseMeshRenderer(int entityId, ECSManager* manager)
 	manager->m_MeshRenderers[id].m_BorderColor = borderColor;
 	manager->m_MeshRenderers[id].m_BorderEnabled = borderEnabled;
 	manager->m_MeshRenderers[id].m_Transparency = isTransparent == 0 ? Transparency::kNonTransparent : isTransparent == 1 ? Transparency::GL_TEXTURE_WRAP_SemiTransparent : Transparency::GL_TEXTURE_WRAP_Transparent;
-	manager->m_MeshRenderers[id].m_IsSolid= isSolid;
+	manager->m_MeshRenderers[id].m_IsSolid = isSolid;
+	manager->m_MeshRenderers[id].m_ExplodeStartTime = -1;
+
 	manager->m_MeshRenderers[id].m_Enabled = enabled;
 	//Set texture settings for transparent/semi transparent objects
 	if (isTransparent == 1 || isTransparent == 2)

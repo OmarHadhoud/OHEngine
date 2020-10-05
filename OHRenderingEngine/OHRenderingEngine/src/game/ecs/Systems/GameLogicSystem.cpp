@@ -18,6 +18,7 @@ void GameLogicSystem::Update()
 {
 	ProcessEvents(); 
 	UpdateRigidBodyComponents();
+	DisableDeadEntities();
 }
 
 GameState GameLogicSystem::GetGameState() const
@@ -52,6 +53,7 @@ void GameLogicSystem::ProcessEvent(Event* event)
 		PlayerMouseClickEvent* pressEvent = dynamic_cast<PlayerMouseClickEvent*> (event);
 		glm::vec3 rayNormalized = GetRayCameraNormalized(pressEvent->m_MouseXPos, pressEvent->m_MouseYPos);
 		int hitEntity = GetRayPickedEntityID(rayNormalized);
+		ShootEntity(hitEntity);
 		break;
 	}
 	case EventType::kPlayerSelects:
@@ -147,6 +149,19 @@ void GameLogicSystem::UpdateRigidBodyComponents()
 	}
 }
 
+void GameLogicSystem::DisableDeadEntities()
+{
+	float time = glfwGetTime();
+	for (int i = 0; i < MeshRenderer::m_Count; i++)
+	{
+		if (m_ECSManager->m_MeshRenderers[i].m_ExplodeStartTime < time - TIME_BEFORE_DESTRUCTION && m_ECSManager->m_MeshRenderers[i].m_ExplodeStartTime != -1)
+		{
+			int transformIndex = Transform::m_Indices[m_ECSManager->m_MeshRenderers[i].m_EntityID];
+			m_ECSManager->m_Transforms[transformIndex].m_Enabled = false;
+		}
+	}
+}
+
 glm::vec3 GameLogicSystem::GetRayCameraNormalized(double xPos, double yPos) const
 {
 	//Camera data
@@ -192,8 +207,6 @@ int GameLogicSystem::GetRayPickedEntityID(glm::vec3 ray)
 			minT = ts[0];
 		}
 	}
-	if (entityId != -1)
-		std::cout << "HIT ENTITY # " << entityId << std::endl;
 	return entityId;
 }
 
@@ -237,4 +250,12 @@ std::vector<float> GameLogicSystem::GetIntersectionParams(glm::vec3 origin, glm:
 	intersect = true;
 
 	return t;
+}
+
+void GameLogicSystem::ShootEntity(int entityId)
+{
+	int rendererIndex = MeshRenderer::m_Indices[entityId];
+	int colliderIndex = BoxCollider::m_Indices[entityId];
+	m_ECSManager->m_MeshRenderers[rendererIndex].m_ExplodeStartTime = glfwGetTime();
+	m_ECSManager->m_BoxColliders[colliderIndex].m_Enabled = false;
 }

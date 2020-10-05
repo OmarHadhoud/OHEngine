@@ -17,6 +17,7 @@ struct MeshRenderer : Component
 	std::unique_ptr<Model> m_Model;
 	glm::vec3 m_BorderColor;
 	bool m_BorderEnabled;
+	float m_ExplodeStartTime;
 	Transparency m_Transparency;
 	bool m_IsSolid;
 	static unsigned int m_Count;
