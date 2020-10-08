@@ -79,17 +79,21 @@ void GameLogicSystem::UpdateCameraPosition(int index, MovementDirection dir, flo
 	{
 	case MovementDirection::kForward:
 		m_ECSManager->m_Transforms[transformIndex].m_Position += movementDirection * cameraSpeed * delta_time;
+		m_ECSManager->m_Transforms[transformIndex+1].m_Position += movementDirection * cameraSpeed * delta_time;
 		break;
 	case MovementDirection::kBackward:
 		m_ECSManager->m_Transforms[transformIndex].m_Position -= movementDirection * cameraSpeed * delta_time;
+		m_ECSManager->m_Transforms[transformIndex+1].m_Position -= movementDirection * cameraSpeed * delta_time;
 		break;
 	case MovementDirection::kRight:
 		right = glm::normalize(glm::cross(movementDirection, glm::vec3(0, 1, 0)));
 		m_ECSManager->m_Transforms[transformIndex].m_Position += right * delta_time * cameraSpeed;
+		m_ECSManager->m_Transforms[transformIndex+1].m_Position += right * delta_time * cameraSpeed;
 		break;
 	case MovementDirection::kLeft:
 		right = glm::normalize(glm::cross(movementDirection, glm::vec3(0, 1, 0)));
 		m_ECSManager->m_Transforms[transformIndex].m_Position -= right * delta_time * cameraSpeed;
+		m_ECSManager->m_Transforms[transformIndex+1].m_Position -= right * delta_time * cameraSpeed;
 		break;
 	}
 }
@@ -113,17 +117,18 @@ void GameLogicSystem::UpdateCameraRotation(int index, double xpos, double ypos, 
 	float yaw = m_ECSManager->m_Cameras[index].m_Yaw;
 	float pitch = m_ECSManager->m_Cameras[index].m_Pitch;
 
-	m_ECSManager->m_Cameras[index].m_Yaw = yaw > 360.0f ? yaw - 360.f : yaw;
-	m_ECSManager->m_Cameras[index].m_Yaw = yaw < 0.0f ? yaw + 360.f : yaw;
-	m_ECSManager->m_Cameras[index].m_Pitch = pitch > 89.0f ? 89.0f : pitch;
-	m_ECSManager->m_Cameras[index].m_Pitch = pitch < -89.0f ? -89.0f : pitch;
+	m_ECSManager->m_Cameras[index].m_Yaw = yaw >= 360.0f ? yaw - 360.f : yaw;
+	m_ECSManager->m_Cameras[index].m_Yaw = yaw <= 0.0f ? yaw + 360.f : yaw;
+	m_ECSManager->m_Cameras[index].m_Pitch = pitch >= 89.0f ? 89.0f : pitch;
+	m_ECSManager->m_Cameras[index].m_Pitch = pitch <= -89.0f ? -89.0f : pitch;
+
 
 	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[0].m_EntityID];
 	m_ECSManager->m_Transforms[transformIndex].m_Forward.y = sin(glm::radians(m_ECSManager->m_Cameras[index].m_Pitch));
 	m_ECSManager->m_Transforms[transformIndex].m_Forward.x = cos(glm::radians(m_ECSManager->m_Cameras[index].m_Pitch)) * cos(glm::radians(m_ECSManager->m_Cameras[index].m_Yaw));
 	m_ECSManager->m_Transforms[transformIndex].m_Forward.z = cos(glm::radians(m_ECSManager->m_Cameras[index].m_Pitch)) * sin(glm::radians(m_ECSManager->m_Cameras[index].m_Yaw));
-
 	m_ECSManager->m_Transforms[transformIndex].m_Forward = glm::normalize(m_ECSManager->m_Transforms[transformIndex].m_Forward);
+	
 }
 
 void GameLogicSystem::UpdateRigidBodyComponents()

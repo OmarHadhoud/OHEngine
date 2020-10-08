@@ -72,13 +72,8 @@ void main()
 	float invRatio = resolution.y / resolution.x;
 	vec3 crosshair = vec3(texture(crosshairTex, vec2(19,19*invRatio)*vec2(-0.474,-0.474)+(v_TexCoords.xy*vec2(19,19*invRatio))));
 	FragColor += vec4(crosshair, 0.0f);
-	//Add gun on top [Hard coded values]
-	float recoilArm = 0.8-v_TexCoords.x;
-	vec4 gun = vec4(texture(gunTex, (v_TexCoords.xy+vec2(0,-recoilPower*60*recoilArm))*vec2(1,1*invRatio)));
-	if(gun.a > 0.1f)
-		FragColor = vec4(gun.xyz,1.0f);
 	//Add gunfire
-	gun = vec4(texture(gunfireTex, (v_TexCoords.xy)*vec2(1,1*invRatio))); 
+	vec4 gun = vec4(texture(gunfireTex, (v_TexCoords.xy)*vec2(1,1*invRatio))); 
 		if(gun.a > 0.1f && shootingFire==true)
 		FragColor += gun ;
 	//Make gamma correction

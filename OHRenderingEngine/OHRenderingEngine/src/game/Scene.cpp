@@ -288,7 +288,7 @@ void Scene::ParseTransform(int entityId, ECSManager* manager)
 {
 	glm::vec3 position;
 	glm::vec3 scale;
-	glm::vec3 rotationAxis;
+	glm::vec3 rotationAngles;
 	glm::vec3 forward;
 	float rotationAngle;
 	int enabled;
@@ -296,15 +296,13 @@ void Scene::ParseTransform(int entityId, ECSManager* manager)
 	std::string tmp;
 	m_sceneStream >> tmp >> tmp >> position.x >> position.y >> position.z;
 	m_sceneStream >> tmp >> tmp >> scale.x >> scale.y >> scale.z;
-	m_sceneStream >> tmp >> tmp >> rotationAxis.x >> rotationAxis.y >> rotationAxis.z;
-	m_sceneStream >> tmp >> tmp >> rotationAngle;
+	m_sceneStream >> tmp >> tmp >> rotationAngles.x >> rotationAngles.y >> rotationAngles.z;
 	m_sceneStream >> tmp >> tmp >> forward.x >> forward.y >> forward.z;
 	m_sceneStream >> tmp >> tmp >> enabled;
 	int id = manager->AddComponent<Transform>(entityId);
 	manager->m_Transforms[id].m_Position = position;
 	manager->m_Transforms[id].m_Scale = scale;
-	manager->m_Transforms[id].m_RotationAxis = rotationAxis;
+	manager->m_Transforms[id].m_RotationAngles = rotationAngles;
 	manager->m_Transforms[id].m_Forward = forward;
-	manager->m_Transforms[id].m_RotationAngle = rotationAngle;
 	manager->m_Transforms[id].m_Enabled = enabled;
 }

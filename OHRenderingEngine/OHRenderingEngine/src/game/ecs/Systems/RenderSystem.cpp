@@ -151,6 +151,33 @@ void RenderSystem::Update()
 	DrawSemiTransparentObjects(semiTransparentMeshes, m_MainShader);
 	Renderer::DisableBlending();
 
+	//TODO: TESTING
+	m_MainShader.Use();
+	projection = glm::perspective(glm::radians(m_ECSManager->m_Cameras[m_CurrentCamera].m_FOV), (float)m_WindowWidth / (float)m_WindowHeight, 0.00001f, 1.0f);
+	Renderer::Clear(GL_DEPTH_BUFFER_BIT,glm::vec4(0));
+	m_MainShader.SetMat4("projection", projection);
+	int transformIndex = 1;
+	int meshIndex = 0;
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, m_ECSManager->m_Transforms[1].m_Position - m_ECSManager->m_Transforms[0].m_Position);
+	float timeSinceRecoilStarted = glfwGetTime() - m_RecoilStartedTime;
+	float xRot = m_ECSManager->m_Transforms[1].m_RotationAngles.x;
+	float yRot = m_ECSManager->m_Transforms[1].m_RotationAngles.y;
+	if (timeSinceRecoilStarted < RECOIL_DURATION && m_RecoilStartedTime != -1)
+	{
+		if (timeSinceRecoilStarted < RECOIL_DURATION / 2)
+			xRot += timeSinceRecoilStarted * 10 / (RECOIL_DURATION / 2);
+		else
+			xRot += (RECOIL_DURATION - timeSinceRecoilStarted) * 10 / (RECOIL_DURATION / 2);
+	}
+	model = glm::rotate(model, glm::radians(xRot), glm::vec3(1, 0, 0));
+	model = glm::rotate(model, glm::radians(yRot), glm::vec3(0, 1, 0));
+	glm::mat4 identity(1.0f);
+	m_MainShader.SetMat4("view", identity);
+	m_MainShader.SetMat4("model", model);
+	m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(m_MainShader);
+	//
+
 	//=============Start rendering level editor objects=================
 	DrawColliders(view, projection);
 
@@ -176,11 +203,13 @@ void RenderSystem::ProcessEvent(Event* event)
 		UpdatePostProcessingParams* updEvent = dynamic_cast<UpdatePostProcessingParams*> (event);
 		m_Exposure = updEvent->m_Exposure;
 		m_GammaCorrection = updEvent->m_GammaCorrection;
+		break;
 	}
 	case EventType::kPlayerShoots:
 	{
 		m_RecoilStartedTime = glfwGetTime();
 		m_ShootingFireStartedTime = glfwGetTime();
+		break;
 	}
 	default:
 		break;
@@ -402,7 +431,7 @@ void RenderSystem::DrawNonTransparentObjects(const int * const indices, const Sh
 			shader.SetFloat("explodePower", 0);
 		else
 		{
-			float explodePower = 2.5 * abs(sin(glm::radians((explodeStartTime - time) * 300)));
+			float explodePower = 4 * abs(sin(glm::radians((explodeStartTime - time) * 300)));
 			shader.SetFloat("explodePower", explodePower);
 		}
 		m_ECSManager->m_MeshRenderers[meshIndex].m_Model->Draw(shader);
@@ -861,7 +890,9 @@ void RenderSystem::UpdateModelMatrices()
 	{
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, m_ECSManager->m_Transforms[i].m_Position);
-		model = glm::rotate(model, glm::radians(m_ECSManager->m_Transforms[i].m_RotationAngle), m_ECSManager->m_Transforms[i].m_RotationAxis);
+		model = glm::rotate(model, glm::radians(m_ECSManager->m_Transforms[i].m_RotationAngles.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(m_ECSManager->m_Transforms[i].m_RotationAngles.y), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(m_ECSManager->m_Transforms[i].m_RotationAngles.z), glm::vec3(0, 0, 1));
 		model = glm::scale(model, m_ECSManager->m_Transforms[i].m_Scale);
 		m_ECSManager->m_Transforms[i].m_ModelMatrix = model;
 	}

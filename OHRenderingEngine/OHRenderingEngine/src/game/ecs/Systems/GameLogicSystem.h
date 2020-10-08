@@ -18,7 +18,10 @@ enum class GameState
 //Constant values needed
 const int MAX_VELOCITY = 20.0f;
 const float ZERO_ACCELERATION = 0.001f;
-const float TIME_BEFORE_DESTRUCTION = 0.15f;
+const float TIME_BEFORE_DESTRUCTION = 0.05f;
+const float PI = 3.14159265f;
+const glm::vec3 WEAPON_ROTATION = glm::vec3(2.85, -85.0f, 0.0f);
+
 
 
 class GameLogicSystem : public System

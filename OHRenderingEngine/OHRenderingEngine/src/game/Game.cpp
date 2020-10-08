@@ -121,7 +121,7 @@ void Game::CreateWindow()
 {
 	//If we have an open window
 	if (m_CurrentWindow != nullptr) return;
-	m_CurrentWindow = glfwCreateWindow(m_WindowWidth, m_WindowHeight, "Demo Window", glfwGetPrimaryMonitor() , nullptr);
+	m_CurrentWindow = glfwCreateWindow(m_WindowWidth, m_WindowHeight, "Demo Window", nullptr , nullptr);
 	if (m_CurrentWindow == nullptr) 
 		return;
 	glfwMakeContextCurrent(m_CurrentWindow);

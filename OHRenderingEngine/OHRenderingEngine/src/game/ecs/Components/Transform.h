@@ -8,8 +8,7 @@ struct Transform : Component
 {
 	glm::vec3 m_Position;
 	glm::vec3 m_Scale;
-	glm::vec3 m_RotationAxis;
-	float m_RotationAngle;
+	glm::vec3 m_RotationAngles;
 	glm::vec3 m_Forward;
 	glm::mat4 m_ModelMatrix;
 	static unsigned int m_Count;
