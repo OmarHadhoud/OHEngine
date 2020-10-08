@@ -179,6 +179,8 @@ void RenderSystem::Update()
 	//
 
 	//=============Start rendering level editor objects=================
+	view = GetCameraViewMatrix(m_CurrentCamera);
+	projection = glm::perspective(glm::radians(m_ECSManager->m_Cameras[m_CurrentCamera].m_FOV), (float)m_WindowWidth / (float)m_WindowHeight, m_ECSManager->m_Cameras[m_CurrentCamera].m_NearPlane, m_ECSManager->m_Cameras[m_CurrentCamera].m_FarPlane);
 	DrawColliders(view, projection);
 
 	DownsampleMSBuffer();

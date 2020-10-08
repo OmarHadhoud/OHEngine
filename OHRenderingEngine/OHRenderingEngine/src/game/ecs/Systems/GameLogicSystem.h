@@ -45,9 +45,11 @@ private:
 	void DisableDeadEntities();
 	//Util functions
 	glm::vec3 GetRayCameraNormalized(double xPos, double yPos) const;
-	int GetRayPickedEntityID(glm::vec3 ray);
-	std::vector<float> GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool &intersect, int colliderIndex) const;
+	int GetRayPickedEntityID(glm::vec3 pos, glm::vec3 ray, int* maskedEntitiesID = nullptr, int size = 0);
+	int GetRayPickedEntityID(glm::vec3 pos, glm::vec3 ray, float &t0, float &t1, int* maskedEntitiesID = nullptr, int size = 0);
+	void GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool &intersect, int colliderIndex, float &t0, float &t1) const;
 	void ShootEntity(int entityId);
+	bool CanMoveInDir(glm::vec3 pos, glm::vec3 dir, int entityId);
 };
 
 #endif // !GAME_LOGIC_SYSTEM_H

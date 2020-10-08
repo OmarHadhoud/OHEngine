@@ -33,6 +33,14 @@ void GameLogicSystem::ProcessEvent(Event* event)
 	case EventType::kMovePlayer:
 	{
 		MovePlayerEvent* moveEvent = dynamic_cast<MovePlayerEvent*>(event);
+		glm::vec3 dir= m_ECSManager->m_Transforms[0].m_Forward;
+		if (m_ECSManager->m_Cameras[0].m_YLocked) dir.y = 0;
+		if(moveEvent->m_MovementDirection == MovementDirection::kRight || moveEvent->m_MovementDirection == MovementDirection::kLeft)
+			dir = glm::normalize(glm::cross(dir, glm::vec3(0, 1, 0)));
+		if (moveEvent->m_MovementDirection == MovementDirection::kBackward || moveEvent->m_MovementDirection == MovementDirection::kLeft)
+			dir *= -1;
+		if (!CanMoveInDir(m_ECSManager->m_Transforms[0].m_Position, dir, 0))
+			break;
 		m_ECSManager->m_RigidBodies[0].m_Acceleration = glm::vec3(1.0f);
 		UpdateCameraPosition(0, moveEvent->m_MovementDirection, Game::m_DeltaTime);
 		break;
@@ -52,7 +60,7 @@ void GameLogicSystem::ProcessEvent(Event* event)
 	{
 		PlayerMouseClickEvent* pressEvent = dynamic_cast<PlayerMouseClickEvent*> (event);
 		glm::vec3 rayNormalized = GetRayCameraNormalized(pressEvent->m_MouseXPos, pressEvent->m_MouseYPos);
-		int hitEntity = GetRayPickedEntityID(rayNormalized);
+		int hitEntity = GetRayPickedEntityID(m_ECSManager->m_Transforms[0].m_Position,rayNormalized);
 		ShootEntity(hitEntity);
 		break;
 	}
@@ -195,7 +203,7 @@ glm::vec3 GameLogicSystem::GetRayCameraNormalized(double xPos, double yPos) cons
 	return rayNormalized;
 }
 
-int GameLogicSystem::GetRayPickedEntityID(glm::vec3 ray)
+int GameLogicSystem::GetRayPickedEntityID(glm::vec3 pos, glm::vec3 ray, int* maskedEntitiesID, int size)
 {
 	int entityId = -1;
 	float minT = INT32_MAX;
@@ -204,20 +212,57 @@ int GameLogicSystem::GetRayPickedEntityID(glm::vec3 ray)
 		if (!m_ECSManager->m_BoxColliders[i].m_Enabled)
 			continue;
 		bool intersect;
-		std::vector<float> ts;
-		ts = GetIntersectionParams(m_ECSManager->m_Transforms[0].m_Position, ray, intersect, i);
-		if (intersect && ts[0] < minT)
+		bool notMasked = true;
+		if (size != 0)
+		{
+			for (int j = 0; j < size; j++)
+				notMasked = notMasked && m_ECSManager->m_BoxColliders[i].m_EntityID != maskedEntitiesID[j];
+		}
+		float t0;
+		float t1;
+		GetIntersectionParams(pos, ray, intersect, i, t0, t1);
+		if (intersect && t0 < minT && notMasked)
 		{
 			entityId = m_ECSManager->m_BoxColliders[i].m_EntityID;
-			minT = ts[0];
+			minT = t0;
 		}
 	}
 	return entityId;
 }
 
-std::vector<float> GameLogicSystem::GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool & intersect, int colliderIndex) const
+int GameLogicSystem::GetRayPickedEntityID(glm::vec3 pos, glm::vec3 ray, float &t0, float &t1, int* maskedEntitiesID, int size)
 {
-	std::vector<float> t = { -1,-1 };
+	int entityId = -1;
+	float minT = INT32_MAX;
+	for (int i = 0; i < BoxCollider::m_Count; i++)
+	{
+		if (!m_ECSManager->m_BoxColliders[i].m_Enabled)
+			continue;
+		bool intersect;
+		bool notMasked = true;
+		if (size != 0)
+		{
+			for (int j = 0; j < size; j++)
+				notMasked = notMasked && m_ECSManager->m_BoxColliders[i].m_EntityID != maskedEntitiesID[j];
+		}
+		float t0_;
+		float t1_;
+		GetIntersectionParams(pos, ray, intersect, i, t0_, t1_);
+		if (intersect && t0_ < minT && notMasked)
+		{
+			entityId = m_ECSManager->m_BoxColliders[i].m_EntityID;
+			minT = t0_;
+			t0 = t0_;
+			t1 = t1_;
+		}
+	}
+	return entityId;
+}
+
+
+void GameLogicSystem::GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool & intersect, int colliderIndex, float &t0, float &t1) const
+{
+	t0 = t1 = -1;
 	intersect = false;
 
 	glm::vec3 invDir = glm::vec3(1 / dir.x, 1 / dir.y, 1 / dir.z);
@@ -246,15 +291,15 @@ std::vector<float> GameLogicSystem::GetIntersectionParams(glm::vec3 origin, glm:
 	tmax = std::min(tmax, t1z);
 
 	if (tmin > tmax || tmin < 0)
-		return t;
+		return;
 
 
-	t[0] = tmin;
-	t[1] = tmax;
+	t0 = tmin;
+	t1 = tmax;
 
 	intersect = true;
 
-	return t;
+	return;
 }
 
 void GameLogicSystem::ShootEntity(int entityId)
@@ -263,4 +308,24 @@ void GameLogicSystem::ShootEntity(int entityId)
 	int colliderIndex = BoxCollider::m_Indices[entityId];
 	m_ECSManager->m_MeshRenderers[rendererIndex].m_ExplodeStartTime = glfwGetTime();
 	m_ECSManager->m_BoxColliders[colliderIndex].m_Enabled = false;
+}
+
+bool GameLogicSystem::CanMoveInDir(glm::vec3 pos, glm::vec3 dir, int entityId)
+{
+	float t0;
+	float t1;
+	int masked[] = { 0 };
+	dir = glm::normalize(dir);
+	//TODO: THIS SHOULD BE INTEGRATED WITH THE PLAYER COMPONENT
+	float playerHeight = 5.8;
+	float hitMargin = 0.5;
+	int hitEntity;
+	bool hit = false;
+	for (int i = 0; i < 10 && !hit; i++) //Make 10 rays to check for collision
+	{
+		hitEntity = GetRayPickedEntityID(pos, dir, t0, t1, &masked[0], 1);
+		hit = t0 < hitMargin && hitEntity != -1;
+		pos.y -= playerHeight / 10.0f;
+	}
+	return !hit;
 }
