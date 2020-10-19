@@ -32,23 +32,31 @@ void GameLogicSystem::ProcessEvent(Event* event)
 	{
 	case EventType::kMovePlayer:
 	{
+		int playerEntityID = m_ECSManager->m_Players[0].m_EntityID;
+		int transformIndex = Transform::m_Indices[playerEntityID];
+		int cameraIndex = Camera::m_Indices[playerEntityID];
+		int rigidbodyIndex = RigidBody::m_Indices[playerEntityID];
+
 		MovePlayerEvent* moveEvent = dynamic_cast<MovePlayerEvent*>(event);
-		glm::vec3 dir= m_ECSManager->m_Transforms[0].m_Forward;
-		if (m_ECSManager->m_Cameras[0].m_YLocked) dir.y = 0;
+		glm::vec3 dir= m_ECSManager->m_Transforms[transformIndex].m_Forward;
+		if (m_ECSManager->m_Cameras[cameraIndex].m_YLocked) dir.y = 0;
 		if(moveEvent->m_MovementDirection == MovementDirection::kRight || moveEvent->m_MovementDirection == MovementDirection::kLeft)
 			dir = glm::normalize(glm::cross(dir, glm::vec3(0, 1, 0)));
 		if (moveEvent->m_MovementDirection == MovementDirection::kBackward || moveEvent->m_MovementDirection == MovementDirection::kLeft)
 			dir *= -1;
-		if (!CanMoveInDir(m_ECSManager->m_Transforms[0].m_Position, dir, 0))
+		if (!CanMoveInDir(m_ECSManager->m_Transforms[transformIndex].m_Position, dir, playerEntityID))
 			break;
-		m_ECSManager->m_RigidBodies[0].m_Acceleration = glm::vec3(1.0f);
-		UpdateCameraPosition(0, moveEvent->m_MovementDirection, Game::m_DeltaTime);
+		m_ECSManager->m_RigidBodies[rigidbodyIndex].m_Acceleration = glm::vec3(1.0f);
+		UpdateCameraPosition(cameraIndex, moveEvent->m_MovementDirection, Game::m_DeltaTime);
 		break;
 	}
 	case EventType::kRotatePlayer:
 	{
+		int playerEntityID = m_ECSManager->m_Players[0].m_EntityID;
+		int cameraIndex = Camera::m_Indices[playerEntityID];
+
 		RotatePlayerEvent* rotateEvent = dynamic_cast<RotatePlayerEvent*> (event);
-		UpdateCameraRotation(0, rotateEvent->m_MouseXPos, rotateEvent->m_MouseYPos, rotateEvent->m_LastMouseXPos, rotateEvent->m_LastMouseYPos);
+		UpdateCameraRotation(cameraIndex, rotateEvent->m_MouseXPos, rotateEvent->m_MouseYPos, rotateEvent->m_LastMouseXPos, rotateEvent->m_LastMouseYPos);
 		break;
 	}
 	case EventType::kExitGame:
@@ -58,9 +66,12 @@ void GameLogicSystem::ProcessEvent(Event* event)
 	}
 	case EventType::kPlayerShoots:
 	{
+		int playerEntityID = m_ECSManager->m_Players[0].m_EntityID;
+		int transformIndex = Transform::m_Indices[playerEntityID];
+
 		PlayerMouseClickEvent* pressEvent = dynamic_cast<PlayerMouseClickEvent*> (event);
 		glm::vec3 rayNormalized = GetRayCameraNormalized(pressEvent->m_MouseXPos, pressEvent->m_MouseYPos);
-		int hitEntity = GetRayPickedEntityID(m_ECSManager->m_Transforms[0].m_Position,rayNormalized);
+		int hitEntity = GetRayPickedEntityID(m_ECSManager->m_Transforms[transformIndex].m_Position,rayNormalized);
 		ShootEntity(hitEntity);
 		break;
 	}
@@ -75,12 +86,12 @@ void GameLogicSystem::ProcessEvent(Event* event)
 
 void GameLogicSystem::UpdateCameraPosition(int index, MovementDirection dir, float delta_time)
 {
-	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[0].m_EntityID];
-	int rigidBodyIndex = RigidBody::m_Indices[m_ECSManager->m_Cameras[0].m_EntityID];
+	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[index].m_EntityID];
+	int rigidBodyIndex = RigidBody::m_Indices[m_ECSManager->m_Cameras[index].m_EntityID];
 	glm::vec3 movementDirection = m_ECSManager->m_Transforms[transformIndex].m_Forward;
 	glm::vec3 cameraSpeed = m_ECSManager->m_RigidBodies[rigidBodyIndex].m_Velocity;
 	glm::vec3 right;
-	bool m_YLocked = m_ECSManager->m_Cameras[0].m_YLocked;
+	bool m_YLocked = m_ECSManager->m_Cameras[index].m_YLocked;
 	
 	if (m_YLocked) movementDirection.y = 0;
 	switch (dir)
@@ -170,18 +181,25 @@ void GameLogicSystem::DisableDeadEntities()
 		if (m_ECSManager->m_MeshRenderers[i].m_ExplodeStartTime < time - TIME_BEFORE_DESTRUCTION && m_ECSManager->m_MeshRenderers[i].m_ExplodeStartTime != -1)
 		{
 			int transformIndex = Transform::m_Indices[m_ECSManager->m_MeshRenderers[i].m_EntityID];
-			m_ECSManager->m_Transforms[transformIndex].m_Enabled = false;
+			int healthIndex = Health::m_Indices[m_ECSManager->m_MeshRenderers[i].m_EntityID];
+			if (healthIndex != -1 && m_ECSManager->m_Health[healthIndex].m_Value <= 0)
+				m_ECSManager->m_Transforms[transformIndex].m_Enabled = false;
+			else
+				m_ECSManager->m_MeshRenderers[i].m_ExplodeStartTime = -1;
 		}
 	}
 }
 
 glm::vec3 GameLogicSystem::GetRayCameraNormalized(double xPos, double yPos) const
 {
+	int playerEntityID = m_ECSManager->m_Players[0].m_EntityID;
+	int cameraIndex = Camera::m_Indices[playerEntityID];
+	int transformIndex = Transform::m_Indices[playerEntityID];
+
 	//Camera data
-	float nearPlane = m_ECSManager->m_Cameras[0].m_NearPlane;
-	float farPlane = m_ECSManager->m_Cameras[0].m_FarPlane;
-	float fov = m_ECSManager->m_Cameras[0].m_FOV;
-	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[0].m_EntityID];
+	float nearPlane = m_ECSManager->m_Cameras[cameraIndex].m_NearPlane;
+	float farPlane = m_ECSManager->m_Cameras[cameraIndex].m_FarPlane;
+	float fov = m_ECSManager->m_Cameras[cameraIndex].m_FOV;
 	glm::vec3 pos = m_ECSManager->m_Transforms[transformIndex].m_Position;
 	glm::vec3 forward = m_ECSManager->m_Transforms[transformIndex].m_Forward;
 	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
@@ -306,7 +324,18 @@ void GameLogicSystem::ShootEntity(int entityId)
 {
 	int rendererIndex = MeshRenderer::m_Indices[entityId];
 	int colliderIndex = BoxCollider::m_Indices[entityId];
+	int healthIndex = Health::m_Indices[entityId];
+
+	m_ECSManager->m_Health[healthIndex].m_Value -= WEAPON_DAMAGE;
 	m_ECSManager->m_MeshRenderers[rendererIndex].m_ExplodeStartTime = glfwGetTime();
+	if (m_ECSManager->m_Health[healthIndex].m_Value <= 0)
+		KillEntity(entityId);
+}
+
+void GameLogicSystem::KillEntity(int entityId)
+{
+	int rendererIndex = MeshRenderer::m_Indices[entityId];
+	int colliderIndex = BoxCollider::m_Indices[entityId];
 	m_ECSManager->m_BoxColliders[colliderIndex].m_Enabled = false;
 }
 

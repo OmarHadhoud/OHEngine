@@ -85,5 +85,7 @@
     <ClInclude Include="src\game\ecs\Components\Component.h" />
     <ClInclude Include="src\game\ecs\ECSCount.h" />
     <ClInclude Include="src\game\ecs\Components\CameraComponent.h" />
+    <ClInclude Include="src\game\ecs\Components\Player.h" />
+    <ClInclude Include="src\game\ecs\Components\Health.h" />
   </ItemGroup>
 </Project>

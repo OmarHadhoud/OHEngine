@@ -21,6 +21,7 @@ const float ZERO_ACCELERATION = 0.001f;
 const float TIME_BEFORE_DESTRUCTION = 0.05f;
 const float PI = 3.14159265f;
 const glm::vec3 WEAPON_ROTATION = glm::vec3(2.85, -85.0f, 0.0f);
+const float WEAPON_DAMAGE = 50;
 
 
 
@@ -49,6 +50,7 @@ private:
 	int GetRayPickedEntityID(glm::vec3 pos, glm::vec3 ray, float &t0, float &t1, int* maskedEntitiesID = nullptr, int size = 0);
 	void GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, bool &intersect, int colliderIndex, float &t0, float &t1) const;
 	void ShootEntity(int entityId);
+	void KillEntity(int entityId);
 	bool CanMoveInDir(glm::vec3 pos, glm::vec3 dir, int entityId);
 };
 

@@ -24,6 +24,8 @@ private:
 	void ParseRigidBody(int entityId, ECSManager* manager);
 	void ParseSpotLight(int entityId, ECSManager* manager);
 	void ParseTransform(int entityId, ECSManager* manager);
+	void ParsePlayer(int entityId, ECSManager* manager);
+	void ParseHealth(int entityId, ECSManager* manager);
 };
 #endif // !SCENE_H
 

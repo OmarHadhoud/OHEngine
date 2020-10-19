@@ -62,6 +62,10 @@ void Scene::ParseEntity(ECSManager* manager)
 			ParseSpotLight(entityId, manager);
 		else if (tmpString == "TRANSFORM")
 			ParseTransform(entityId, manager);
+		else if (tmpString == "PLAYER")
+			ParsePlayer(entityId, manager);
+		else if (tmpString == "HEALTH")
+			ParseHealth(entityId, manager);
 		else if (tmpString == "ENTITY_END")
 			break;
 	}
@@ -305,4 +309,29 @@ void Scene::ParseTransform(int entityId, ECSManager* manager)
 	manager->m_Transforms[id].m_RotationAngles = rotationAngles;
 	manager->m_Transforms[id].m_Forward = forward;
 	manager->m_Transforms[id].m_Enabled = enabled;
+}
+
+void Scene::ParsePlayer(int entityId, ECSManager* manager)
+{
+	int enabled;
+
+	std::string tmp;
+	m_sceneStream >> tmp >> tmp >> enabled;
+	
+	int id = manager->AddComponent<Player>(entityId);
+	manager->m_Players[id].m_Enabled = enabled;
+}
+
+void Scene::ParseHealth(int entityId, ECSManager* manager)
+{
+	float value;
+	int enabled;
+
+	std::string tmp;
+	m_sceneStream >> tmp >> tmp >> value;
+	m_sceneStream >> tmp >> tmp >> enabled;
+
+	int id = manager->AddComponent<Health>(entityId);
+	manager->m_Health[id].m_Value= value;
+	manager->m_Health[id].m_Enabled = enabled;
 }

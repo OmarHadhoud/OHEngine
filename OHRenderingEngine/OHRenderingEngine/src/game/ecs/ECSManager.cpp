@@ -13,6 +13,8 @@ unsigned int PointLight::m_Count = 0;
 unsigned int RigidBody::m_Count = 0;
 unsigned int SpotLight::m_Count = 0;
 unsigned int Transform::m_Count = 0;
+unsigned int Player::m_Count = 0;
+unsigned int Health::m_Count = 0;
 //MAPS
 int BoxCollider::m_Indices[MAX_ENTITY_COUNT];
 int Camera::m_Indices[MAX_ENTITY_COUNT];
@@ -23,6 +25,8 @@ int PointLight::m_Indices[MAX_ENTITY_COUNT];
 int RigidBody::m_Indices[MAX_ENTITY_COUNT];
 int SpotLight::m_Indices[MAX_ENTITY_COUNT];
 int Transform::m_Indices[MAX_ENTITY_COUNT];
+int Player::m_Indices[MAX_ENTITY_COUNT];
+int Health::m_Indices[MAX_ENTITY_COUNT];
 
 
 
@@ -49,6 +53,8 @@ void ECSManager::SetupComponents()
 		PointLight::m_Indices[i] = -1;
 		SpotLight::m_Indices[i] = -1;
 		Transform::m_Indices[i] = -1;
+		Player::m_Indices[i] = -1;
+		Health::m_Indices[i] = -1;
 	}
 }
 
@@ -171,4 +177,26 @@ template<> unsigned int ECSManager::AddComponent<Transform>(unsigned int entityI
 	Transform::m_Indices[entityId] = Transform::m_Count;
 	Transform::m_Count++;
 	return Transform::m_Count - 1;
+}
+
+template<> unsigned int ECSManager::AddComponent<Player>(unsigned int entityId)
+{
+	assert(Player::m_Count != MAX_TRANSFORM_COUNT);
+	assert(entityId < Entity::m_Count);
+	assert(Player::m_Indices[entityId] == -1);
+	m_Players[Player::m_Count].m_EntityID = entityId;
+	Player::m_Indices[entityId] = Player::m_Count;
+	Player::m_Count++;
+	return Player::m_Count - 1;
+}
+
+template<> unsigned int ECSManager::AddComponent<Health>(unsigned int entityId)
+{
+	assert(Health::m_Count != MAX_TRANSFORM_COUNT);
+	assert(entityId < Entity::m_Count);
+	assert(Health::m_Indices[entityId] == -1);
+	m_Players[Health::m_Count].m_EntityID = entityId;
+	Health::m_Indices[entityId] = Health::m_Count;
+	Health::m_Count++;
+	return Health::m_Count - 1;
 }

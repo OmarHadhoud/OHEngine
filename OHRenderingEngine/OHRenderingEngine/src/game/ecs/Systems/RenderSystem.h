@@ -97,6 +97,7 @@ private:
 	
 	void DrawNonTransparentObjects(const int * const indices, const Shader &shader);
 	void DrawSemiTransparentObjects(std::map<float, int> &indices, const Shader &shader);
+	void DrawFPSGun();
 	void DownsampleMSBuffer();
 	void ApplyBloom();
 	void DrawInBuffer();

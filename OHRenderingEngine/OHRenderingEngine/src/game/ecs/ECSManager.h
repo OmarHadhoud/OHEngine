@@ -10,6 +10,8 @@
 #include "game/ecs/Components/RigidBody.h"
 #include "game/ecs/Components/SpotLight.h"
 #include "game/ecs/Components/Transform.h"
+#include "game/ecs/Components/Player.h"
+#include "game/ecs/Components/Health.h"
 
 #include "game/ecs/Entity.h"
 #include "game/ecs/ECSCount.h"
@@ -33,6 +35,8 @@ public:
 	RigidBody m_RigidBodies[MAX_RIGID_BODY_COUNT];
 	SpotLight m_SpotLights[MAX_SPOTLIGHT_COUNT];
 	Transform m_Transforms[MAX_TRANSFORM_COUNT];
+	Player m_Players[MAX_PLAYER_COUNT];
+	Health m_Health[MAX_HEALTH_COUNT];
 	//Add Entity/Components functions
 	int AddEntities(int count);
 	template<typename T> unsigned int AddComponent(unsigned int entityId);

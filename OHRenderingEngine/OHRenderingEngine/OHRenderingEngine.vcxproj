@@ -57,8 +57,10 @@
     <ClInclude Include="src\game\ecs\Components\CameraComponent.h" />
     <ClInclude Include="src\game\ecs\Components\Component.h" />
     <ClInclude Include="src\game\ecs\Components\DirectionalLight.h" />
+    <ClInclude Include="src\game\ecs\Components\Health.h" />
     <ClInclude Include="src\game\ecs\Components\LightShadow.h" />
     <ClInclude Include="src\game\ecs\Components\MeshRenderer.h" />
+    <ClInclude Include="src\game\ecs\Components\Player.h" />
     <ClInclude Include="src\game\ecs\Components\PointLight.h" />
     <ClInclude Include="src\game\ecs\Components\RigidBody.h" />
     <ClInclude Include="src\game\ecs\Components\SpotLight.h" />
@@ -109,32 +111,32 @@
     <ProjectGuid>{AAC3BE0E-E2E6-4501-90C0-2F02FA38BF6C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RenderingEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
