@@ -36,7 +36,8 @@ The renderer folder has all classes needed for rendering and creating a scene us
 # Dependencies
 This project uses imgui for the GUI, stbi for image loading, and assimp for model loading. It also uses GLFW, GLAD and GLM for openGL related stuff.
 # How to run
-Just download the project and run using visual studio in debug mode/ release mode. Release mode is preferred as it is much faster specially to loading models using assimp.
+Just download the project and run using visual studio in debug mode/ release mode. Release mode is preferred as it is much faster specially to loading models using assimp.  
+Note: As the 3D models size is too large, you can download it from here: https://drive.google.com/file/d/114mm2LcC46iRoOX_wXUAiKO8ff6BONml/view?usp=sharing and extract it in the res folder.  
 # Screenshots/GIFS
 ![image](/Screenshots/1.png?raw=true)
 A pink point light, a white directional light from the left side, both reflecting on the ground. Skybox made of a Yokohama panorama picture can be seen.    
