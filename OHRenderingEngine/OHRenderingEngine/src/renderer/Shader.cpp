@@ -60,7 +60,7 @@ Shader::Shader(const char * vertexPath, const char * fragmentPath)
 	GlCall(glGetShaderiv(fragment, GL_COMPILE_STATUS, &success));
 	if (!success)
 	{
-		GlCall(glGetShaderInfoLog(vertex, 512, NULL, infoLog));
+		GlCall(glGetShaderInfoLog(fragment, 512, NULL, infoLog));
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	};
 
