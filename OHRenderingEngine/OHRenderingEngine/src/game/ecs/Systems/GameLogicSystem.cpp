@@ -136,10 +136,10 @@ void GameLogicSystem::UpdateCameraRotation(int index, double xpos, double ypos, 
 	float yaw = m_ECSManager->m_Cameras[index].m_Yaw;
 	float pitch = m_ECSManager->m_Cameras[index].m_Pitch;
 
-	m_ECSManager->m_Cameras[index].m_Yaw = yaw >= 360.0f ? yaw - 360.f : yaw;
-	m_ECSManager->m_Cameras[index].m_Yaw = yaw <= 0.0f ? yaw + 360.f : yaw;
-	m_ECSManager->m_Cameras[index].m_Pitch = pitch >= 89.0f ? 89.0f : pitch;
-	m_ECSManager->m_Cameras[index].m_Pitch = pitch <= -89.0f ? -89.0f : pitch;
+	yaw = m_ECSManager->m_Cameras[index].m_Yaw = yaw >= 360.0f ? yaw - 360.f : yaw;
+	yaw = m_ECSManager->m_Cameras[index].m_Yaw = yaw <= 0.0f ? yaw + 360.f : yaw;
+	pitch = m_ECSManager->m_Cameras[index].m_Pitch = pitch >= 89.0f ? 89.0f : pitch;
+	pitch = m_ECSManager->m_Cameras[index].m_Pitch = pitch <= -89.0f ? -89.0f : pitch;
 
 
 	int transformIndex = Transform::m_Indices[m_ECSManager->m_Cameras[0].m_EntityID];
