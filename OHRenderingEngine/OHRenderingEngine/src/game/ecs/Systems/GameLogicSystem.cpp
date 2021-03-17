@@ -343,7 +343,7 @@ bool GameLogicSystem::CanMoveInDir(glm::vec3 pos, glm::vec3 dir, int entityId)
 {
 	float t0;
 	float t1;
-	int masked[] = { 0 };
+	int masked[] = { entityId };
 	dir = glm::normalize(dir);
 	//TODO: THIS SHOULD BE INTEGRATED WITH THE PLAYER COMPONENT
 	float playerHeight = 5.8;
