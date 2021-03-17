@@ -8,7 +8,6 @@
 #include "renderer/Camera.h"
 #include "renderer/Debugger.h"
 
-#include "enums.h"
 
 #include <GLFW/glfw3.h>
 

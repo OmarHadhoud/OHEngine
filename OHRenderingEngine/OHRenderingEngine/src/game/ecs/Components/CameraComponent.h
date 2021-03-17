@@ -5,7 +5,6 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "game/ecs/Components/Component.h"
-#include "renderer/Camera.h"
 
 //TODO: Turn it to a true component system instead of just wrapping the class in a pointer.
 struct Camera : Component

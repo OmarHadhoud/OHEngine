@@ -1,8 +1,6 @@
 #ifndef INDEX_BUFFER_H
 #define INDEX_BUFFER_H
 
-#include "renderer/enums.h"
-
 class IndexBuffer
 {
 public:

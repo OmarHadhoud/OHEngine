@@ -2,8 +2,6 @@
 #define VERTEX_BUFFER_H
 
 #include <glad/glad.h>
-
-#include "renderer/enums.h"
 #include "renderer/VertexBufferLayout.h"
 
 class VertexBuffer

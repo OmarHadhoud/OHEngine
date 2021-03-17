@@ -3,7 +3,6 @@
 
 #include "renderer/Texture.h"
 #include "renderer/RenderBuffer.h"
-#include "renderer/enums.h"
 
 class FrameBuffer
 {
