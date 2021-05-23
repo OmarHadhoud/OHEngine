@@ -16,7 +16,7 @@ I also implemented a simple game manager to have a simple game scene as a test e
 - Supports Gamma Correction.  
 - Supports Directional, Point and Spot Lights shadows using shadow mapping.
 - Supports HDR and Bloom post process effect.
-- A simple ECS system based on AoS. It does allocate the maximum memory the game can reach before the start of the game though, to minimize allocate/de-allocating in the game. It also has a lot of hacks in that part, like having an entity ID value for every component to be able to access that entity, and an array mapping all components indices to the entities IDs.
+- A simple ECS system based on SoA. It does allocate the maximum memory the game can reach before the start of the game though, to minimize allocate/de-allocating in the game. It also has a lot of hacks in that part, like having an entity ID value for every component to be able to access that entity, and an array mapping all components indices to the entities IDs.
 - The game engine supports a ".lvl" text files that contain the details for the scene, by listing every entity and its components.
 - The game engine supports adding any number of light sources using the ".lvl" file. There is a maximum though defined in the game engine.
 - The game engine supports adding a certain number of light shadows for Directional and Spot Lights. There is also another maximum number of shadows for Point lights, as they are usually more heavy due to using cubemaps in shadow-mapping.
