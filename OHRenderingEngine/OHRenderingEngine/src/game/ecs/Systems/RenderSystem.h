@@ -7,11 +7,11 @@
 #include "renderer/MultiSampledTexture.h"
 #include "renderer/CubeMapTexture.h"
 #include "renderer/RenderBuffer.h"
+#include "renderer/Skybox.h"
 #include "renderer/FrameBuffer.h"
 #include "renderer/Shader.h"
 #include "game/ecs/Systems/System.h"
 #include "game/ecs/Events/Event.h"
-#include "game/Skybox.h"
 #include <GLFW/glfw3.h>
 
 const int MAX_DEPTH_MAPS = 5;

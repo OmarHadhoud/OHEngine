@@ -160,82 +160,6 @@ void Game::AssignWindow()
 	m_GameLogicSystem->SetCurrentWindow(m_CurrentWindow, m_WindowWidth, m_WindowHeight);
 }
 
-void Game::ProcessInput()
-{
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_ESCAPE))
-		glfwSetWindowShouldClose(m_CurrentWindow, true);
-	/*if (glfwGetKey(m_CurrentWindow, GLFW_KEY_W))
-	{
-		m_Camera.UpdatePosition(kForward, m_DeltaTime);
-		m_Moving = true;
-		m_MovingSpeed += 0.005;
-		return;
-	}
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_S))
-	{
-		m_Camera.UpdatePosition(GL_BACKward, m_DeltaTime);
-		m_Moving = true;
-		m_MovingSpeed += 0.005;
-		return;
-	}
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_D))
-	{
-		m_Camera.UpdatePosition(GL_TEXTURE_WRAP_Right, m_DeltaTime);
-		m_Moving = true;
-		m_MovingSpeed += 0.005;
-		return;
-	}
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_A))
-	{
-		m_Camera.UpdatePosition(kLeft, m_DeltaTime);
-		m_Moving = true;
-		m_MovingSpeed += 0.005;
-		return;
-	}*/
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_N))
-	{
-		m_IsDay = false;
-		return;
-	}
-	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_P))
-	{
-		m_IsDay = true;
-		return;
-	}
-	m_MovingSpeed -= 0.05;
-}
-
-void Game::CheckColliderClickedOn(glm::vec3 ray)
-{
-	for (int i = 0; i < m_Colliders.size(); i++)
-	{
-		BoxCollider *collider = dynamic_cast<BoxCollider*>(m_Colliders[i]);
-		if (collider != nullptr)
-		{
-			bool intersect = false;
-			std::vector<float> ts;
-			//ts = collider->GetRayIntersection(m_Camera.GetPosition(),ray, intersect);
-			m_Bordered = intersect;
-			
-		}
-	}
-}
-
-
-
-
-void Game::SetupIMGUI() const
-{
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(m_CurrentWindow, true);
-	ImGui_ImplOpenGL3_Init("#version 330");
-}
 
 void Game::UpdateWindowSize(int width, int height)
 {
@@ -249,8 +173,6 @@ void Game::UpdateWindowSize(int width, int height)
 void AssignGLFWCallbacks()
 {
 	glfwSetWindowSizeCallback(g_Game->m_CurrentWindow, window_size_callback);
-	glfwSetCursorPosCallback(g_Game->m_CurrentWindow, cursor_position_callback);
-	glfwSetMouseButtonCallback(g_Game->m_CurrentWindow, mouse_click_callback);
 }
 
 
@@ -259,37 +181,3 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 	g_Game->m_Renderer.ResizeWindow(width, height);
 }
 
-void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-{
-	//g_Game->m_Camera.UpdateRotation(xpos, ypos);
-}
-
-void mouse_click_callback(GLFWwindow* window, int button, int action, int mods)
-{
-	//if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	//{
-	//	double xPos, yPos;
-	//	xPos = g_Game->m_WindowWidth / 2;
-	//	yPos = g_Game->m_WindowHeight / 2;
-	//	//Commented as we are using FPS view without cursor.
-	//	//glfwGetCursorPos(window, &xPos, &yPos);
-
-	//	glm::vec4 ray;
-	//	ray.x = (xPos * 2.0f) / (float)g_Game->m_WindowWidth - 1.0f;
-	//	ray.y = 1.0f - (yPos * 2.0f) / (float)g_Game->m_WindowHeight;
-	//	ray.z = -1.0f;
-	//	ray.w = 1.0f;
-	//	glm::mat4 projection = glm::perspective(glm::radians(g_Game->m_Camera.GetFOV()), (float)g_Game->m_WindowWidth / (float)g_Game->m_WindowHeight, 0.1f, 200.0f);
-	//	ray = glm::inverse(projection) * ray;
-	//	ray.z = -1.0f;
-	//	ray.w = 0.0f;
-	//	ray = glm::inverse(g_Game->m_Camera.GetViewMatrix()) * ray;
-	//	glm::vec3 ray_normalized = glm::vec3(ray.x, ray.y, ray.z);
-	//	ray_normalized = glm::normalize(ray_normalized);
-	//	g_Game->CheckColliderClickedOn(ray_normalized);
-	//}
-	//else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-	//{
-	//	g_Game->m_Bordered = false;
-	//}
-}

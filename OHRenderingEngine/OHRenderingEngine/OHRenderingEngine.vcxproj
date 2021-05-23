@@ -28,7 +28,7 @@
     <ClCompile Include="src\game\Collider.cpp" />
     <ClCompile Include="src\game\ecs\Systems\RenderSystem.cpp" />
     <ClCompile Include="src\game\Scene.cpp" />
-    <ClCompile Include="src\game\Skybox.cpp" />
+    <ClCompile Include="src\renderer\Skybox.cpp" />
     <ClCompile Include="src\renderer\CubeMapTexture.cpp" />
     <ClCompile Include="src\renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\renderer\Mesh.cpp" />
@@ -77,7 +77,7 @@
     <ClInclude Include="src\game\ecs\Entity.h" />
     <ClInclude Include="src\game\ecs\Systems\RenderSystem.h" />
     <ClInclude Include="src\game\Scene.h" />
-    <ClInclude Include="src\game\Skybox.h" />
+    <ClInclude Include="src\renderer\Skybox.h" />
     <ClInclude Include="src\renderer\CubeMapTexture.h" />
     <ClInclude Include="src\renderer\enums.h" />
     <ClInclude Include="src\renderer\FrameBuffer.h" />

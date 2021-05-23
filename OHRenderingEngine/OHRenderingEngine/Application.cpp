@@ -1,6 +1,5 @@
 /*
- * This is a demo application using the renderer engine. 
- * The game/application using the renderer should be called/coded here.
+ * This is a demo application using the entity component game engine. 
  * Made by: Omar Salem Hadhoud for learning purposes.
  * GitHub: https://github.com/OmarHadhoud
  */

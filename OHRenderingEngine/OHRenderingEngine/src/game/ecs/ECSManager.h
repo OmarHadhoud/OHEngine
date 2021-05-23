@@ -29,14 +29,14 @@ public:
 	BoxCollider m_BoxColliders[MAX_BOX_COLLIDERS_COUNT];
 	Camera m_Cameras[MAX_CAMERA_COUNT];
 	DirectionalLight m_DirectionalLights[MAX_DIRECTIONAL_LIGHTS_COUNT];
+	Health m_Health[MAX_HEALTH_COUNT];
 	LightShadow m_LightShadows[MAX_LIGHT_SHADHOWS_COUNT];
 	MeshRenderer m_MeshRenderers[MAX_MESH_RENDERER_COUNT];
+	Player m_Players[MAX_PLAYER_COUNT];
 	PointLight m_PointLights[MAX_POINT_LIGHT_COUNT];
 	RigidBody m_RigidBodies[MAX_RIGID_BODY_COUNT];
 	SpotLight m_SpotLights[MAX_SPOTLIGHT_COUNT];
 	Transform m_Transforms[MAX_TRANSFORM_COUNT];
-	Player m_Players[MAX_PLAYER_COUNT];
-	Health m_Health[MAX_HEALTH_COUNT];
 	//Add Entity/Components functions
 	int AddEntities(int count);
 	template<typename T> unsigned int AddComponent(unsigned int entityId);
