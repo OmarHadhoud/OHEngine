@@ -73,7 +73,7 @@ MAX_BOUND = 0.85 6.5 3.5
 ENABLED = 1
 
 HEALTH
-VALUE = 100
+VALUE = 100000
 ENABLED = 1
 ========================================== ENTITY_END ==================================
 
@@ -135,7 +135,7 @@ ENABLED = 1
 TRANSFORM
 POSITION = -8 -2 0
 SCALE = 1 1 1
-ROTATION_ANGLES = 90 0 0
+ROTATION_ANGLES = 0 0 0
 FORWARD = 0 0 1
 ENABLED = 1
 ========================================== ENTITY_END ==================================
@@ -155,7 +155,7 @@ ENABLED = 1
 TRANSFORM
 POSITION = -4 -2 1
 SCALE = 1 1 1
-ROTATION_ANGLES = 90 0 0
+ROTATION_ANGLES = 0 0 0
 FORWARD = 0 0 1
 ENABLED = 1
 ========================================== ENTITY_END ==================================
@@ -173,7 +173,7 @@ ENABLED = 1
 TRANSFORM
 POSITION = -4 -1 0
 SCALE = 1 1 1
-ROTATION_ANGLES = 90 0 0
+ROTATION_ANGLES = 0 0 0
 FORWARD = 0 0 1
 ENABLED = 1
 ========================================== ENTITY_END ==================================
@@ -270,7 +270,7 @@ IS_SOLID = 1
 ENABLED = 1
 
 TRANSFORM
-POSITION = -5 -2.8 5
+POSITION = -5 -1.8 5
 SCALE = 2 2 2
 ROTATION_ANGLES = 0 0 0
 FORWARD = 0 0 1

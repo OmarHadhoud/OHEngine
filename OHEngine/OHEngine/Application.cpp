@@ -11,12 +11,13 @@
 int main()
 {	
 	Game *g = new Game();
+	std::cout << "HELLO THERE\n";
 	while (!g->GameEnded())
 	{
 		if (g->Run() == -1)
 		{
 			delete g;
-			std::cout << "ERROR: GAME COULDN'T RUN, APPLICATON IS TERMINATING" << std::endl;
+			std::cout << "ERROR: GAME COULDN'T RUsN, APPLICATON IS TERMINATING" << std::endl;
 			return -1;
 		}
 	}

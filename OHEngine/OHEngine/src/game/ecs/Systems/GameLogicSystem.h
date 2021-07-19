@@ -10,6 +10,7 @@
 enum class GameState 
 {
 	kLevelRunning,
+	kLevelPaused,
 	kLevelEnded,
 	kGameEnded,
 	kGameExited

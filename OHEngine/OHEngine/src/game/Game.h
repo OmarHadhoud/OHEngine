@@ -3,7 +3,6 @@
 
 
 #include "renderer/Renderer.h"
-#include "game/Collider.h"
 
 #include <memory>
 #include <GLFW/glfw3.h>
@@ -53,7 +52,6 @@ private:
 	Renderer m_Renderer;
 	//Level related
 	bool m_GameEnded;
-	std::vector<Collider*> m_Colliders;
 	//Player related
 	bool m_Moving;
 	float m_MovingSpeed;

@@ -79,6 +79,12 @@ void GameLogicSystem::ProcessEvent(Event* event)
 	{
 		break;
 	}
+	case EventType::kGamePaused:
+	{
+		this->m_gameState = GameState::kLevelPaused;
+
+		break;
+	}
 	default:
 		break;
 	}
@@ -282,11 +288,30 @@ void GameLogicSystem::GetIntersectionParams(glm::vec3 origin, glm::vec3 dir, boo
 {
 	t0 = t1 = -1;
 	intersect = false;
-
+	
+	//Get the entity id of the collider component
+	int entityId = m_ECSManager->m_BoxColliders[colliderIndex].m_EntityID;
+	entityId = Transform::m_Indices[entityId];
+	//Calculate the rotation matrix, transform the raycasted vector from world space to the space of the object (rotated)
+	glm::mat4 rotationMatrix(1.0f);
+	/*rotationMatrix = glm::rotate(rotationMatrix, -glm::radians(m_ECSManager->m_Transforms[entityId].m_RotationAngles.x), glm::vec3(1, 0, 0));
+	rotationMatrix = glm::rotate(rotationMatrix, -glm::radians(m_ECSManager->m_Transforms[entityId].m_RotationAngles.y), glm::vec3(0, 1, 0));
+	rotationMatrix = glm::rotate(rotationMatrix, -glm::radians(m_ECSManager->m_Transforms[entityId].m_RotationAngles.z), glm::vec3(0, 0, 1));
+	*/rotationMatrix = m_ECSManager->m_Transforms[entityId].m_ModelMatrix;
+	//rotationMatrix = glm::inverse(rotationMatrix);
+	dir = rotationMatrix * glm::vec4(dir, 0.0f);
+	//origin = rotationMatrix * glm::vec4(origin, 0.0f);
+	
+	//The inverse of the direction to be used in the algorithm
 	glm::vec3 invDir = glm::vec3(1 / dir.x, 1 / dir.y, 1 / dir.z);
 
-	glm::vec3 & lowerBound = m_ECSManager->m_BoxColliders[colliderIndex].m_Bounds[0];
-	glm::vec3 & upperrBound = m_ECSManager->m_BoxColliders[colliderIndex].m_Bounds[1];
+	glm::vec3 lowerBound = m_ECSManager->m_BoxColliders[colliderIndex].m_Bounds[0];
+	glm::vec3 upperrBound = m_ECSManager->m_BoxColliders[colliderIndex].m_Bounds[1];
+
+
+	//lowerBound = rotationMatrix * glm::vec4(lowerBound, 0.0f);
+	//upperrBound = rotationMatrix * glm::vec4(upperrBound, 0.0f);
+
 
 	float t0x = (lowerBound.x - origin.x) * invDir.x;
 	float t1x = (upperrBound.x - origin.x) * invDir.x;

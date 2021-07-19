@@ -60,7 +60,7 @@ int Game::RunLevel()
 	bool levelEnded = false;
 	//TODO: REMOVE
 	//TURN VSYNC OFF FOR DEBUGGING PURPOSES
-	//glfwSwapInterval(0);
+	glfwSwapInterval(0);
 	
 	while(m_GameLogicSystem->GetGameState()== GameState::kLevelRunning)
 	{
@@ -167,6 +167,8 @@ void Game::UpdateWindowSize(int width, int height)
 	m_WindowHeight = height;
 
 }
+
+
 
 //GLFW Callback functions
 

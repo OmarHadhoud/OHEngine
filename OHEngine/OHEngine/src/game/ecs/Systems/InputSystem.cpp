@@ -156,4 +156,11 @@ void InputSystem::CheckKeyboardInput()
 		m_EventsController->AddEvent(e);
 		return;
 	}
+	if (glfwGetKey(m_CurrentWindow, GLFW_KEY_F2))
+	{
+		Event* e = new Event();
+		e->m_EventType = EventType::kGamePaused;
+		m_EventsController->AddEvent(e);
+		return;
+	}
 }

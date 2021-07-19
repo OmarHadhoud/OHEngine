@@ -12,6 +12,7 @@ enum class EventType
 	kRotatePlayer,
 	kPlayerShoots,
 	kPlayerSelects,
+	kGamePaused, //Whether player pauses, or in editor mode
 	//Game logic events
 	kPlayerWins,
 	kPlayerDies,
