@@ -1,6 +1,9 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "ecs/Systems/GUISystem.h"
+#include "ecs/Systems/RenderSystem.h"
+
 #include <sstream>
 
 class ECSManager;
@@ -8,10 +11,9 @@ class ECSManager;
 class Scene
 {
 public:
-	std::string m_SkyBox;
 	Scene();
 	~Scene();
-	void LoadScene(ECSManager* manager, int sceneNum);
+	void LoadScene(ECSManager* manager, RenderSystem* renderSystem, GUISystem* guiSystem, int sceneNum);
 private:
 	std::stringstream m_sceneStream;
 	//UTILITY FUNCTIONS
@@ -27,7 +29,10 @@ private:
 	void ParseTransform(int entityId, ECSManager* manager);
 	void ParsePlayer(int entityId, ECSManager* manager);
 	void ParseHealth(int entityId, ECSManager* manager);
-	void ParseSkybox();
+	void ParseConfig(RenderSystem* renderSystem, GUISystem* guiSystem);
+	void ParseSkybox(RenderSystem* renderSystem);
+	void ParseExposure(GUISystem* guiSystem);
+	void ParseGamma(GUISystem* guiSystem);
 };
 #endif // !SCENE_H
 

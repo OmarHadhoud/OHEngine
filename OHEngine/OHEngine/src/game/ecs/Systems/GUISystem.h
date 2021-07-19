@@ -13,7 +13,9 @@ public:
 	~GUISystem();
 	void Setup();
 	void Update();
-	void Draw();
+	void Draw();	
+	void SetExposure(float exposure);
+	void SetGamma(float gamma);
 private:
 	//The GUI data
 	float m_Exposure;

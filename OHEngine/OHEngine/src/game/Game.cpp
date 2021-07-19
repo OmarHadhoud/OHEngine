@@ -55,9 +55,7 @@ int Game::RunLevel()
 {
 	//Load scene from scene manager
 	m_ECSManager.SetupComponents();
-	m_Scene.LoadScene(&m_ECSManager, 0);
-	std::string skyboxPath = "res/textures/" + m_Scene.m_SkyBox + "/";
-	m_RenderSystem->CreateSkybox(skyboxPath, "png");
+	m_Scene.LoadScene(&m_ECSManager, &*m_RenderSystem, &*m_GUISystem,0);	
 	bool levelEnded = false;
 	//TODO: REMOVE
 	//TURN VSYNC OFF FOR DEBUGGING PURPOSES

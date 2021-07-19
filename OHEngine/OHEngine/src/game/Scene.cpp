@@ -11,7 +11,7 @@ Scene::~Scene()
 {
 }
 
-void Scene::LoadScene(ECSManager * manager, int sceneNum)
+void Scene::LoadScene(ECSManager * manager, RenderSystem* renderSystem, GUISystem* guiSystem, int sceneNum)
 {
 	std::string scenePath = "res/scenes/scene" + std::to_string(sceneNum) +".lvl";
 	std::ifstream sceneFile;
@@ -30,8 +30,8 @@ void Scene::LoadScene(ECSManager * manager, int sceneNum)
 		{
 			if (tmpString == "ENTITY_START")
 				ParseEntity(manager);
-			else if (tmpString == "SKYBOX")
-				ParseSkybox();
+			else if (tmpString == "CONFIG")
+				ParseConfig(renderSystem, guiSystem);
 		}
 	}
 	catch (std::ifstream::failure e)
@@ -73,11 +73,58 @@ void Scene::ParseEntity(ECSManager* manager)
 	}
 }
 
-void Scene::ParseSkybox()
+void Scene::ParseConfig(RenderSystem* renderSystem, GUISystem* guiSystem)
+{
+	std::string tmpString;
+	while (m_sceneStream >> tmpString)
+	{
+		if (tmpString == "SKYBOX")
+			ParseSkybox(renderSystem);
+		else if (tmpString == "EXPOSURE")
+			ParseExposure(guiSystem);
+		else if (tmpString == "GAMMA")
+			ParseGamma(guiSystem);
+		else if (tmpString == "CONFIG_END")
+			break;
+	}
+}
+
+void Scene::ParseSkybox(RenderSystem* renderSystem)
 {
 	std::string tmp;
 	m_sceneStream >> tmp;
-	m_SkyBox = tmp;
+	std::string skyboxPath = "res/textures/" + tmp + "/";
+	renderSystem->CreateSkybox(skyboxPath, "png");
+}
+
+void Scene::ParseExposure(GUISystem* guiSystem)
+{
+	float exposureVal = -1;
+	std::string tmp;
+	m_sceneStream >> tmp;
+	if(tmp == "OFF")
+		exposureVal = 1.0;
+	else
+	{
+		m_sceneStream >> tmp;
+		exposureVal = atof(tmp.c_str());
+	}
+	guiSystem->SetExposure(exposureVal);
+}
+
+void Scene::ParseGamma(GUISystem* guiSystem)
+{
+	float gammaVal = -1;
+	std::string tmp;
+	m_sceneStream >> tmp;
+	if(tmp == "OFF")
+		gammaVal = 2.2;
+	else
+	{
+		m_sceneStream >> tmp;
+		gammaVal = atof(tmp.c_str());
+	}
+	guiSystem->SetGamma(gammaVal);
 }
 
 

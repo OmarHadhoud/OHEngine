@@ -76,3 +76,13 @@ void GUISystem::ChecGL_TEXTURE_WRAP_Sliders()
 		m_LastSentGammaCorrection = m_GammaCorrection;
 	}
 }
+
+void GUISystem::SetExposure(float val)
+{
+	m_Exposure = val;
+}
+
+void GUISystem::SetGamma(float val)
+{
+	m_GammaCorrection = val;
+}
