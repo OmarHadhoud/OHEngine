@@ -11,7 +11,6 @@
 int main()
 {	
 	Game *g = new Game();
-	std::cout << "HELLO THERE\n";
 	while (!g->GameEnded())
 	{
 		if (g->Run() == -1)

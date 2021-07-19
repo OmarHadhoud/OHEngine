@@ -8,6 +8,7 @@ class ECSManager;
 class Scene
 {
 public:
+	std::string m_SkyBox;
 	Scene();
 	~Scene();
 	void LoadScene(ECSManager* manager, int sceneNum);
@@ -26,6 +27,7 @@ private:
 	void ParseTransform(int entityId, ECSManager* manager);
 	void ParsePlayer(int entityId, ECSManager* manager);
 	void ParseHealth(int entityId, ECSManager* manager);
+	void ParseSkybox();
 };
 #endif // !SCENE_H
 

@@ -67,7 +67,7 @@ RenderSystem::~RenderSystem()
 {
 }
 
-void RenderSystem::CreateSkybox(const char *path, const char* format)
+void RenderSystem::CreateSkybox(std::string path, const char* format)
 {
 	std::string files[6] = { "px","nx","py","ny","pz","nz" };
 	std::vector<std::string> cubemapImages(6);

@@ -25,7 +25,7 @@ class RenderSystem : public System
 public:
 	RenderSystem();
 	~RenderSystem();
-	void CreateSkybox(const char* path, const char* format);
+	void CreateSkybox(std::string path, const char* format);
 	void Setup();
 	void Update();
 	void Draw();

@@ -30,6 +30,8 @@ void Scene::LoadScene(ECSManager * manager, int sceneNum)
 		{
 			if (tmpString == "ENTITY_START")
 				ParseEntity(manager);
+			else if (tmpString == "SKYBOX")
+				ParseSkybox();
 		}
 	}
 	catch (std::ifstream::failure e)
@@ -69,6 +71,13 @@ void Scene::ParseEntity(ECSManager* manager)
 		else if (tmpString == "ENTITY_END")
 			break;
 	}
+}
+
+void Scene::ParseSkybox()
+{
+	std::string tmp;
+	m_sceneStream >> tmp;
+	m_SkyBox = tmp;
 }
 
 
